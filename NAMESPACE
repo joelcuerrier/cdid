@@ -8,3 +8,4 @@
 # export(pre_process_did)
 # export(process_attgt)
 export(chained)
+export(fonction_simu_attrition)
