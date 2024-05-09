@@ -9,7 +9,7 @@ chained.mp.spatt.Boot <- function (nom_outcome,nom_traitement, xformla = NULL, d
                          alp = 0.05, method = "logit", se = TRUE, bstrap = FALSE,
                          biters = 100, clustervars = NULL, cband = FALSE, citers = 100,
                          seedvec = NULL, pl = FALSE, cores = 2, printdetails = TRUE
-                         ,selection , ponderation,weight_assumption,debT2,finT2)  ## de nombreux arguments ne sont plus utilis�s
+                         ,selection , ponderation,weight_assumption,link,debT2,finT2)  ## de nombreux arguments ne sont plus utilis�s
 
 
 {
@@ -55,7 +55,7 @@ tlen <- length(tlist) #tlist c'est la liste des traitements. Formé par tlist (u
 flen <- length(flist) # flist c'est la liste des cohortes. Formé par flist (first.treatment.name unique traitements) ordonné
 
 results <- chained.compute.mp.spatt.Boot(nom_outcome,nom_traitement,flen, tlen, flist, tlist, data, first.treat.name, xformla, tname, w,
-                                 idname, method, seedvec, se, pl, cores, printdetails,selection,ponderation,weight_assumption)
+                                 idname, method, seedvec, se, pl, cores, printdetails,selection,ponderation,weight_assumption,link)
 
 
 

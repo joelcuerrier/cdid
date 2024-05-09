@@ -16,49 +16,49 @@ library(jsonlite)
 set.seed(123)
 
 library(devtools)
-load_all("C:/Users/cuerr/Documents/cdid/R/")
+# load_all("C:/Users/cuerr/Documents/cdid/R/")
 # ls(pos = "package:cdid")
-devtools::document("C:/Users/cuerr/Documents/cdid/R/")
+# devtools::document("C:/Users/cuerr/Documents/cdid/R/")
 
 
-# source("C:/Users/cuerr/Documents/cdid/R/base_de_donnees.R")
-# source("C:/Users/cuerr/Documents/cdid/R/fonctions_estimation_Boot.R")
-# source("C:/Users/cuerr/Documents/cdid/R/mp_spatt_Boot.R")
-# source("C:/Users/cuerr/Documents/cdid/R/compute_mp_spatt_Boot_alt.R")
-# source("C:/Users/cuerr/Documents/cdid/R/panelDiffV.R")
-# source("C:/Users/cuerr/Documents/cdid/R/gg.R")
-# source("C:/Users/cuerr/Documents/cdid/R/agregat.R")
-# source("C:/Users/cuerr/Documents/cdid/R/process_attgt.R")
-# source("C:/Users/cuerr/Documents/cdid/R/pre_process_did.R")
-# source("C:/Users/cuerr/Documents/cdid/R/DIDparams.R")
-# source("C:/Users/cuerr/Documents/cdid/R/mboot.R")
-# source("C:/Users/cuerr/Documents/cdid/R/MP.R")
+source("C:/Users/cuerr/Documents/cdid/R/base_de_donnees.R")
+source("C:/Users/cuerr/Documents/cdid/R/fonctions_estimation_Boot.R")
+source("C:/Users/cuerr/Documents/cdid/R/mp_spatt_Boot.R")
+source("C:/Users/cuerr/Documents/cdid/R/compute_mp_spatt_Boot_alt.R")
+source("C:/Users/cuerr/Documents/cdid/R/panelDiffV.R")
+source("C:/Users/cuerr/Documents/cdid/R/gg.R")
+source("C:/Users/cuerr/Documents/cdid/R/agregat.R")
+source("C:/Users/cuerr/Documents/cdid/R/process_attgt.R")
+source("C:/Users/cuerr/Documents/cdid/R/pre_process_did.R")
+source("C:/Users/cuerr/Documents/cdid/R/DIDparams.R")
+source("C:/Users/cuerr/Documents/cdid/R/mboot.R")
+source("C:/Users/cuerr/Documents/cdid/R/MP.R")
+source("C:/Users/cuerr/Documents/cdid/R/chained.R")
 
 data=data_sim=fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
-
-
-
-
 results=chained(
                 yname="Y1_chaine",
                 tname="annee",
                 idname="id",
                 gname="annee_G",
                 xformla=~X,
-                data=data,            
-                weightsname=c("P_Y1_chaine"), #St
-                # weight_assumption="missing_trends",
-                # weight_assumption="sequential_missing",
+                data=data,      
+                anticipation=0,      
+                weightsname=c("P_Y1_chaine"), #St   
+                weight_assumption="missing_trends",
+                link="logit",
                 bstrap=FALSE,
                 biters=1000,
-                est_method="dr",
                 debT=3,
                 finT=8,
                 deb=1,
                 fin=8,
                 select='select',
-                treated='traite_G')
-getwd()
+                treated='traite_G',
+                pl=FALSE,
+                cores=1,
+                clustervars=NULL)
+
 
 results
 

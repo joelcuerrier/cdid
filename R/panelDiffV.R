@@ -28,7 +28,7 @@ panelDiffV<-function (data, timevars,pondera,idname, tname,t0,t1,t2,selecta)
   dt1<-dt1[order(dt1[, idname]),] ; dt2<-dt2[order(dt2[, idname]),]
 
   Dtimevars<-paste0("D",timevars) #"DY1_chaine" "DY2_chaine"
-  retdat[,Dtimevars] <- dt2[,timevars] - dt1[,timevars] #Donc tu fais DY= Yt+1-Yt, ça devrait pas être Yt-Yt-1?
+  retdat[,Dtimevars] <- dt2[,timevars] - dt1[,timevars] 
     
   return(retdat)
 }

@@ -103,7 +103,7 @@ mboot <- function(inf.func, DIDparams, pl = FALSE, cores = 1) {
   bres <- as.matrix(bres[ , ndg.dim])
 
   # bootstrap variance matrix (this matrix can be defective because of degenerate cases)
-  V <- cov(bres)
+  V <- cov(bres) #bootstrap variance matrix
   # bootstrap standard error
   bSigma <- apply(bres, 2,
                   function(b) (quantile(b, .75, type=1, na.rm = T) -

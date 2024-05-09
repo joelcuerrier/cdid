@@ -33,6 +33,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
                                  , selection ## indicatrice observations valides
                                  , ponderation ## poids utilise  
                                  , weight_assumption ## Hypothèses sur les poids (missing_trends, missing_outcomes, missing_trends_outcomes)
+                                 , link ## link function for the propensity score model
                                  
                                  
 )
@@ -70,9 +71,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         #################################################
 
         disdat <- data[(data[, tname] == pret), ]
-        
         disdat <- droplevels(disdat) 
-        
         disdat$C <- 1 * (disdat[, first.treat.name] == 0) 
         disdat$G <- 1 * (disdat[, first.treat.name] == flist[f])
         
@@ -99,23 +98,61 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         if (any(is.na(thet))) {
           warning(paste0("Problems estimating propensity score...likely perfectly predicting treatment for group: ",
           flist[f], " at time period: ", tlist[t +1]))}
-
           #disdat contient deja seulement tname ==pret. Donc disdat contient toutes les observations pour tname=pret. on a donc toutes les valeurs de t, pas seulement t et t+1
-        # if (is.null(POND_RD)){
-          disdat <- data[(data[, tname] == pret |data[, tname] == tlist[t + 1] | data[, tname] == tlist[t]), ]#} 
-        # else{
-          # disdat <- data2[(data2[, tname] == pret |data2[, tname] == tlist[t + 1] | data2[, tname] == tlist[t]),]}
-        
+        disdat <- data[(data[, tname] == pret |data[, tname] == tlist[t + 1] | data[, tname] == tlist[t]), ]#}
         disdat <- makeBalancedPanel(disdat, idname, tname)##on cylindre sur les trois dates utiles au calcul (pret,tlist[t],tlist[t+1]). Doc: https://bcallaway11.github.io/BMisc/reference/makeBalancedPanel.html
         ##This function drops observations from data.frame that are not part of balanced panel data set.
         ##disdat à ce point contient les observations aux années flist[f]-1, tlist[t], tlist[t+1]. Si f=2 et t=6, on a les observations années 3,6,7.
+        
+        
+
+        disdat$C <- 1 * (disdat[, first.treat.name] == 0) 
+        disdat$G <- 1 * (disdat[, first.treat.name] == flist[f])
+        ############################
+        # Assumptions on Weights ###
+        ############################
+
+        if(!is.null(weight_assumption)){
+          ################################
+          # Assumption 7: Missing trends #
+          ################################
+          if (weight_assumption=="missing_trends"){
+              
+              st1 = disdat[disdat[[tname]]==tlist[t],][,c(ponderation)]
+              st2 = disdat[disdat[[tname]]==tlist[t+1],][,c(ponderation)]
+              gg  = disdat[disdat[[tname]]==tlist[t],][,c(nom_traitement)]
+              nom = mean(gg*st1*st2)
+
+              #glm logit
+              disdat$StSt <- st1*st2
+                        
+              #Maybe should use a second pfomla for StSt...
+              pformla <- BMisc::toformula('StSt', BMisc::rhs.vars(xformla)) #StSt~X
+              pformla <- update(pformla, . ~ . + G)
+             
+              pscore.reg <- glm(pformla, family = binomial(link = link),data = disdat)
+              thet2 <- coef(pscore.reg)   
+              
+              if (any(is.na(thet2))) {
+                warning(paste0("Problems estimating propensity score...likely perfectly predicting treatment for group: ",
+                flist[f], " at time period: ", tlist[t +1]))}
+              
+              denom <- predict(pscore.reg, newdata = disdat,type = "response") 
+              reweight = t(nom%*%denom)
+              disdat$reweight <- reweight
+              
+
+          }
+          
+          else reweight=1
+        }
+
+        #Delta Y
         disdat <- panelDiffV(disdat,nom_outcome,ponderation,idname, tname,pret,tlist[t],tlist[t+1],selection) #deltaY
         #Masking pour disdat[année==pret,]$delta_y=yt+1-yt. Disdat contient seulement les obs pour l'année pret.
         
-        
         pscore <- predict(pscore.reg, newdata = disdat,type = "response")  ### on calcule un score pour tout disdat
         pscore[is.na(pscore)]<-0   ## on met un score nul pour les obseravation pour lesquelles on ne peut pas calculer de score
-        
         ### on supprime les scores = 0 | = 1 pour le bootstrap (et m�me pour l'estimateur)
         disdat$pscore<-pscore
         disdat<-disdat[disdat$pscore<1 & disdat$pscore>0,]
@@ -129,74 +166,32 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         Dnom_outcome<-paste0("D",nom_outcome) 
         dy <- disdat[,Dnom_outcome] #delta y
         #On refait les mêmes manipulations sur disdat en raison de l'overwriting de disdat
-        disdat$C <- 1 * (disdat[, first.treat.name] == 0) #+ 1 * (disdat[, first.treat.name] > flist[f] & disdat[, first.treat.name] > tlist[t+1])
+        disdat$C <- 1 * (disdat[, first.treat.name] == 0) 
         disdat$G <- 1 * (disdat[, first.treat.name] == flist[f])
         NN<-dim(disdat)[1] ## d�finition de N pour boot
         disdat$pp=disdat[[ponderation[1]]]
         
         # Calcul de matrices pour calcul strate 
         traite<-cbind(disdat$G,disdat$C)
-        
         traiteS<- traite #G,C
-        
         devant<-(traiteS[,1]-traiteS[,2]) 
         devant2<-traiteS[,1]+(pscore/(1 - pscore))*traiteS[,2] #1 ou pscore/(1-pscore) selon si G ou C. Partie des equations Wg ou Wc.
         traite_boot<-traiteS
-            
-        
-          
-      
         
         dommk<-t(as.matrix(traiteS))%*%as.matrix((devant2*disdat[,ponderation]))
         colnames(dommk)<- ponderation #renommer la colonne, sinon pp_noDenom aura des NaN.
         Denom <- 1/(dommk) 
         colnames(Denom)<- ponderation #renommer la colonne, sinon pp_noDenom aura des NaN.
         
-        
         pp<-devant*(traiteS%*%Denom)*(devant2*disdat[,ponderation]) 
-        pp_noDenom<- devant*(traiteS%*%(dommk*Denom))*(devant2*disdat[,ponderation]) 
         
         
+        
+        
+        pp=pp*disdat$reweight #reweighting 
+        pp_noDenom<- devant*(traiteS%*%(dommk*Denom))*(devant2*disdat[,ponderation])       
 
-        #############
-        # Weights ###
-        #############
-
-        if(!is.null(weight_assumption)){
-         
-          #Create distinct columns for St and St-1
-          # In the simulation, ponderation is The sampling probability in the consecutive periods t, t + 1 conditional on αi.
-          disdat2=disdat #not ram efficient. Ok for now else error.
-          disdat2=as.data.table(disdat2)
-          setkeyv(disdat2, c(idname, tname))
-          disdat2[, c(paste0(ponderation, "_forward"), paste0(nom_outcome, "_forward")) := .(
-          shift(get(ponderation), type = "lead"),
-          shift(get(nom_outcome), type = "lead"))]
-          disdat2[, c(paste0(ponderation, "_forward"), paste0(nom_outcome, "_forward")) := lapply(.SD, function(x) replace(x, is.na(x), 0)), .SDcols = c(paste0(ponderation, "_forward"), paste0(nom_outcome, "_forward"))] #Fill the NA with 0
-          
-          #     ################################
-          #     # Assumption 7: Missing trends #
-          #     ################################
-          if (weight_assumption=="missing_trends"){
-
-              # nom=mean(traiteS[,1]*disdat[,ponderation]) #E((G)*(Stt+1))
-              # denom <- (aggregate(disdat2[[ponderation]], by = list(disdat2$X, disdat2$C), FUN = mean) * mean(traiteS[,1]))#disdat$C because C+G=1... 
-              nom <- mean(traiteS[, 1] * disdat2[[ponderation]] * disdat2[[ paste0(ponderation, "_forward")]])                       
-              denom <- (aggregate(disdat2[[ponderation]] * disdat2[[paste0(ponderation, "_forward")]], 
-                    by = list(disdat2$X, disdat2$C), FUN = mean) * mean(traiteS[, 1]))$x
-              pp <- nom / denom #recyclage de données, à valider avec David 
-              }
-            
-            else if  (weight_assumption=="sequential_missing"){
-            nom <- mean(traiteS[, 1] * disdat2[[ponderation]] * disdat2[[ paste0(ponderation, "_forward")]])                       
-            denom1 <- ((aggregate(disdat2[[paste0(ponderation, "_forward")]], 
-                    by = list(disdat2$X,disdat2[[paste0(nom_outcome, "_forward")]],disdat2[[ponderation]] ), FUN = mean) * mean(traiteS[, 1]))$x)
-            denom2 <- ((aggregate(disdat2[[paste0(ponderation, "_forward")]], 
-                    by = list(disdat2$X, disdat2$C), FUN = mean) * mean(traiteS[, 1]))$x)
-            denom=denom1*denom2
-            pp <- nom / denom #recyclage de données, à valider avec David 
-            }
-          }
+       
 
 
         ### ATT ###

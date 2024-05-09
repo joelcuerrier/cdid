@@ -16,16 +16,17 @@ pre_process_did <- function(yname,
                             gname,
                             xformla = NULL,
                             data,
-                            panel = TRUE,
+                            panel = TRUE, #
                             allow_unbalanced_panel,
                             control_group = c("nevertreated","notyettreated"),
                             anticipation = 0,
                             weightsname = NULL,
                             alp = 0.05,
                             bstrap = FALSE,
+                            cband=FALSE, #
                             biters = 1000,
                             clustervars = NULL,
-                            est_method = "dr",
+                            est_method = "dr", #
                             base_period = "varying",
                             print_details = FALSE,
                             pl = FALSE,
@@ -97,6 +98,7 @@ pre_process_did <- function(yname,
   # Check if there is a never treated group
   if ( length(glist[glist==0]) == 0) {
     if(control_group=="nevertreated"){
+      
       stop("There is no available never-treated group")
     } else {
       # Drop all time periods with time periods >= latest treated
@@ -282,9 +284,9 @@ pre_process_did <- function(yname,
 
   # if there are only two time periods, then uniform confidence
   # bands are the same as pointwise confidence intervals
-  # if (length(tlist)==2) {
-  #   cband <- FALSE
-  # }
+  if (length(tlist)==2) {
+    cband <- FALSE
+  }
 
   #-----------------------------------------------------------------------------
   # more error handling after we have balanced the panel

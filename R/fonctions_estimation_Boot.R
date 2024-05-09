@@ -74,11 +74,10 @@ chained_estimPeriod_Boot<-function(yname,
                                    select,
                                    weightsname, #St
                                    weight_assumption,
+                                   link,
                                    alp=0.05,
                                    bstrap,
                                    biters=1000,
-                                   
-                                   
                                    treated){
   
   
@@ -106,7 +105,7 @@ chained_estimPeriod_Boot<-function(yname,
                          first.treat.name = gname,
                          idname = idname, tname=tname,
                          bstrap = FALSE,se=TRUE,cband =FALSE
-                         ,selection=select,ponderation=weightsname,weight_assumption=weight_assumption,debT2=debT,finT2=finT)
+                         ,selection=select,ponderation=weightsname,weight_assumption=weight_assumption,link=link,debT2=debT,finT2=finT)
   
 
 }
