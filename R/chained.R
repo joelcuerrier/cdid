@@ -8,7 +8,6 @@
 #' @param gname The name of the variable in data that contains the first period when a particular observation is treated. This should be a positive number for all observations in treated groups. It defines which "group" a unit belongs to. It should be 0 for units in the untreated group.
 #' @param xformla A formula for the covariates to include in the model. It should be of the form ~ X1 + X2. Default is NULL which is equivalent to xformla=~1. This is used to create a matrix of covariates which is then passed to the 2x2 DID estimator chosen in est_method.
 #' @param data The name of the data.frame that contains the data
-
 #' @param anticipation The number of time periods before participating in the treatment where units can anticipate participating in the treatment and therefore it can affect their untreated potential outcomes
 #' @param weightsname The name of the column containing the sampling weights. If not set, all observations have same weight.
 #' @param weight_assumption This is used to specify the assumption about the weights. The default is NULL which means that the weights are assumed to be constant over time. The other options are "missing_trends" and "sequential_missing". The first option assumes that the weights are constant over time, but that there are missing trends in the data. The second option assumes that the weights are constant over time, but that there are missing observations in the data. The last option is "varying" which assumes that the weights are varying over time. This is not yet implemented.
@@ -71,6 +70,7 @@ chained <-function(yname,
                    data,
                    panel=TRUE,  #
                    allow_unbalanced_panel=TRUE, #
+                   
                    control_group=c("nevertreated","notyettreated"), #
                    anticipation=0, #
                    weightsname=NULL,
@@ -91,7 +91,7 @@ chained <-function(yname,
                    deb,
                    fin,
                    select,
-                   cband=TRUE,
+                  
                    treated){
 
 dp=pre_process_did(yname=yname,
@@ -133,7 +133,6 @@ resultat=chained_estimPeriod_Boot(yname=yname,
                           finT=finT,
                           deb=deb,
                           fin=fin,
-                          anticipation=anticipation,
                           select=select,
                           weightsname=weightsname,
                           weight_assumption=weight_assumption,

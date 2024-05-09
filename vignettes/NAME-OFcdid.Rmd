@@ -87,6 +87,8 @@ devtools::install_github("joelcuerrier/cdid")
 # Using the function `fonction_simu_attrition` from the `cdid` package, we simulate the data for the following parameter values: $\theta_2 = 0.2, \lambda_1 = 0.2, \sigma_{\alpha} = 2, \sigma_{\epsilon} = 0.5$.
 
 
+ls("package:cdid")
+
 data=data_sim=fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
 head(data)
 ```
