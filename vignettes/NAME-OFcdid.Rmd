@@ -88,7 +88,7 @@ set.seed(123)
 # browseVignettes("did")
 
 #importing the package
-devtools::install_github("joelcuerrier/cdid", ref = "library")
+devtools::install_github("joelcuerrier/cdid", ref = "library",force = TRUE)
 library(cdid)
 ls("package:cdid")
 library(did)

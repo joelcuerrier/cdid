@@ -144,12 +144,11 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
 
           }
           #create the column reweight taking values of 1
-          
 
-          
           else {disdat$reweight <- 1}
-          View(disdat)
+          
         }
+          else {disdat$reweight <- 1}
 
         #Delta Y
         disdat <- panelDiffV(disdat,nom_outcome,ponderation,idname, tname,pret,tlist[t],tlist[t+1],selection) #deltaY
