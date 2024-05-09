@@ -143,8 +143,12 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
               
 
           }
+          #create the column reweight taking values of 1
           
-          else reweight=1
+
+          
+          else {disdat$reweight <- 1}
+          View(disdat)
         }
 
         #Delta Y
@@ -190,9 +194,6 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         
         pp=pp*disdat$reweight #reweighting 
         pp_noDenom<- devant*(traiteS%*%(dommk*Denom))*(devant2*disdat[,ponderation])       
-
-       
-
 
         ### ATT ###
         att<- colSums(pp * dy) 

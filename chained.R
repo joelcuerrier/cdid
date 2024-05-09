@@ -21,7 +21,7 @@ library(devtools)
 # devtools::document("C:/Users/cuerr/Documents/cdid/R/")
 
 
-source("C:/Users/cuerr/Documents/cdid/R/base_de_donnees.R")
+source("C:/Users/cuerr/Documents/cdid/R/fonction_simu_attrition.R")
 source("C:/Users/cuerr/Documents/cdid/R/fonctions_estimation_Boot.R")
 source("C:/Users/cuerr/Documents/cdid/R/mp_spatt_Boot.R")
 source("C:/Users/cuerr/Documents/cdid/R/compute_mp_spatt_Boot_alt.R")
@@ -61,6 +61,9 @@ results=chained(
 
 
 results
+
+
+
 
 #Prochaines étapes
 # réparer group_ATT_estimators (valider les resulttats)

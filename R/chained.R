@@ -31,7 +31,7 @@
 #' data=data_sim = fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
 #' results = chained(
 #'                 yname="Y1_chaine",
-#'                 tname="annee",
+#'                 tname="annee", 
 #'                 idname="id",
 #'                 gname="annee_G",
 #'                 xformla=~X,
