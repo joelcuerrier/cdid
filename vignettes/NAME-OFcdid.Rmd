@@ -80,10 +80,11 @@ group. Second, we sample from this population using the specified process. We
 
 ```{r}
 set.seed(123)
+
 #importing the package
+devtools::install_github("joelcuerrier/cdid", ref = "library")
 library(cdid)
-#import library from githuib
-devtools::install_github("joelcuerrier/cdid")
+
 # Using the function `fonction_simu_attrition` from the `cdid` package, we simulate the data for the following parameter values: $\theta_2 = 0.2, \lambda_1 = 0.2, \sigma_{\alpha} = 2, \sigma_{\epsilon} = 0.5$.
 
 
