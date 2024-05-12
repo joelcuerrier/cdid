@@ -3,7 +3,7 @@ library(Matrix)
 #Voir l'équation de la page 17. Tu vas catch aussi pouruqoi il fait cumsum.
 agregatChris<-function(tab,nom_outcome,tname,first.treat.name,poids){
   
-  
+
   nb_an<-unique(tab[,tname])
   nn<-length(nb_an)
   nb_an_long<-c(min(nb_an)-1,nb_an)

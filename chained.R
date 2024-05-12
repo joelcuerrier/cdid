@@ -36,6 +36,8 @@ source("C:/Users/cuerr/Documents/cdid/R/MP.R")
 source("C:/Users/cuerr/Documents/cdid/R/chained.R")
 
 data=data_sim=fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
+View(data)
+
 results=chained(
                 yname="Y1_chaine",
                 tname="annee",
@@ -59,11 +61,18 @@ results=chained(
                 cores=1,
                 clustervars=NULL)
 
-
 results
 
 
 
+
+
+
+
+
+
+# Le probleme c'est quon a un groupe a t=2 alors que le traitement commence qu'a 3. Il faut corriger ça et apres les fonctions daggregat de did vont focntionner. 
+#voir MP j'ai hardcoder une solution. il faut juste ajouter debT comme argument dans la fonction 
 
 #Prochaines étapes
 # réparer group_ATT_estimators (valider les resulttats)
@@ -78,3 +87,23 @@ results
 #mettre clean
 #publier
 #vérifier les hypothèses
+
+
+
+# group = c(2, 3, 4, 5, 6, 7, 8, 2, 3, 4, 5, 6, 7, 8, 2, 3, 4, 5, 6, 7, 
+# 8, 2, 3, 4, 5, 6, 7, 8, 2, 3, 4, 5, 6, 7, 8, 2, 3, 4, 5, 6, 7, 
+# 8) and glist=c(3, 4, 5, 6, 7, 8)
+# and pg = c(0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
+# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863)
+# why do this   pg <- pg[match(group, glist)] returns a list with nan as you can see here: c(NA, 0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
+# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863, 
+# NA, 0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
+# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863, 
+# NA, 0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
+# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863, 
+# NA, 0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
+# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863, 
+# NA, 0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
+# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863, 
+# NA, 0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
+# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863)

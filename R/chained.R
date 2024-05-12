@@ -155,11 +155,12 @@ resultat=chained_estimPeriod_Boot(yname=yname,
 
   inffunc=resultat[[2]]
   inffunc <- inffunc[, 2,]
-  attgt.results=process_attgt(attgt.list)
+  attgt.results=process_attgt(attgt.list) #
   
   group=attgt.results$group
   att=attgt.results$att
   tt=attgt.results$tt
+  
   
   
   # analytical standard errors
@@ -270,7 +271,7 @@ resultat=chained_estimPeriod_Boot(yname=yname,
 
 
 
-  return(MP(group=group, t=tt, att=att, V_analytical=V, se=se, c=cval, inffunc=inffunc, n=n, W=W, Wpval=Wpval, alp = alp, DIDparams=dp))  
+  return(MP(group=group, t=tt, att=att, V_analytical=V, se=se, c=cval, inffunc=inffunc, n=n, W=W, Wpval=Wpval, alp = alp, DIDparams=dp,debT))  
   
   
   }
