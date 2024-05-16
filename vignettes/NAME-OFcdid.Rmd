@@ -136,7 +136,7 @@ example_attgt <- chained(
                   clustervars=NULL)
 
 summary(example_attgt)
-
+example_attgt
 
 
 

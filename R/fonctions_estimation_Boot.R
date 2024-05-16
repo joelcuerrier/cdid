@@ -66,6 +66,7 @@ chained_estimPeriod_Boot<-function(yname,
                                    idname,
                                    gname,
                                    xformla,
+                                   propensityformla,
                                    data,
                                    debT,
                                    finT,
@@ -74,7 +75,8 @@ chained_estimPeriod_Boot<-function(yname,
                                    select,
                                    weightsname, #St
                                    weight_assumption,
-                                   link,
+                                   
+                                   cband=cband,
                                    alp=0.05,
                                    bstrap,
                                    biters=1000,
@@ -101,11 +103,11 @@ chained_estimPeriod_Boot<-function(yname,
   xxF<-as.formula(paste(" ~ ",paste(xformla, collapse=" + "),sep=""))
   
   # resultat: objet liste avec trois éléments dans la liste: (1) att, (2) mat_influence et (3) indiv la liste des individus 
-  resultat<- chained.mp.spatt.Boot(nom_outcome=yname,nom_traitement=treated,xformla=xxF,data=bebe,
+  resultat<- chained.mp.spatt.Boot(nom_outcome=yname,nom_traitement=treated,xformla=xxF,propensityformla=propensityformla,data=bebe,
                          first.treat.name = gname,
                          idname = idname, tname=tname,
                          bstrap = FALSE,se=TRUE,cband =FALSE
-                         ,selection=select,ponderation=weightsname,weight_assumption=weight_assumption,link=link,debT2=debT,finT2=finT)
+                         ,selection=select,ponderation=weightsname,weight_assumption=weight_assumption,debT=debT,finT=finT)
   
 
 }

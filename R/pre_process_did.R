@@ -334,7 +334,7 @@ pre_process_did <- function(yname,
                   bstrap=bstrap,
                   biters=biters,
                   clustervars=clustervars,
-                  
+                  cband=cband,
                   print_details=print_details,
                   pl=pl,
                   cores=cores,

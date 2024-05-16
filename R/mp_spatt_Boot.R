@@ -4,12 +4,12 @@
 ##### CHAINED-----------------------------------------------------------------------------------------------------
 ##### ---------------------------------------------------------------------------------------------------------------------------
 
-chained.mp.spatt.Boot <- function (nom_outcome,nom_traitement, xformla = NULL, data, tname, aggte = TRUE,
+chained.mp.spatt.Boot <- function (nom_outcome,nom_traitement, xformla = NULL,propensityformla,data, tname, aggte = TRUE,
                          w = NULL, idname = NULL, first.treat.name,
                          alp = 0.05, method = "logit", se = TRUE, bstrap = FALSE,
                          biters = 100, clustervars = NULL, cband = FALSE, citers = 100,
                          seedvec = NULL, pl = FALSE, cores = 2, printdetails = TRUE
-                         ,selection , ponderation,weight_assumption,link,debT2,finT2)  ## de nombreux arguments ne sont plus utilis�s
+                         ,selection , ponderation,weight_assumption,debT,finT)  ## de nombreux arguments ne sont plus utilis�s
 
 
 {
@@ -25,7 +25,7 @@ chained.mp.spatt.Boot <- function (nom_outcome,nom_traitement, xformla = NULL, d
   
 
 #finT2 c'est  dernière génératio nde traitement considérée finT
-  data2<-data[data[,first.treat.name]<=finT2,c(first.treat.name,tname)]
+  data2<-data[data[,first.treat.name]<=finT,c(first.treat.name,tname)]
   flist <- unique(data2[, first.treat.name])[order(unique(data2[,first.treat.name]))]
   
   
@@ -54,8 +54,8 @@ chained.mp.spatt.Boot <- function (nom_outcome,nom_traitement, xformla = NULL, d
 tlen <- length(tlist) #tlist c'est la liste des traitements. Formé par tlist (unique traitements) ordonné
 flen <- length(flist) # flist c'est la liste des cohortes. Formé par flist (first.treatment.name unique traitements) ordonné
 
-results <- chained.compute.mp.spatt.Boot(nom_outcome,nom_traitement,flen, tlen, flist, tlist, data, first.treat.name, xformla, tname, w,
-                                 idname, method, seedvec, se, pl, cores, printdetails,selection,ponderation,weight_assumption,link)
+results <- chained.compute.mp.spatt.Boot(nom_outcome,nom_traitement,flen, tlen, flist, tlist, data, first.treat.name, xformla, propensityformla,tname, w,
+                                 idname, method, seedvec, se, pl, cores, printdetails,selection,ponderation,weight_assumption,debT, finT)
 
 
 

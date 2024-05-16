@@ -7,6 +7,7 @@
 #' @param idname The individual (cross-sectional unit) id name
 #' @param gname The name of the variable in data that contains the first period when a particular observation is treated. This should be a positive number for all observations in treated groups. It defines which "group" a unit belongs to. It should be 0 for units in the untreated group.
 #' @param xformla A formula for the covariates to include in the model. It should be of the form ~ X1 + X2. Default is NULL which is equivalent to xformla=~1. This is used to create a matrix of covariates which is then passed to the 2x2 DID estimator chosen in est_method.
+#' @param propensityformla A formula for the covariates to include in the calculation of the propensity scores for the weights. This should be used only if weight_assumption is not NULL. Must be panel data.
 #' @param data The name of the data.frame that contains the data
 #' @param anticipation The number of time periods before participating in the treatment where units can anticipate participating in the treatment and therefore it can affect their untreated potential outcomes
 #' @param weightsname The name of the column containing the sampling weights. If not set, all observations have same weight.
@@ -62,11 +63,14 @@
 # pre_process_did <- did::pre_process_did
 # process_attgt <- did::process_attgt
 
+
+#valider les resultats avec cs
 chained <-function(yname,
                    tname,
                    idname=NULL,
                    gname,
                    xformla=NULL,
+                   propensityformla,
                    data,
                    panel=TRUE,  #
                    allow_unbalanced_panel=TRUE, #
@@ -75,7 +79,7 @@ chained <-function(yname,
                    anticipation=0, #
                    weightsname=NULL,
                    weight_assumption=NULL,
-                   link='logit',
+                   
                    alp=0.05,
                    bstrap=TRUE,
                    cband=TRUE, #
@@ -109,6 +113,7 @@ dp=pre_process_did(yname=yname,
                    bstrap=bstrap,
                    biters=biters,
                    clustervars=clustervars,
+                   cband=cband,
                    est_method=est_method,
                    base_period=base_period,
                    print_details=print_details,
@@ -128,6 +133,7 @@ resultat=chained_estimPeriod_Boot(yname=yname,
                           idname=idname,
                           gname=gname,
                           xformla=xformla,
+                          propensityformla=propensityformla,  
                           data=data,
                           debT=debT,
                           finT=finT,
@@ -136,7 +142,8 @@ resultat=chained_estimPeriod_Boot(yname=yname,
                           select=select,
                           weightsname=weightsname,
                           weight_assumption=weight_assumption,
-                          link=link,
+                          
+                          cband=cband,
                           alp=0.05,
                           bstrap=bstrap,
                           biters=biters,
@@ -154,7 +161,10 @@ resultat=chained_estimPeriod_Boot(yname=yname,
     post = ifelse(attgt_list[i, gname] > attgt_list[i, tname], 1, 0))})
 
   inffunc=resultat[[2]]
-  inffunc <- inffunc[, 2,]
+  
+  
+  inffunc <- inffunc[, 2,] #to verify, it seems hard coded.... JC
+  # print(dim(inffunc)) 6597   42
   attgt.results=process_attgt(attgt.list) #
   
   group=attgt.results$group
@@ -269,8 +279,8 @@ resultat=chained_estimPeriod_Boot(yname=yname,
     }
   }
 
-
-
+  
+  # print(dim(inffunc)) #6597   42
   return(MP(group=group, t=tt, att=att, V_analytical=V, se=se, c=cval, inffunc=inffunc, n=n, W=W, Wpval=Wpval, alp = alp, DIDparams=dp,debT))  
   
   

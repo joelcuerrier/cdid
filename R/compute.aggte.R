@@ -29,13 +29,16 @@ compute.aggte <- function(MP,
   # unpack MP object
   #-----------------------------------------------------------------------------
   # load parameters
+
   group <- MP$group
   t <- MP$t
   att <- MP$att
   dp <- MP$DIDparams
+  
   inffunc1 <- MP$inffunc
   n <- MP$n
-
+  
+  
 
   gname <- dp$gname
   data <- as.data.frame(dp$data)
@@ -403,6 +406,11 @@ compute.aggte <- function(MP,
     dynamic.inf.func.e <- simplify2array(BMisc::getListElement(dynamic.se.inner, "inf.func"))
 
     dynamic.crit.val <- stats::qnorm(1 - alp/2)
+    
+    ### JC ###
+    # dp$cband=TRUE
+
+
     if(dp$cband==TRUE){
       if(dp$bstrap == FALSE){
         warning('Used bootstrap procedure to compute simultaneous confidence band')
@@ -626,10 +634,16 @@ wif <- function(keepers, pg, weights.ind, G, group) {
 #' @keywords internal
 get_agg_inf_func <- function(att, inffunc1, whichones, weights.agg, wif=NULL) {
   # enforce weights are in matrix form
-  weights.agg <- as.matrix(weights.agg)
+  
+  
+  
 
+  weights.agg <- as.matrix(weights.agg)
+  
   # multiplies influence function times weights and sums to get vector of weighted IF (of length n)
   thisinffunc <- inffunc1[,whichones]%*%weights.agg
+  
+ 
 
   # Incorporate influence function of the weights
   if (!is.null(wif)) {

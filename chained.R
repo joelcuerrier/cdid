@@ -11,15 +11,13 @@ library(data.table)
 library(BMisc)
 library(did)
 library(jsonlite)
-# install.packages("did")
-
+library(devtools)
+library(tidyr)
 set.seed(123)
 
-library(devtools)
 # load_all("C:/Users/cuerr/Documents/cdid/R/")
 # ls(pos = "package:cdid")
 # devtools::document("C:/Users/cuerr/Documents/cdid/R/")
-
 
 source("C:/Users/cuerr/Documents/cdid/R/fonction_simu_attrition.R")
 source("C:/Users/cuerr/Documents/cdid/R/fonctions_estimation_Boot.R")
@@ -34,22 +32,22 @@ source("C:/Users/cuerr/Documents/cdid/R/DIDparams.R")
 source("C:/Users/cuerr/Documents/cdid/R/mboot.R")
 source("C:/Users/cuerr/Documents/cdid/R/MP.R")
 source("C:/Users/cuerr/Documents/cdid/R/chained.R")
-
+source("C:/Users/cuerr/Documents/cdid/R/compute.aggte.R")
+source("C:/Users/cuerr/Documents/cdid/R/aggte.R")
 data=data_sim=fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
-View(data)
 
 results=chained(
                 yname="Y1_chaine",
                 tname="annee",
                 idname="id",
                 gname="annee_G",
-                xformla=~X,
+                xformla=~X, 
+                propensityformla=c("X"), 
                 data=data,      
                 anticipation=0,      
                 weightsname=c("P_Y1_chaine"), #St   
-                # weight_assumption="missing_trends",
-                link="logit",
-                bstrap=FALSE,
+                weight_assumption="missing_trends",
+                bstrap=TRUE, #si je met false je recoit un message erreur pour aggte dynamic. Dans le code did cette erreure est controlée avec un message perso.
                 biters=1000,
                 debT=3,
                 finT=8,
@@ -59,51 +57,97 @@ results=chained(
                 treated='traite_G',
                 pl=FALSE,
                 cores=1,
+                cband=TRUE,
                 clustervars=NULL)
+#Vérifier si panel marche.
+#unbalanced.
+#estim_method.
+#prochains travaux futurs: anticipations? voir https://bcallaway11.github.io/did/articles/extensions.html
 
-results
-
-
-
-
-
-
-
-
-
-# Le probleme c'est quon a un groupe a t=2 alors que le traitement commence qu'a 3. Il faut corriger ça et apres les fonctions daggregat de did vont focntionner. 
-#voir MP j'ai hardcoder une solution. il faut juste ajouter debT comme argument dans la fonction 
-
-#Prochaines étapes
-# réparer group_ATT_estimators (valider les resulttats)
-#implémenter les poids différents selon les hypothèses
-
-#retirer les hard code et rendre les fonctions clean pour etre integres dans did (ex les poids de la sim)
-
-# (voir function gg) et les betas de 0.25,50,.75 qui sont hard coded
-#retirer le truc des strates, et de pond_RD
-
-#améliorer l'efficacité fonction compute
-#mettre clean
-#publier
-#vérifier les hypothèses
+# Note: MP a été modifié pour rejetter les traités < debT. C'est pourquoi on a 36 combinaisons de g,t et non 42.
+# J'uniformise l'output de chained pour que inffunc soit compatibles avec les fonctions de did. 
+# Pour se faire, la matrice doit être transformée en dgc matrix. @p correspond au groupe g,t. 
 
 
+# unique_id <- unique(results$DIDparams$data$id)
+# unique_group <- unique(results$group)
+# unique_t <- unique(results$t)
 
-# group = c(2, 3, 4, 5, 6, 7, 8, 2, 3, 4, 5, 6, 7, 8, 2, 3, 4, 5, 6, 7, 
-# 8, 2, 3, 4, 5, 6, 7, 8, 2, 3, 4, 5, 6, 7, 8, 2, 3, 4, 5, 6, 7, 
-# 8) and glist=c(3, 4, 5, 6, 7, 8)
-# and pg = c(0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
-# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863)
-# why do this   pg <- pg[match(group, glist)] returns a list with nan as you can see here: c(NA, 0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
-# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863, 
-# NA, 0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
-# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863, 
-# NA, 0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
-# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863, 
-# NA, 0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
-# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863, 
-# NA, 0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
-# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863, 
-# NA, 0.00416666666666667, 0.002720700152207, 0.00277777777777778, 
-# 0.00228310502283105, 0.00195966514459665, 0.0011986301369863)
+# inffunc_data <- expand.grid(id = unique_id,
+#                              group = unique_group,
+#                              t = unique_t)
+
+# inffunc_data$gt <- as.integer(factor(paste0(inffunc_data$group, inffunc_data$t), levels = unique(paste0(inffunc_data$group, inffunc_data$t))))
+# inffunc_data$x=results$inffunc
+
+# sparse_matrix <- sparseMatrix(
+#   i = inffunc_data$id,
+#   j = inffunc_data$gt,
+#   x = inffunc_data$x,
+# #   dims = c(6597, 36),
+#   dimnames = list(NULL, NULL)
+# )
+
+# results$inffunc=sparse_matrix
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # # did::ggdid(results)
+# # agg.simple=aggte(MP = results, type = "simple")
+# # summary(agg.simple)
+
+# # agg.es=aggte(MP = results, type = "dynamic") 
+# # ggdid(agg.es) #voir gt ==0, drole de resultat.
+
+# # agg.gs <- aggte(MP = results, type = "group")
+# # summary(agg.gs)
+# # ggdid(agg.gs)
+
+# # agg.ct <- aggte(MP = results, type = "calendar")
+# # summary(agg.ct)
+# # ggdid(agg.ct)
+
+
+
+
+
+
+
+
+# # #  $ V_analytical: num [1:36, 1:36] 130.87 -42.3 4.07 12.73 -3.44 ...
+# # # au lieu de 
+# # # $ V_analytical:Formal class 'dgCMatrix' [package "Matrix"] with 6 slots  
+# # #   .. ..@ i       : int [1:144] 0 1 2 3 4 5 6 7 8 9 ...
+# # #   .. ..@ p       : int [1:13] 0 12 24 36 48 60 72 84 96 108 ...
+
+# # #Prochaines étapes
+# # # réparer group_ATT_estimators (valider les resulttats)
+# # # (voir function gg) et les betas de 0.25,50,.75 qui sont hard coded
+# # #améliorer l'efficacité fonction compute
+# # #mettre clean
+# # #je crois dans les fonctions d'aggregation de did, ils utilisent les poids pg du papier de callaway. voir les fonctions compute.aggte.R (les codes pour faire rouller aggte.)
+# #Vérifier les fonctions de compute.aggte.R et les résultats:
+#         # dim(data)#lambda probleme de selection
+#         #enlever les effets fixes juste garder betas pour generer y att pour valider les betas .
+#         # cs pour valider 
+
+

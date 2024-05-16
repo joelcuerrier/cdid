@@ -7,11 +7,9 @@
 ##### ---------------------------------------------------------------------------------------------------------------------------
 
 # Notes à Discuter avec David:
-# Page 21 du papier de David ATTcd on a Yt-Yit-1, mais le code est yt+1-yt. Jai modifié le code pour quil soit yt-yt-1 dans la main loop.
-# Fonction compute.mp.spatt.Boot o� on enlève les "not yet treated" du groupe de contrôle ! On balance les données, mais pour le GMM il faudrait pas garder ces observations?
 # Disdat est overwitten by data ou data2 et il y a des manipulations en double. Améliorer ceci pour RAM
-#Il y a encore des dépendances à la simulation; exemple Y2_chaine, Y1_chaine, etc. Aussi pscore. La probabilit/ detre observé pour 2 période de suite est hard codé (Sitt+1). 
-#retire le STRATE
+#voir définition de gg avec David.
+
 chained.compute.mp.spatt.Boot <- function ( nom_outcome
                                  , nom_traitement
                                  , flen  ## nombre de cohortes dans le traitement 
@@ -21,6 +19,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
                                  , data  ## Les données
                                  , first.treat.name ## la variable indiquant l'annee de traitement par un dispositif donné
                                  , xformla ## le modèle de score ~X
+                                 , propensityformla
                                  , tname ## la variable de date
                                  , w ## ??  NULL par défaut
                                  , idname ## identifiant individu
@@ -33,13 +32,15 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
                                  , selection ## indicatrice observations valides
                                  , ponderation ## poids utilise  
                                  , weight_assumption ## Hypothèses sur les poids (missing_trends, missing_outcomes, missing_trends_outcomes)
-                                 , link ## link function for the propensity score model
-                                 
+                                 , debT
+                                 , finT
                                  
 )
 {
 
   
+  
+
   ################################
   # initialisation des matrices  #
   ################################
@@ -57,7 +58,14 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
   indiv<-unique(data[,c(first.treat.name,idname)]) #liste des observations uniques (id) et leur première année de traitement
   mat_influence = array(0,dim=c(nrow(indiv),(1+length(nom_outcome)),nbligne))
   counter <- 1
-
+  
+  #Matrices pour les poids
+  ssit <-matrix(0, nrow = nrow(indiv), ncol = tlen-1) 
+  st1 <- matrix(0, nrow = nrow(indiv), ncol = tlen-1) 
+  st2 <- matrix(0, nrow = nrow(indiv), ncol = tlen-1) 
+  cit <- matrix(0, nrow = nrow(indiv), ncol = tlen-1)
+  flag=FALSE #In the calculations of reweights, Gg matrix does not have to be calculated every g,t. I use this flag to calculate it only once.
+  
 ##########################################
 # Boucles sur les cohortes et les dates  #
 ##########################################
@@ -65,7 +73,10 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
     ## boucle sur la date : t, [1 2 3 4 5 6 7 8]. tlist[t+1] prend les valeurs 2, 3, 4, 5, 6, 7, 8. tlist[t] prend les valeurs 1, 2, 3, 4, 5, 6, 7.
     for (t in 1:(tlen - 1)) {  
         pret <- flist[f]-1 # cohorte G-1, flist est inclut dans [3 4 5 6 7 8], pret  est inclut dans [2,3,4,5,6,7].
+        print(f)
+        print(t)
         
+      
         #################################################
         # Mesure des Pscores et Prédictions des Pscores #
         #################################################
@@ -101,55 +112,137 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
           #disdat contient deja seulement tname ==pret. Donc disdat contient toutes les observations pour tname=pret. on a donc toutes les valeurs de t, pas seulement t et t+1
         disdat <- data[(data[, tname] == pret |data[, tname] == tlist[t + 1] | data[, tname] == tlist[t]), ]#}
         disdat <- makeBalancedPanel(disdat, idname, tname)##on cylindre sur les trois dates utiles au calcul (pret,tlist[t],tlist[t+1]). Doc: https://bcallaway11.github.io/BMisc/reference/makeBalancedPanel.html
-        ##This function drops observations from data.frame that are not part of balanced panel data set.
+         ##This function drops observations from data.frame that are not part of balanced panel data set.
         ##disdat à ce point contient les observations aux années flist[f]-1, tlist[t], tlist[t+1]. Si f=2 et t=6, on a les observations années 3,6,7.
-        
-        
-
+        # #dim
+        # [1] 19791    28
+        # [1] 13194    28
+        # ...
         disdat$C <- 1 * (disdat[, first.treat.name] == 0) 
-        disdat$G <- 1 * (disdat[, first.treat.name] == flist[f])
+        disdat$G <- 1 * (disdat[, first.treat.name] == flist[f]) 
+       
+
         ############################
         # Assumptions on Weights ###
         ############################
-
+          #print(first.treat.name)
         if(!is.null(weight_assumption)){
-          ################################
-          # Assumption 7: Missing trends #
-          ################################
-          if (weight_assumption=="missing_trends"){
-              
-              st1 = disdat[disdat[[tname]]==tlist[t],][,c(ponderation)]
-              st2 = disdat[disdat[[tname]]==tlist[t+1],][,c(ponderation)]
-              gg  = disdat[disdat[[tname]]==tlist[t],][,c(nom_traitement)]
-              nom = mean(gg*st1*st2)
-
-              #glm logit
-              disdat$StSt <- st1*st2
-                        
-              #Maybe should use a second pfomla for StSt...
-              pformla <- BMisc::toformula('StSt', BMisc::rhs.vars(xformla)) #StSt~X
-              pformla <- update(pformla, . ~ . + G)
-             
-              pscore.reg <- glm(pformla, family = binomial(link = link),data = disdat)
-              thet2 <- coef(pscore.reg)   
-              
-              if (any(is.na(thet2))) {
-                warning(paste0("Problems estimating propensity score...likely perfectly predicting treatment for group: ",
-                flist[f], " at time period: ", tlist[t +1]))}
-              
-              denom <- predict(pscore.reg, newdata = disdat,type = "response") 
-              reweight = t(nom%*%denom)
-              disdat$reweight <- reweight
-              
-
-          }
-          #create the column reweight taking values of 1
-
-          else {disdat$reweight <- 1}
+            ################################
+            # Assumption 7: Missing trends #
+            ################################
           
-        }
-          else {disdat$reweight <- 1}
+            if (weight_assumption=="missing_trends"){
+                
+                #######################
+                # Calcule de matrices #
+                #######################
+                
+                if (t>=debT){ #Pour exclure les valeurs avant le début du traitement. 
+                if (flag==FALSE){ # The values are calculated only once.
+                    unique_ids <- unique(disdat[[idname]])
+                    
+                    #Matrice Gg
+                    id_gg <- data.frame(id = unique(disdat[[idname]]), annee_G = disdat[[first.treat.name]][match(unique_ids, disdat[[idname]])])
+                    ggi <- matrix(0, nrow = nrow(id_gg), ncol = finT)
+                    for (i in 1:nrow(id_gg)) {
+                      ggi[i, id_gg[i, "annee_G"]] <- 1}
+                    ggi <- as.data.frame(ggi)   
+                    names(ggi) <- 1:finT
+                    ggi <- ggi[, 1:finT-1, drop = FALSE] 
+                    ggi = as.matrix(ggi) # dim 6594x8 (id x finT)
+                    #retirer les t avant debT
+                    # ggi <- ggi[, debT:ncol(ggi)]
+                    
+                    # Matrice cit
+                    cit <- disdat[disdat[[tname]]==tlist[debT],]$C
+                    cit = as.matrix(cit) # dim 6594x1 (id x 1)
 
+                    # Matrice pour xit et propensityformla
+                    lenX=length(propensityformla) #"X"
+                    xit <- array(0, dim = c(6597, finT, lenX)) #On a donc une dimension pour chacune des éléments de propensityformla
+
+                    for (i in 1:lenX) {
+                         value <- pivot_wider(data = data[,c(idname,tname,propensityformla[i])], 
+                         id_cols = id, 
+                         names_from = annee, 
+                         values_from = propensityformla[i])    
+                        
+                         value <- value[,  -1] #remove id column                
+                         value=value[, order(colnames(value))] #NxT  
+                         value=as.matrix(value) #NxT
+                         xit[, , i] <-value
+                         }
+                    
+                    flag=TRUE 
+                    }
+
+                st1[,t] = disdat[disdat[[tname]]==tlist[t],][,c(ponderation)]  # Easier to troubleshoot with [,t]
+                st2[,t] = disdat[disdat[[tname]]==tlist[t+1],][,c(ponderation)]
+                ssit[,t] <- matrix(unlist(st1[,t]*st2[,t]), ncol = 1) #dim 6594x1
+                
+                ##############
+                # nominateur #
+                ##############
+                # repeated_ssi <- matrix(rep(ssit[,t], ncol(ggi)), ncol = ncol(ggi), byrow = TRUE) # nom=mean(repeated_ssi * ggi) 
+                nom=mean(ssit[,t] * ggi[,t]) # 1x1. mean(list). Je prend [,t], sinon le calcul n'est pas intuitif. Voir ci-dessous.
+                
+                      # [,1] [,2] [,3]
+                # [1,]    1    4    7
+                # [2,]    2    5    8
+                # [3,]    3    6    9
+                # Mean of column 1: (1 + 2 + 3) / 3 = 2
+                # Mean of column 2: (4 + 5 + 6) / 3 = 5
+                # Mean of column 3: (7 + 8 + 9) / 3 = 8
+                # Mean of means: (2 + 5 + 8) / 3 = 5
+                
+                #Une autre option est de conserver le code initial pour le nominateur. (similaire a christophe)
+                # gg  = disdat[disdat[[tname]]==tlist[t],][,c(nom_traitement)]
+                # nom = mean(gg*st1*st2)
+
+                ################
+                # denominateur #
+                ################
+
+                # Le calcule des poids ne se fait qu'avec logit pour le moment. 
+                # Sinon, il faut ajuster les calculs pour les fonctions d'influence.
+
+                # Espérance de Gg
+                mean_gg=mean(ggi[,tlist[t]]) # à g -> 1x1
+
+                #Denominateur G                           
+                design_matrix <- cbind(ggi[, debT:ncol(ggi)], xit[,,]) #Je garde seulement t apres debT. Ils servent à rien, et les betas sont 0.
+                model <- glm(ssit[,t] ~ ., data = data.frame(design_matrix), family = binomial(link = "logit"))
+                betas <- coef(model) #dim Gx1. #pour le moment les betas sur Xit sont les mêmes car X est constant dans le temps pour chq i.
+                
+                if (any(is.na(betas))) {
+                  warning(paste0("Problems estimating propensity score...likely perfectly predicting treatment for group: ",   flist[f], " at time period: ", tlist[t +1]))}
+                pred_ssit_g <- predict(model, newdata = data.frame(design_matrix), type = "response") #Nx1
+                denom_g=mean(pred_ssit_g)*mean_gg #Rappel: mean_gg=mean(ggi[,tlist[t]]) # à g -> 1x1. À valider avec David.
+                
+                # #Denominateur C
+                design_matrix <- cbind(cit, xit[,,]) #used in logit
+                model <- glm(ssit[,t] ~ ., data = data.frame(design_matrix), family = binomial(link = "logit"))
+                betas <- coef(model) #dim Gx1
+                if (any(is.na(betas))) {
+                  warning(paste0("Problems estimating propensity score...likely perfectly predicting treatment for group: ",   flist[f], " at time period: ", tlist[t +1]))}
+                pred_ssit_c <- predict(model, newdata = data.frame(design_matrix), type = "response") #Nx1
+                denom_c=mean(pred_ssit_c)*mean_gg #pred-> un nombre (car tu fais la moyenne d'une liste) x un chiffre
+                
+                # # Calcul des poids pour i,g,t.
+                git=1-cit
+                pp2 = (nom/denom_g) * git #haddamard ici ou régulier?
+                pp1= (nom/denom_c) * cit #nom/denom 1x1 et ggi NxT.Cohérant, tu estime StSt+1 pour chq i et tu fais la moyenne.
+                pp0=pp2-pp1 # Nx1, le poids est le meme pour chaque i, cohérant puisqu'on fait des moyenne à t.
+                #normal que les poids soient les memes pour chaque individu (+ ou -)
+                }
+
+            }
+          
+
+          else {pp0 <- matrix(1, nrow = unique_ids, ncol = 1)}
+        }
+          else {pp0 <- matrix(1, nrow = unique_ids, ncol = 1)}
+    
         #Delta Y
         disdat <- panelDiffV(disdat,nom_outcome,ponderation,idname, tname,pret,tlist[t],tlist[t+1],selection) #deltaY
         #Masking pour disdat[année==pret,]$delta_y=yt+1-yt. Disdat contient seulement les obs pour l'année pret.
@@ -179,6 +272,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         traiteS<- traite #G,C
         devant<-(traiteS[,1]-traiteS[,2]) 
         devant2<-traiteS[,1]+(pscore/(1 - pscore))*traiteS[,2] #1 ou pscore/(1-pscore) selon si G ou C. Partie des equations Wg ou Wc.
+        
         traite_boot<-traiteS
         
         dommk<-t(as.matrix(traiteS))%*%as.matrix((devant2*disdat[,ponderation]))
@@ -191,17 +285,23 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         
         
         
-        pp=pp*disdat$reweight #reweighting 
+        
+        
+        # pp=pp*disdat$reweight #reweighting 
         pp_noDenom<- devant*(traiteS%*%(dommk*Denom))*(devant2*disdat[,ponderation])       
 
         ### ATT ###
         att<- colSums(pp * dy) 
+
+        ########################################################
         ### Bootstrap  : calcul de la fonction d'influence de la brique
         # matrice de covariance pour calculer ATT        
+        ########################################################
         esperance_dy<- traite_boot%*% t(traite_boot) %*%as.matrix((pp * dy))
         esperance_dy<- (-1) * esperance_dy * disdat$C + 1 * esperance_dy * disdat$G
         
-        psi<-NN*pp *(dy-esperance_dy)
+        psi<-NN*pp *(dy-esperance_dy) #dim 6594x1 (il y a 6594 indiv)
+        
 
         colnames(psi)=nom_outcome
         x <- model.matrix(xformla, data = disdat)
@@ -216,7 +316,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
 
           M_i <- as.matrix(apply(as.matrix((C_i/(1 - pscore))^2 * gg(x, thet) * (dy_i - mean(wc_i * dy_i)) * x), 2,mean)/mean(wc1_i))
           
-          #gg c'est une fonction qui retourne gval <- 1/((1 + exp(x %*% thet))^2)
+          #gg c'est une fonction qui retourne gval <- 1/((1 + exp(x %*% thet))^2). Ça vient d'ou ça?
           A1_i <- (G_i + C_i) * gg(x, thet)^2/(pscore * (1 -   pscore))
           A1_i <- (t(A1_i * x) %*% x/n)
           
@@ -239,14 +339,15 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         ### mettre les siren dans psi
         psi<-as.data.frame(psi)
         colnames(psi)<-nom_outcome
-
+        # View(psi)
         # psi[,idname]<-disdat[,..idname]
-        psi[,idname]<-disdat[,idname]
+        psi[,idname]<-disdat[,idname] #dim 6594x1
+        
         ### apparier psi avec indiv
         psi<-merge(indiv[idname], psi, by.x=idname, by.y=idname, all.x=TRUE)
         for (i in 1:length(nom_outcome)){
           psi[is.na(psi[,nom_outcome[i]]),nom_outcome[i]]<-0
-        }
+        }#dim 6594x1
 
       
         
@@ -254,8 +355,8 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
   
         nG<-round(mean(colSums(as.matrix(disdat$G * 1 *(disdat[,ponderation]>0)))))
         nC<-round(mean(colSums(as.matrix(disdat$C * 1 *(disdat[,ponderation]>0)))))
-        #fin de la patch
         
+        #fin de la patch
         # else  {
         #   att<- colSums(0 * dy) #filled with 0
         #   # Nombre d'observations utilis�es pour l'estimation de chaque brique
@@ -275,10 +376,16 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         fatt[counter,"nobsG"]<-nG
         fatt[counter,"nobsC"]<-nC
         ### Remplissage de la matrice des fonctions d'influence
-        for (i in 1:dim(psi)[2]){
-          mat_influence[,i,counter]=psi[,i]  
-        } 
+        
+        
+        for (i in 1:dim(psi)[2]){ #i=1,2,1,...
+          
+          mat_influence[,i,counter]=psi[,i]   #counter C'est g,t = 42
+        }  #6597x1x42
+        #donc on loop pour tous les individus, i et tout counter=42
     
+    # print(counter) 
+
     counter <- counter + 1
     
     
@@ -292,9 +399,9 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
   } ## fin boucle sur le traitement f
   
   
+
+
   
-  # View(disdat)
-  #subset for id==1 and tname==1 or 2
   
   list(fatt,mat_influence,indiv)
 }
