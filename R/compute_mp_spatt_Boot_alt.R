@@ -289,6 +289,8 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         if(!is.null(weight_assumption)){
           if (weight_assumption=="missing_trends"){
         pp=pp*pp0 }
+        }
+
         pp_noDenom<- devant*(traiteS%*%(dommk*Denom))*(devant2*disdat[,ponderation])       
 
         ### ATT ###
@@ -385,7 +387,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         }  #6597x1x42
         #donc on loop pour tous les individus, i et tout counter=42
     
-    # print(counter) 
+    
 
     counter <- counter + 1
     
@@ -408,7 +410,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
 }
 
 
-}
+
 
 
 

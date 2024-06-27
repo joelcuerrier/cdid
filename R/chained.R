@@ -89,12 +89,10 @@ chained <-function(yname,
                    data,
                    panel=TRUE,  #
                    allow_unbalanced_panel=TRUE, #
-                   
                    control_group=c("nevertreated","notyettreated"), #
                    anticipation=0, #
                    weightsname=NULL,
                    weight_assumption=NULL,
-                   
                    alp=0.05,
                    bstrap=TRUE,
                    cband=TRUE, #
@@ -110,7 +108,6 @@ chained <-function(yname,
                    deb,
                    fin,
                    select,
-                  
                    treated){
 
 dp=pre_process_did(yname=yname,
@@ -164,7 +161,7 @@ resultat=chained_estimPeriod_Boot(yname=yname,
                           biters=biters,
                           treated=treated)    
 
-  # print(str((resultat)))
+  print(str((resultat)))
   # View(resultat[[1]])
 
   #Les codes suivants sont basés sur les codes de la fonction att_gt.R du package did
@@ -309,20 +306,4 @@ resultat=chained_estimPeriod_Boot(yname=yname,
   
   # print(dim(inffunc)) #6597   42
   return(MP(group=group, t=tt, att=att, V_analytical=V, se=se, c=cval, inffunc=inffunc, n=n, W=W, Wpval=Wpval, alp = alp, DIDparams=dp,debT=debT))  
-  
-  
   }
-
-
-
-
-# library(rmarkdown)
-
-# # Specify the path to your .Rmd file
-# rmd_file <- "C:/Users/cuerr/Documents/cdid/man/aggte.Rd"
-
-# # Render .Rmd to HTML
-# render(rmd_file)
-
-# # Open HTML file in browser
-# browseURL("C:/Users/cuerr/Documents/cdid/man/aggte.html")

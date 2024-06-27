@@ -166,10 +166,10 @@ In many applications, there can be a large number of groups and time periods. In
 One idea that is likely to immediately come to mind is to just return a weighted average of all group-time average treatment effects with weights proportional to the group size. This is available by calling the aggte function with type = simple.
 
 ```{r}
-
-source("C:/Users/cuerr/Documents/cdid/R/aggte.R")
-source("C:/Users/cuerr/Documents/cdid/R/compute.aggte.R")
-agg.simple <- aggte(MP = example_attgt, type = "simple")
+#Mettre ca apres mais il manque une partie du code qui nest pas mise dans cdid encore
+# source("C:/Users/cuerr/Documents/cdid/R/aggte.R")
+# source("C:/Users/cuerr/Documents/cdid/R/compute.aggte.R")
+# agg.simple <- aggte(MP = example_attgt, type = "simple")
 
 
 

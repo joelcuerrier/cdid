@@ -42,7 +42,7 @@ data=fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0
 #dp calcule .w (les poids) mais de la mauvaise façon donc juste les remplacer avec les bons cdid.
 #trucs de hard coded dans chained.R
 # disdat$pp=disdat[[ponderation[1]]] #hard coded... dans compute
-a=chained(
+results=chained(
                 yname="Y1_chaine",
                 tname="annee",
                 idname="id",
@@ -67,11 +67,6 @@ a=chained(
                 cband=TRUE,
                 clustervars=NULL)
 
-
-a
-dim(a)
-class(a)
-
 #Vérifier si panel marche.
 #unbalanced.
 #estim_method.
@@ -80,41 +75,33 @@ class(a)
 # Note: MP a été modifié pour rejetter les traités < debT. C'est pourquoi on a 36 combinaisons de g,t et non 42 (avec les données de la simulation).
 # L'output est modifié afin de l'uniformiser au résulltats du package DiD. Ceci permet d'utiliser les fonctions d'aggrégation de DiD.
 # Pour se faire, la matrice doit être transformée en dgc matrix. @p correspond au groupe g,t. 
-a
-
-unique_id <- unique(a$DIDparams$data$id)
-unique_group <- unique(a$group)
-print(unique_group)
-unique_t <- unique(a$t)
-print(unique_t)
-
-inffunc_data <- expand.grid(id = unique_id,
-                             group = unique_group,
-                             t = unique_t)
-
-inffunc_data$gt <- as.integer(factor(paste0(inffunc_data$group, inffunc_data$t), levels = unique(paste0(inffunc_data$group, inffunc_data$t))))
-inffunc_data$x=results$inffunc
-
-sparse_matrix <- sparseMatrix(
-  i = inffunc_data$id,
-  j = inffunc_data$gt,
-  x = inffunc_data$x,
-  dimnames = list(NULL, NULL)
-)
-
-results$inffunc=sparse_matrix
 
 
-# did::ggdid(results)
+# unique_id <- unique(results$DIDparams$data$id)
+# unique_group <- unique(results$group)
+# print(unique_group)
+# unique_t <- unique(results$t)
+# print(unique_t)
 
-str(a)
-class(a)
-# agg.simple=aggte(MP = results, type = "simple")
-# summary(agg.simple)
+# inffunc_data <- expand.grid(id = unique_id,
+#                              group = unique_group,
+#                              t = unique_t)
 
-agg.es=aggte(MP = a, type = "dynamic") 
-agg.es
-ggdid(agg.es) #voir gt ==0, drole de resultat.
+# inffunc_data$gt <- as.integer(factor(paste0(inffunc_data$group, inffunc_data$t), levels = unique(paste0(inffunc_data$group, inffunc_data$t))))
+# inffunc_data$x=results$inffunc
+
+# sparse_matrix <- sparseMatrix(
+#   i = inffunc_data$id,
+#   j = inffunc_data$gt,
+#   x = inffunc_data$x,
+#   dimnames = list(NULL, NULL)
+# )
+
+# results$inffunc=sparse_matrix
+
+# agg.es=aggte(MP = results, type = "dynamic") 
+# agg.es
+# ggdid(agg.es) #voir gt ==0, drole de resultat.
 
 
 
@@ -177,7 +164,7 @@ ggdid(agg.es) #voir gt ==0, drole de resultat.
                 
                 
                 
-a
+
 
 
 # # # #Prochaines étapes
