@@ -1,7 +1,6 @@
+# The vignettes included in this library are based on those authored by [Brantly Callaway and Pedro H.C. Sant'Anna] for the 'did' package. We have adapted the content for use in this library to provide users with accessible and informative documentation. The original vignettes authored by [Brantly Callaway and Pedro H.C. Sant'Anna] can be found in the 'did' package documentation [https://bcallaway11.github.io/did/articles/did-basics.html].
 #' @title Chained
-#' 
 #' @description The chained difference-in-differences, leverages the overlapping structure of many unbalanced panel data set.
-#' 
 #' @param tname The name of the column containing the time periods
 #' @param yname The name of the outcome variable
 #' @param idname The individual (cross-sectional unit) id name
@@ -38,7 +37,7 @@
 #'                 xformla=~X,
 #'                 data=data,            
 #'                 weightsname=c("P_Y1_chaine"), #St
-#'                 weight_assumption="missing_trends",
+#'                 #weight_assumption="missing_trends",
 #'                 bstrap=FALSE,
 #'                 biters=1000,
 #'                 est_method="dr",
@@ -49,10 +48,12 @@
 #'                 select='select',
 #'                 treated='traite_G')
 #' results
+#' 
+#' library(did)
+#' did
+#' 
 
 #' @return  \item{att}{The average treatment effect on the treated}
-
-
 
 
 #Éventuellement utiliser les fonctions de Callaway. Quelques modifications à faire avant.
@@ -64,7 +65,21 @@
 # process_attgt <- did::process_attgt
 
 
-#valider les resultats avec cs
+#Ajouter une description pour l'inférence corolaire 1. On a pas considéré l'incertitude des propensity scores du first step
+#Faire des tests
+
+#comparer avec did. Et écrire une script simple qui permet aux utilisateurs de comparer.
+
+
+
+
+
+
+
+
+
+
+
 chained <-function(yname,
                    tname,
                    idname=NULL,
@@ -123,11 +138,11 @@ dp=pre_process_did(yname=yname,
                    ,treated=treated
                    )
 
-
+  
   #-----------------------------------------------------------------------------
   # Compute all ATT(g,t)
   #-----------------------------------------------------------------------------
-
+#remettre les t > debT dans compute et autres
 resultat=chained_estimPeriod_Boot(yname=yname,
                           tname=tname,
                           idname=idname,
@@ -149,27 +164,36 @@ resultat=chained_estimPeriod_Boot(yname=yname,
                           biters=biters,
                           treated=treated)    
 
-  
+  # print(str((resultat)))
+  # View(resultat[[1]])
+
   #Les codes suivants sont basés sur les codes de la fonction att_gt.R du package did
   #https://cran.r-project.org/web/packages/did/did.pdf
-  attgt_list=resultat[[1]]
+  attgt_list=resultat[[1]] 
   attgt.list <- lapply(1:nrow(attgt_list), function(i) {
+    #Faire certain que tname pour groupe et gname poour year cest ok...
   list(
     att = as.numeric(attgt_list[i, yname]),
-    group = as.numeric(attgt_list[i, tname]),
-    year = as.numeric(attgt_list[i, gname]),
+    group = as.numeric(attgt_list[i, gname]),
+    year = as.numeric(attgt_list[i, tname]),
     post = ifelse(attgt_list[i, gname] > attgt_list[i, tname], 1, 0))})
+  # print(dim(attgt_list)) #42x6
+  # class(attgt_list) #data.frame
 
-  inffunc=resultat[[2]]
-  
-  
-  inffunc <- inffunc[, 2,] #to verify, it seems hard coded.... JC
-  # print(dim(inffunc)) 6597   42
+
+  inffunc=resultat[[2]] #dim 6597x1x42
+  inffunc <- inffunc[, 2,] #to verify, it seems hard coded.... JC...no ok... 2nd dim is the inffunc value, first is id
+  # print(dim(inffunc)) #6597   42
+  # class(inffunc) # array
+
   attgt.results=process_attgt(attgt.list) #
-  
+  # View(as.data.frame(attgt.results))
   group=attgt.results$group
+  
   att=attgt.results$att
   tt=attgt.results$tt
+  # View(tt)
+  
   
   
   
@@ -181,9 +205,10 @@ resultat=chained_estimPeriod_Boot(yname=yname,
   # note to self: this def. won't work with unbalanced panel,
   # same with clustered standard errors
   # but it is always ignored b/c bstrap has to be true in that case
-
+  
   n <- length(unique(data[,idname]))
   V <- Matrix::t(inffunc)%*%inffunc/n
+  
   se <- sqrt(Matrix::diag(V)/n)  
   se[se <= sqrt(.Machine$double.eps)*10] <- NA
 
@@ -218,6 +243,8 @@ resultat=chained_estimPeriod_Boot(yname=yname,
   # select which periods are pre-treatment
   pre <- which(group > tt)
 
+
+  
   # Drop group-periods that have variance equal to zero (singularity problems)
   if(length(zero_na_sd_entry)>0){
     pre <- pre[!(pre %in% zero_na_sd_entry)]
@@ -281,7 +308,21 @@ resultat=chained_estimPeriod_Boot(yname=yname,
 
   
   # print(dim(inffunc)) #6597   42
-  return(MP(group=group, t=tt, att=att, V_analytical=V, se=se, c=cval, inffunc=inffunc, n=n, W=W, Wpval=Wpval, alp = alp, DIDparams=dp,debT))  
+  return(MP(group=group, t=tt, att=att, V_analytical=V, se=se, c=cval, inffunc=inffunc, n=n, W=W, Wpval=Wpval, alp = alp, DIDparams=dp,debT=debT))  
   
   
   }
+
+
+
+
+# library(rmarkdown)
+
+# # Specify the path to your .Rmd file
+# rmd_file <- "C:/Users/cuerr/Documents/cdid/man/aggte.Rd"
+
+# # Render .Rmd to HTML
+# render(rmd_file)
+
+# # Open HTML file in browser
+# browseURL("C:/Users/cuerr/Documents/cdid/man/aggte.html")

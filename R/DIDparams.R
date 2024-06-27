@@ -43,7 +43,7 @@ DIDparams <- function(yname,
                    tlist=NULL,
                    glist=NULL,
                    call=NULL) {
-
+  
   out <- list(yname=yname,
               tname=tname,
               idname=idname,

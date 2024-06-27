@@ -10,6 +10,7 @@ chained(
   idname = NULL,
   gname,
   xformla = NULL,
+  propensityformla,
   data,
   panel = TRUE,
   allow_unbalanced_panel = TRUE,
@@ -19,6 +20,7 @@ chained(
   weight_assumption = NULL,
   alp = 0.05,
   bstrap = TRUE,
+  cband = TRUE,
   biters = 1000,
   clustervars = NULL,
   est_method = "chained",
@@ -45,13 +47,9 @@ chained(
 
 \item{xformla}{A formula for the covariates to include in the model. It should be of the form ~ X1 + X2. Default is NULL which is equivalent to xformla=~1. This is used to create a matrix of covariates which is then passed to the 2x2 DID estimator chosen in est_method.}
 
+\item{propensityformla}{A formula for the covariates to include in the calculation of the propensity scores for the weights. This should be used only if weight_assumption is not NULL. Must be panel data.}
+
 \item{data}{The name of the data.frame that contains the data}
-
-\item{panel}{Whether or not the data is a panel dataset. The panel dataset should be provided in long format -- that is, where each row corresponds to a unit observed at a particular point in time. The default is TRUE. When is using a panel dataset, the variable idname must be set. When panel=FALSE, the data is treated as repeated cross sections.}
-
-\item{allow_unbalanced_panel}{Whether or not function should "balance" the panel with respect to time and id. The default values if FALSE which means that att_gt() will drop all units where data is not observed in all periods. The advantage of this is that the computations are faster (sometimes substantially).}
-
-\item{control_group}{Which units to use the control group. The default is "nevertreated" which sets the control group to be the group of units that never participate in the treatment. This group does not change across groups or time periods. The other option is to set group="notyettreated". In this case, the control group is set to the group of units that have not yet participated in the treatment in that time period. This includes all never treated units, but it includes additional units that eventually participate in the treatment, but have not participated yet.}
 
 \item{anticipation}{The number of time periods before participating in the treatment where units can anticipate participating in the treatment and therefore it can affect their untreated potential outcomes}
 
@@ -63,11 +61,11 @@ chained(
 
 \item{bstrap}{Boolean for whether or not to compute standard errors using the multiplier bootstrap. If standard errors are clustered, then one must set bstrap=TRUE. Default is TRUE (in addition, cband is also by default TRUE indicating that uniform confidence bands will be returned. If bstrap is FALSE, then analytical standard errors are reported.}
 
+\item{cband}{Boolean for whether or not to compute a uniform confidence band that covers all of the group-time average treatment effects with fixed probability \code{1-alp}.  In order to compute uniform confidence bands, \code{bstrap} must also be set to \code{TRUE}.  The default is \code{TRUE}.}
+
 \item{biters}{The number of bootstrap iterations to use. The default is 1000, and this is only applicable if bstrap=TRUE.}
 
-\item{clustervars}{A vector of variables names to cluster on. At most, there can be two variables (otherwise will throw an error) and one of these must be the same as idname which allows for clustering at the individual level. By default, we cluster at individual level (when bstrap=TRUE).}
-
-\item{est_method}{The method to compute group-time average treatment effetcs. The default is "chained". Later, dr, ipw and reg will be added.}
+\item{clustervars}{The name of the column containing the clustering variable. Default is NULL.}
 
 \item{base_period}{Whether to use a "varying" base period or a "universal" base period. Either choice results in the same post-treatment estimates of ATT(g,t)'s. In pre-treatment periods, using a varying base period amounts to computing a pseudo-ATT in each treatment period by comparing the change in outcomes for a particular group relative to its comparison group in the pre-treatment periods (i.e., in pre-treatment periods this setting computes changes from period t-1 to period t, but repeatedly changes the value of t). A universal base period fixes the base period to always be (g-anticipation-1). This does not compute pseudo-ATT(g,t)'s in pre-treatment periods, but rather reports average changes in outcomes from period t to (g-anticipation-1) for a particular group relative to its comparison group. This is analogous to what is often reported in event study regressions. Using a varying base period results in an estimate of ATT(g,t) being reported in the period immediately before treatment. Using a universal base period normalizes the estimate in the period right before treatment (or earlier when the user allows for anticipation) to be equal to 0, but one extra estimate in an earlier period.}
 
@@ -99,14 +97,13 @@ The chained difference-in-differences, leverages the overlapping structure of ma
 data=data_sim = fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
 results = chained(
                 yname="Y1_chaine",
-                tname="annee",
+                tname="annee", 
                 idname="id",
                 gname="annee_G",
                 xformla=~X,
                 data=data,            
                 weightsname=c("P_Y1_chaine"), #St
-                # weight_assumption="missing_trends",
-                # weight_assumption="sequential_missing",
+                #weight_assumption="missing_trends",
                 bstrap=FALSE,
                 biters=1000,
                 est_method="dr",
@@ -117,4 +114,8 @@ results = chained(
                 select='select',
                 treated='traite_G')
 results
+
+library(did)
+did
+
 }

@@ -1,9 +1,3 @@
-
-
-# install.packages("openxlsx")
-# install.packages("data.table")
-# install.packages("jsonlite")
-# install.packages("devtools")
 #' @noRd
 library(devtools)
 library(openxlsx)
@@ -20,6 +14,7 @@ set.seed(123)
 # devtools::document("C:/Users/cuerr/Documents/cdid/R/")
 
 source("C:/Users/cuerr/Documents/cdid/R/fonction_simu_attrition.R")
+source("C:/Users/cuerr/Documents/cdid/R/fonction_simu_attrition_nofe.R")
 source("C:/Users/cuerr/Documents/cdid/R/fonctions_estimation_Boot.R")
 source("C:/Users/cuerr/Documents/cdid/R/mp_spatt_Boot.R")
 source("C:/Users/cuerr/Documents/cdid/R/compute_mp_spatt_Boot_alt.R")
@@ -34,7 +29,9 @@ source("C:/Users/cuerr/Documents/cdid/R/MP.R")
 source("C:/Users/cuerr/Documents/cdid/R/chained.R")
 source("C:/Users/cuerr/Documents/cdid/R/compute.aggte.R")
 source("C:/Users/cuerr/Documents/cdid/R/aggte.R")
-data=data_sim=fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
+data=fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
+# data=fonction_simu_attrition_nofe(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
+
 
 results=chained(
                 yname="Y1_chaine",
@@ -59,9 +56,9 @@ results=chained(
                 cores=1,
                 cband=TRUE,
                 clustervars=NULL)
-#Vérifier si panel marche.
-#unbalanced.
-#estim_method.
+
+
+
 #prochains travaux futurs: anticipations? voir https://bcallaway11.github.io/did/articles/extensions.html
 
 # Note: MP a été modifié pour rejetter les traités < debT. C'est pourquoi on a 36 combinaisons de g,t et non 42.
@@ -69,28 +66,26 @@ results=chained(
 # Pour se faire, la matrice doit être transformée en dgc matrix. @p correspond au groupe g,t. 
 
 
-# unique_id <- unique(results$DIDparams$data$id)
-# unique_group <- unique(results$group)
-# unique_t <- unique(results$t)
+unique_id <- unique(results$DIDparams$data$id)
+unique_group <- unique(results$group)
+unique_t <- unique(results$t)
 
-# inffunc_data <- expand.grid(id = unique_id,
-#                              group = unique_group,
-#                              t = unique_t)
+inffunc_data <- expand.grid(id = unique_id,
+                             group = unique_group,
+                             t = unique_t)
 
-# inffunc_data$gt <- as.integer(factor(paste0(inffunc_data$group, inffunc_data$t), levels = unique(paste0(inffunc_data$group, inffunc_data$t))))
-# inffunc_data$x=results$inffunc
+inffunc_data$gt <- as.integer(factor(paste0(inffunc_data$group, inffunc_data$t), levels = unique(paste0(inffunc_data$group, inffunc_data$t))))
+inffunc_data$x=results$inffunc
 
-# sparse_matrix <- sparseMatrix(
-#   i = inffunc_data$id,
-#   j = inffunc_data$gt,
-#   x = inffunc_data$x,
-# #   dims = c(6597, 36),
-#   dimnames = list(NULL, NULL)
-# )
+sparse_matrix <- sparseMatrix(
+  i = inffunc_data$id,
+  j = inffunc_data$gt,
+  x = inffunc_data$x,
+#   dims = c(6597, 36),
+  dimnames = list(NULL, NULL)
+)
 
-# results$inffunc=sparse_matrix
-
-
+results$inffunc=sparse_matrix
 
 
 
@@ -110,16 +105,18 @@ results=chained(
 
 
 
+results
 
-# # # did::ggdid(results)
-# # agg.simple=aggte(MP = results, type = "simple")
-# # summary(agg.simple)
 
-# # agg.es=aggte(MP = results, type = "dynamic") 
-# # ggdid(agg.es) #voir gt ==0, drole de resultat.
+did::ggdid(results)
+agg.simple=aggte(MP = results, type = "simple")
+summary(agg.simple)
 
-# # agg.gs <- aggte(MP = results, type = "group")
-# # summary(agg.gs)
+agg.es=aggte(MP = results, type = "dynamic") 
+ggdid(agg.es) #voir gt ==0, drole de resultat.
+
+agg.gs <- aggte(MP = results, type = "group")
+summary(agg.gs)
 # # ggdid(agg.gs)
 
 # # agg.ct <- aggte(MP = results, type = "calendar")
@@ -149,5 +146,3 @@ results=chained(
 #         # dim(data)#lambda probleme de selection
 #         #enlever les effets fixes juste garder betas pour generer y att pour valider les betas .
 #         # cs pour valider 
-
-

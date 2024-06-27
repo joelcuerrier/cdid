@@ -2,7 +2,7 @@
 % Please edit documentation in R/pre_process_did.R
 \name{pre_process_did}
 \alias{pre_process_did}
-\title{Process `did` Function Arguments}
+\title{Process \code{did} Function Arguments}
 \usage{
 pre_process_did(
   yname,
@@ -18,6 +18,7 @@ pre_process_did(
   weightsname = NULL,
   alp = 0.05,
   bstrap = FALSE,
+  cband = FALSE,
   biters = 1000,
   clustervars = NULL,
   est_method = "dr",
@@ -33,10 +34,10 @@ pre_process_did(
 \item{call}{Function call to att_gt}
 }
 \value{
-a [`DIDparams`] object
+a \code{\link{DIDparams}} object
 }
 \description{
 Function to process arguments passed to the main methods in the
- `did` package as well as conducting some tests to make sure
- data is in proper format / try to throw helpful error messages.
+\code{did} package as well as conducting some tests to make sure
+data is in proper format / try to throw helpful error messages.
 }

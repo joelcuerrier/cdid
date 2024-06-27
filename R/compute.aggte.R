@@ -42,6 +42,7 @@ compute.aggte <- function(MP,
 
   gname <- dp$gname
   data <- as.data.frame(dp$data)
+  
   tname <- dp$tname
   idname <- dp$idname
 
@@ -81,12 +82,13 @@ compute.aggte <- function(MP,
   if(!(type %in% c("simple", "dynamic", "group", "calendar"))) {
     stop('`type` must be one of c("simple", "dynamic", "group", "calendar")')
   }
-
+  View(att)
   if(na.rm){
     notna <- !is.na(att)
     group <- group[notna]
     t <- t[notna]
     att <- att[notna]
+    
     inffunc1 <- inffunc1[, notna]
     #tlist <- sort(unique(t))
     glist <- sort(unique(group))
@@ -128,7 +130,7 @@ compute.aggte <- function(MP,
     #aggregate data
     dta <- base::suppressWarnings(stats::aggregate(data, list((data[,idname])), mean)[,-1])
   }
-
+  
   #-----------------------------------------------------------------------------
   # data organization and recoding
   #-----------------------------------------------------------------------------
@@ -165,25 +167,26 @@ compute.aggte <- function(MP,
   maxT <- max(t)
 
   # Set the weights
-  weights.ind  <-  dta$.w
-
+  weights.ind  <-  dta$.w # sampling weights
+  
+  
+  
   # we can work in overall probabilities because conditioning will cancel out
   # cause it shows up in numerator and denominator
   
-  
+  ###JC###
+  # pg c'est la probabilité de faire partie du groupe g et d'être sampled.
   pg <- sapply(originalglist, function(g) mean(weights.ind*(dta[,gname]==g)))
   
   
   # length of this is equal to number of groups
   pgg <- pg
 
-  # View(group)
-  # View(glist)
-  # View(pg)
+ 
 
   # same but length is equal to the number of ATT(g,t)
   pg <- pg[match(group, glist)]
-  # View(pg)
+  
 
   # which group time average treatment effects are post-treatment
   keepers <- which(group <= t & t<= (group + max_e)) ### added second condition to allow for limit on longest period included in att
@@ -201,8 +204,7 @@ compute.aggte <- function(MP,
     # averages all post-treatment ATT(g,t) with weights
     # given by group size
 
-    # View(pg)
-    # View(sum(pg[keepers]))
+  
 
     simple.att <- sum(att[keepers]*pg[keepers])/(sum(pg[keepers]))
 
@@ -355,7 +357,8 @@ compute.aggte <- function(MP,
     # note: event time = 0 corresponds to "on impact"
     #eseq <- unique(t-group)
     eseq <- unique(originalt - originalgroup)
-    eseq <- eseq[order(eseq)]
+    eseq <- eseq[order(eseq)] #c(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5)
+    
 
     # if the user specifies balance_e, then we are going to
     # drop some event times and some groups; if not, we just
@@ -375,14 +378,16 @@ compute.aggte <- function(MP,
 
     # only looks at some event times
     eseq <- eseq[ (eseq >= min_e) & (eseq <= max_e) ]
-
     # compute atts that are specific to each event time
     dynamic.att.e <- sapply(eseq, function(e) {
       # keep att(g,t) for the right g&t as well as ones that
       # are not trimmed out from balancing the sample
       whiche <- which( (originalt - originalgroup == e) & (include.balanced.gt) )
+      # View(cbind(originalt, originalgroup, originalt - originalgroup, include.balanced.gt))
+      # View(whiche) # e c'est la duree e. whiche contient l'index row respectant la condition.
       atte <- att[whiche]
-      pge <- pg[whiche]/(sum(pg[whiche]))
+      # View(cbind(whiche,sum(whiche)))
+      pge <- pg[whiche]/(sum(pg[whiche]))  #pg c'est la probabilité de faire partie du groupe g et d'être sampled. On prend donc la probabilité à l'index[whiche] et on pondère par la somme de ces probabilités. Cela normalise les probabilités sélectionnées pour qu'elles représentent une distribution de probabilité valide où la somme de toutes les probabilités est égale à 1
       sum(atte*pge)
     })
 
@@ -407,8 +412,6 @@ compute.aggte <- function(MP,
 
     dynamic.crit.val <- stats::qnorm(1 - alp/2)
     
-    ### JC ###
-    # dp$cband=TRUE
 
 
     if(dp$cband==TRUE){
@@ -437,7 +440,9 @@ compute.aggte <- function(MP,
     # get overall average treatment effect
     # by averaging over positive dynamics
     epos <- eseq >= 0
-    dynamic.att <- mean(dynamic.att.e[epos])
+    
+    dynamic.att <- mean(dynamic.att.e[epos]) #ATT pour les séquences positives (post)
+    
     dynamic.inf.func <- get_agg_inf_func(att=dynamic.att.e[epos],
                                          inffunc1=as.matrix(dynamic.inf.func.e[,epos]),
                                          whichones=(1:sum(epos)),

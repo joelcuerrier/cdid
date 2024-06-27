@@ -12,6 +12,7 @@ process_attgt <- function(attgt.list) {
   nG <- length(unique(unlist(BMisc::getListElement(attgt.list, "group"))))
   nT <- length(unique(unlist(BMisc::getListElement(attgt.list, "year"))))
   
+  
   # create vectors to hold the results
   group <- c()
   att <- c()

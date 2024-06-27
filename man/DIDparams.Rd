@@ -18,6 +18,7 @@ DIDparams(
   bstrap = TRUE,
   biters = 1000,
   clustervars = NULL,
+  cband = TRUE,
   print_details = TRUE,
   pl = FALSE,
   cores = 1,

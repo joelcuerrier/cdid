@@ -137,12 +137,12 @@ return(results)
 ##### POUR L'ESTIMATEUR GMM -----------------------------------------------------------------------------------------------------
 ##### ---------------------------------------------------------------------------------------------------------------------------
 
-mp.spatt.GMM <- function (nom_outcome,nom_traitement, xformla = NULL, data, tname, aggte = TRUE,
+mp.spatt.GMM <- function (nom_outcome,nom_traitement, xformla = NULL,propensityformla, data, tname, aggte = TRUE,
                            w = NULL, idname = NULL, first.treat.name,
                            alp = 0.05, method = "logit", se = TRUE, bstrap = FALSE,
                            biters = 100, clustervars = NULL, cband = FALSE, citers = 100,
                            seedvec = NULL, pl = FALSE, cores = 2, printdetails = TRUE
-                           ,selection , ponderation,debT2,finT2,strate,POND_RD=NULL)  ## de nombreux arguments ne sont plus utilis�s
+                           ,selection , ponderation,weight_assumption,debT,finT)  ## de nombreux arguments ne sont plus utilis�s
 {
   if (!all(class(data) == "data.frame")) {
     warning("class of data object was not data.frame; converting...")
@@ -152,7 +152,7 @@ mp.spatt.GMM <- function (nom_outcome,nom_traitement, xformla = NULL, data, tnam
   data2<-data[,c(first.treat.name,tname)]
   tlist <- unique(data2[, tname])[order(unique(data2[, tname]))]
   
-  data2<-data[data[,first.treat.name]<=finT2,c(first.treat.name,tname)]
+  data2<-data[data[,first.treat.name]<=finT,c(first.treat.name,tname)]
   flist <- unique(data2[, first.treat.name])[order(unique(data2[,first.treat.name]))]
   flist <- flist[flist > 0]
   
@@ -172,12 +172,31 @@ mp.spatt.GMM <- function (nom_outcome,nom_traitement, xformla = NULL, data, tnam
   tlen <- length(tlist)
   flen <- length(flist)
   
-  results <- compute.mp.spatt.GMM(nom_outcome,nom_traitement,flen, tlen, flist, tlist, data, first.treat.name, xformla, tname, w,
-                                   idname, method, seedvec, se, pl, cores, printdetails,selection,ponderation,strate,POND_RD)
+  results <- compute.mp.spatt.GMM(nom_outcome,nom_traitement,flen, tlen, flist, tlist, data, first.treat.name, xformla, propensityformla,tname, w,
+                                   idname, method, seedvec, se, pl, cores, printdetails,selection,ponderation,weight_assumption,debT,finT)
   
   
   return(results)
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

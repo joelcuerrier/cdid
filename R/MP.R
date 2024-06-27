@@ -27,25 +27,26 @@ MP <- function(group, t, att, V_analytical, se, c, inffunc, n=NULL, W=NULL, Wpva
   
   ###JC###
   #This patch is just removing treatement for t < debT (begining of treatment).
-    # if (!is.null(debT)) {
-    filter_indices <- group >= 3
-    group <- group[filter_indices]
-    t <- t[filter_indices]
-    att <- att[filter_indices]
-    V_analytical <- V_analytical[filter_indices, filter_indices]
-    se <- se[filter_indices]
-    inffunc <- inffunc[filter_indices]
-    if (!is.null(n)) n <- sum(filter_indices)
-    if (!is.null(W)) W <- W
-    if (!is.null(Wpval)) Wpval <- Wpval
-    if (!is.null(aggte)) aggte <- aggte
-    if (!is.null(DIDparams)) DIDparams <- DIDparams
+  #   if (!is.null(debT)) {
+  #   filter_indices <- group >= debT
+  #   group <- group[filter_indices]
+  #   t <- t[filter_indices]
+  #   att <- att[filter_indices]
+  #   V_analytical <- V_analytical[filter_indices, filter_indices]
+  #   se <- se[filter_indices]
+  #   inffunc <- inffunc[filter_indices]
+  #   if (!is.null(n)) n <- sum(filter_indices)
+  #   if (!is.null(W)) W <- W
+  #   if (!is.null(Wpval)) Wpval <- Wpval
+  #   if (!is.null(aggte)) aggte <- aggte
+  #   if (!is.null(DIDparams)) DIDparams <- DIDparams
   # }
   ###END###
   
   out <- list(group=group, t=t, att=att, V_analytical=V_analytical, se=se, c=c,
   inffunc=inffunc, n=n, W=W, Wpval=Wpval, aggte=aggte, alp = alp,
   DIDparams=DIDparams, call=DIDparams$call)
+  
   class(out) <- "MP"
   out
 }

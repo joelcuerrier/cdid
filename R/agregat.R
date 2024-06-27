@@ -391,6 +391,7 @@ agregat_influence_longDID<-function(tab,array_inf,listG,nom_outcome,tname,first.
 
 
 agregat_influence_GMM<-function(tab,array_influ,agreg_influence,listG,nom_outcome,tname,first.treat.name,poids){
+ 
   # fonction pour agreger les fonctions d'influence PHI_influence_ATTgt
   sum_array<-function(array_f){
     len = dim(array_f)[3]
@@ -402,34 +403,61 @@ agregat_influence_GMM<-function(tab,array_influ,agreg_influence,listG,nom_outcom
     }
     mat_result
   }
+
   tab$time_to_treatment<-tab[,tname]-(tab[,first.treat.name]-1)
   tab$compteur<-1:nrow(tab)
   tab=merge(tab,poids,by.x=first.treat.name, by.y="Var1",all.x)
   ttt=unique(sort(tab$time_to_treatment))
   agreg_influence_final <- array(0,dim=c(dim(agreg_influence)[1],length(nom_outcome)+1,length(ttt)+1))
+  
   for (i in 1:length(ttt)){
     ATTgti=tab[tab$time_to_treatment==ttt[i],]
     ATTgti$Freq=ATTgti$Freq/sum(ATTgti$Freq)
     agreg_inf_i=agreg_influence[,,ATTgti$compteur]
+    
+    ###JC###
+    #Patch pour transformer en structure de matrice.
+    agreg_inf_i=as.matrix(agreg_inf_i) 
+    agreg_inf_i=array(agreg_inf_i,dim=c(dim(agreg_inf_i)[1],1,dim(agreg_inf_i)[2]))
+    # agreg_inf_i <- structure(agreg_inf_i, .Dim = c(dim(agreg_inf_i)[1], 1,dim(agreg_inf_i)[2]))
+      
     if (is.na(dim(agreg_inf_i)[3])==TRUE){
-      agreg_inf_i=array(0,dim=c(dim(agreg_influence)[1],length(nom_outcome),1))
+      
+      # agreg_inf_i=array(0,dim=c(dim(agreg_influence)[1],length(nom_outcome),1))
       agreg_inf_i[,,1]=agreg_influence[,,ATTgti$compteur]
     } else {
-      agreg_inf_i=agreg_influence[,,ATTgti$compteur]
+      # agreg_inf_i=agreg_influence[,,ATTgti$compteur]
       for (j in 1:dim(ATTgti)[1]){
         agreg_inf_i[,,j]=ATTgti$Freq[j]*agreg_inf_i[,,j]
       }
     }
-    # D�but modif
-    # Comme les poids sont des fr�quences empiriques, ils sont al�atoires, 
-    # il faut ajouter un terme suppl�mentaire dans la fonction d'influence pour ne pas sous-�valuer la variance
+  
+    
+    # Début modif
+    # Comme les poids sont des fréquences empiriques, ils sont aléatoires, 
+    # il faut ajouter un terme supplémentaire dans la fonction d'influence pour ne pas sous-évaluer la variance
     for (j in 1:dim(ATTgti)[1]){
       traitement_j <- listG
       traitement_j[,1][traitement_j[,1]!= ATTgti[j,1]] <- 0
       traitement_j[,1][traitement_j[,1]== ATTgti[j,1]] <- 1
       traitement_j[,1] <- (traitement_j[,1]-mean(traitement_j[,1])) * 1/(dim(ATTgti)[1])
       agreg_inf_i[,(1:dim(agreg_inf_i)[2]),j] <- agreg_inf_i[,(1:dim(agreg_inf_i)[2]),j]+ t(t(traitement_j[,1]))%*%as.matrix(ATTgti[j,nom_outcome])
+      
+      # View(cbind(traitement_j,as.matrix(ATTgti[j,nom_outcome])))
+      # annee_G -0.0514 et attgti[j,outcome] cest 0.7414 a repetition dans le dataframe.les valeurs sont differents pour chq iterations.
+      # View(agreg_inf_i[,(1:dim(agreg_inf_i)[2]),j])
+#       c(-0.0380987867925241, 2.46125134205987, -0.0380987867925241, 
+# -0.0380987867925241, -0.0380987867925241, -1.44488465317681, 
+# -0.0380987867925241, -0.0380987867925241, 6.2228414112023, -0.0380987867925241, 
+# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
+# 0.492520020616457, -0.0380987867925241, -0.0380987867925241, 
+# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
+      #Seule difference avec 3.6.1 cest que eux cest un dataframe avec 2 output alors que moi jai une liste car jai un output donc dim1.
     }
+
+  
+   
+
     # End modif
     if (ttt[i]< 0 ) {
       agreg_influence_final[,2:dim(agreg_influence_final)[2],i]=sum_array(agreg_inf_i)
@@ -437,12 +465,112 @@ agregat_influence_GMM<-function(tab,array_influ,agreg_influence,listG,nom_outcom
       agreg_influence_final[,2:dim(agreg_influence_final)[2],i+1]=sum_array(agreg_inf_i)
     }
   }
+  # View(sum_array(agreg_inf_i))
+  #Seule difference avec 3.6.1 cest que eux cest un dataframe avec 2 output alors que moi jai une liste car jai un output donc dim1.
+
+# c(-0.0380987867925241, 2.46125134205987, -0.0380987867925241, 
+# -0.0380987867925241, -0.0380987867925241, -1.44488465317681, 
+# -0.0380987867925241, -0.0380987867925241, 6.2228414112023, -0.0380987867925241, 
+# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
+# 0.492520020616457, -0.0380987867925241, -0.0380987867925241, 
+# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
+# -0.0380987867925241, -0.0380987867925241, -2.99456499984133, 
+# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
+# -0.0380987867925241, 2.11081322870858, -0.0380987867925241, 4.4147590187473, 
+# -0.0380987867925241, -6.17050931748603, -0.0380987867925241, 
+# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
+# -5.0656937473256, -0.0380987867925241, 1.4469771848768, -2.3420234426436, 
+# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
+
   # Remettre les identifiants des individus
   for (i in 1:(length(ttt)+1)){
     agreg_influence_final[,1,i]=array_influ[,1,1]
   }
+  # View(agreg_influence_final) #output ok
   agreg_influence_final
+  
 }
+
+#back up
+
+# agregat_influence_GMM<-function(tab,array_influ,agreg_influence,listG,nom_outcome,tname,first.treat.name,poids){
+#   print(dim(agreg_influence))
+  
+#   # fonction pour agreger les fonctions d'influence PHI_influence_ATTgt
+#   sum_array<-function(array_f){
+#     len = dim(array_f)[3]
+#     mat_result=array_f[,,1]
+#     if (len>1){
+#       for (k in 2:len){
+#         mat_result=mat_result+array_f[,,k]
+#       }
+#     }
+#     mat_result
+#   }
+
+#   tab$time_to_treatment<-tab[,tname]-(tab[,first.treat.name]-1)
+#   tab$compteur<-1:nrow(tab)
+#   tab=merge(tab,poids,by.x=first.treat.name, by.y="Var1",all.x)
+#   ttt=unique(sort(tab$time_to_treatment))
+  
+
+#   agreg_influence_final <- array(0,dim=c(dim(agreg_influence)[1],length(nom_outcome)+1,length(ttt)+1))
+#   for (i in 1:length(ttt)){
+#     ATTgti=tab[tab$time_to_treatment==ttt[i],]
+#     ATTgti$Freq=ATTgti$Freq/sum(ATTgti$Freq)
+    
+#     agreg_inf_i=agreg_influence[,,ATTgti$compteur]
+
+#     ###JC###
+#     agreg_inf_i=as.matrix(agreg_inf_i)
+#     print(dim(agreg_inf_i)) #si compteur est vide/aucune donnees dans attgti, la troisieme dimension est vide. 
+#     View(agreg_inf_i)
+   
+#     if (is.na(dim(agreg_inf_i)[3])==TRUE){    
+#       print('lol')
+#       agreg_inf_i=array(0,dim=c(dim(agreg_influence)[1],length(nom_outcome),1))
+#       agreg_inf_i[,,1]=agreg_influence[,,ATTgti$compteur]
+#     } else {
+#       print('xd')
+#       agreg_inf_i=agreg_influence[,,ATTgti$compteur]
+#       for (j in 1:dim(ATTgti)[1]){
+#         agreg_inf_i[,,j]=ATTgti$Freq[j]*agreg_inf_i[,,j]
+#       }
+#     }
+   
+
+#     # Début modif
+#     # Comme les poids sont des fréquences empiriques, ils sont aléatoires, 
+#     # il faut ajouter un terme supplémentaire dans la fonction d'influence pour ne pas sous-évaluer la variance
+#     for (j in 1:dim(ATTgti)[1]){
+#       traitement_j <- listG
+#       traitement_j[,1][traitement_j[,1]!= ATTgti[j,1]] <- 0
+#       traitement_j[,1][traitement_j[,1]== ATTgti[j,1]] <- 1
+#       traitement_j[,1] <- (traitement_j[,1]-mean(traitement_j[,1])) * 1/(dim(ATTgti)[1])
+#       agreg_inf_i[,(1:dim(agreg_inf_i)[2]),j] <- agreg_inf_i[,(1:dim(agreg_inf_i)[2]),j]+ t(t(traitement_j[,1]))%*%as.matrix(ATTgti[j,nom_outcome])
+#     }
+
+#     # View(sum_array(agreg_inf_i))
+
+
+
+#     # End modif
+#     if (ttt[i]< 0 ) {
+#       agreg_influence_final[,2:dim(agreg_influence_final)[2],i]=sum_array(agreg_inf_i)
+#     } else {
+#       agreg_influence_final[,2:dim(agreg_influence_final)[2],i+1]=sum_array(agreg_inf_i)
+#     }
+#   }
+#   # Remettre les identifiants des individus
+#   for (i in 1:(length(ttt)+1)){
+#     agreg_influence_final[,1,i]=array_influ[,1,1]
+#   }
+#   agreg_influence_final
+# }
+
+
+
+
 
 
 
