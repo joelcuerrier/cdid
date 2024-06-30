@@ -27,6 +27,7 @@
 #' @param clustervars The name of the column containing the clustering variable. Default is NULL.
 #' @param cband Boolean for whether or not to compute a uniform confidence band that covers all of the group-time average treatment effects with fixed probability `1-alp`.  In order to compute uniform confidence bands, `bstrap` must also be set to `TRUE`.  The default is `TRUE`.
 #' @name gmm
+#' @export
 #' @examples
 #' data=data_sim = fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
 #' results=gmm(
