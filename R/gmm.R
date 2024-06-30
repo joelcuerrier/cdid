@@ -26,7 +26,7 @@
 #' @param treated The name of the column containing the treatment indicator. 
 #' @param clustervars The name of the column containing the clustering variable. Default is NULL.
 #' @param cband Boolean for whether or not to compute a uniform confidence band that covers all of the group-time average treatment effects with fixed probability `1-alp`.  In order to compute uniform confidence bands, `bstrap` must also be set to `TRUE`.  The default is `TRUE`.
-
+#' @name gmm
 #' @examples
 #' data=data_sim = fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
 #' results=gmm(
@@ -72,24 +72,24 @@
   set.seed(123)
 
 #Compare the results gmm vs chained 
-  source("C:/Users/cuerr/Documents/cdid/R/fonction_simu_attrition.R")
-  source("C:/Users/cuerr/Documents/cdid/R/fonction_simu_attrition_nofe.R")
-  source("C:/Users/cuerr/Documents/cdid/R/fonctions_estimation_Boot.R")
-  source("C:/Users/cuerr/Documents/cdid/R/mp_spatt_Boot.R")
-  source("C:/Users/cuerr/Documents/cdid/R/compute_mp_spatt_Boot_alt.R")
-  source("C:/Users/cuerr/Documents/cdid/R/panelDiffV.R")
-  source("C:/Users/cuerr/Documents/cdid/R/gg.R")
-  source("C:/Users/cuerr/Documents/cdid/R/agregat.R")
-  source("C:/Users/cuerr/Documents/cdid/R/process_attgt.R")
-  source("C:/Users/cuerr/Documents/cdid/R/pre_process_did.R")
-  source("C:/Users/cuerr/Documents/cdid/R/DIDparams.R")
-  source("C:/Users/cuerr/Documents/cdid/R/mboot.R")
-  source("C:/Users/cuerr/Documents/cdid/R/MP.R")
-  source("C:/Users/cuerr/Documents/cdid/R/chained.R")
-  source("C:/Users/cuerr/Documents/cdid/R/compute.aggte.R")
-  source("C:/Users/cuerr/Documents/cdid/R/aggte.R")
-  source("C:/Users/cuerr/Documents/cdid/R/process_attgt_gmm.R")
-  source("C:/Users/cuerr/Documents/cdid/R/MP.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/fonction_simu_attrition.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/fonction_simu_attrition_nofe.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/fonctions_estimation_Boot.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/mp_spatt_Boot.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/compute_mp_spatt_Boot_alt.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/panelDiffV.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/gg.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/agregat.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/process_attgt.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/pre_process_did.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/DIDparams.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/mboot.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/MP.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/chained.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/compute.aggte.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/aggte.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/process_attgt_gmm.R")
+  # source("C:/Users/cuerr/Documents/cdid/R/MP.R")
   
  
   gmm <-function(yname,
