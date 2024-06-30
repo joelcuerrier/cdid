@@ -87,7 +87,7 @@ group. Second, we sample from this population using the specified process. We
 set.seed(123)
 
 library(devtools)
-devtools::install_github("joelcuerrier/cdid", ref = "june24", force = TRUE)
+remotes::install_github("joelcuerrier/cdid", ref = "june24")
 
 
 library(cdid)
@@ -97,7 +97,7 @@ ls("package:did")
 
 # Using the function `fonction_simu_attrition` from the `cdid` package.
 # We simulate the data for the following parameter values: $\theta_2 = 0.2, \lambda_1 = 0.2, \sigma_{\alpha} = 2, \sigma_{\epsilon} = 0.5$.
-dta=fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
+dta=cdid::fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
 
 #      id annee  Y1_chaine       X         annee_G   P_Y1_chaine   traite_G  select  
 # 6616  1     1  0.7697235   1.3126786       0            0           0         1   

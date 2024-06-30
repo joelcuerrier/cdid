@@ -3,7 +3,7 @@
 #' @description Does the heavy lifting on computing aggregated group-time
 #'  average treatment effects
 #'
-#' @inheritParams att_gt
+
 #' @inheritParams aggte
 #' @param call The function call to aggte
 #'

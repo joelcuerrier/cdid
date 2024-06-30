@@ -9,6 +9,7 @@
 #' @keywords datasets
 #' @examples 
 #' data=data_sim=fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
+#' @export
 
 fonction_simu_attrition <- function(nbsimu = 1, theta2_alpha_Gg, lambda1_alpha_St, sigma_alpha, sigma_epsilon){
 # Remarque : pour l'estimateur long DID, on l'estime sur un panel cylindr� qui drop les observations manquantes
