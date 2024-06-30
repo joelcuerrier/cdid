@@ -86,8 +86,10 @@ group. Second, we sample from this population using the specified process. We
 ```{r}
 set.seed(123)
 
-#importing the package
-devtools::install_github("joelcuerrier/cdid", ref = "library",force = TRUE)
+library(devtools)
+devtools::install_github("joelcuerrier/cdid", ref = "june24", force = TRUE)
+
+
 library(cdid)
 ls("package:cdid")
 library(did)

@@ -48,7 +48,7 @@ MP <- function(group, t, att, V_analytical, se, c, inffunc, n=NULL, W=NULL, Wpva
   DIDparams=DIDparams, call=DIDparams$call)
   
   class(out) <- "MP"
-  out
+  return(out)
 }
 
 #' @title summary.MP

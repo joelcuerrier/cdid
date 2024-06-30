@@ -17,13 +17,6 @@ process_attgt_gmm <- function(attgt.list) {
   nG=(length(unique(map_dfr(attgt.list, ~as.data.frame(.x))$group)))
   nT=length(unique(map_dfr(attgt.list, ~as.data.frame(.x))$year))
   
-  # print(dim(map_dfr(attgt.list, ~as.data.frame(.x)))[1]/(nG*nT))
-  
-  
-  
-  
-  
-  
   # create vectors to hold the results
   group <- c()
   att <- c()
@@ -33,10 +26,10 @@ process_attgt_gmm <- function(attgt.list) {
   # counter=1
   # populate result vectors and matrices
   for (f in nG) {
-    for (s in nT) {
+    for (s in nT) { #added the dimension k. 
       for (t in 1:dim(map_dfr(attgt.list, ~as.data.frame(.x)))[1]/(nG*nT)) {
-      # print(counter)
-      # counter=counter+1
+      
+      
       group[i] <- attgt.list[[i]]$group
       tt[i] <- attgt.list[[i]]$year
       att[i] <- attgt.list[[i]]$att
@@ -44,6 +37,9 @@ process_attgt_gmm <- function(attgt.list) {
       }
     }
   }
+
+  
+  
 
   list(group=group, att=att, tt=tt)
 }

@@ -1,25 +1,30 @@
 Package: cdid
 Type: Package
-Title: "chained difference-in-differences" 
+Title: Chained Difference-in-Differences
 Version: 0.1.0
-Authors@R: c(person("Joel", "Cuerrier", email = "joel.cuerrier@hec.ca", role = c("cre","aut")),person("David","Benatia",email= "david.benatia@hec.ca",role= c("aut")),person("Christophe","Bellégo",email= "christophe.bellego@ensae.fr",role="aut"),person("Vincent","Dortet-Bernadet",email= "vincent.dortet-bernadet@finances.gouv.fr",role="aut"))
+Authors@R: 
+    c(
+      person("Joel", "Cuerrier", email = "joel.cuerrier@hec.ca", role = c("cre", "aut")),
+      person("David", "Benatia", email = "david.benatia@hec.ca", role = c("aut")),
+      person("Christophe", "Bellégo", email = "christophe.bellego@ensae.fr", role = "aut"),
+      person("Vincent", "Dortet-Bernadet", email = "vincent.dortet-bernadet@finances.gouv.fr", role = "aut")
+    )
 URL: https://github.com/joelcuerrier/cdid
-Maintainer: The package maintainer <joel.cuerrier@hec.ca>
+Maintainer: Joel Cuerrier <joel.cuerrier@hec.ca>
 Description: The "chained difference-in-differences" package provides tools for modeling long-term treatment effects in scenarios where balanced panel data is unavailable or only a subset of the available data is present.
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
 Imports: 
-        openxlsx,
-        data.table,
-        BMisc,
-        jsonlite,
-        did
+    openxlsx,
+    data.table,
+    BMisc,
+    jsonlite,
+    did
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 BugReports: https://github.com/joelcuerrier/cdid/issues
-VignetteBuilder:
-    knitr
+VignetteBuilder: knitr
 Depends:
     R (>= 3.5.0)
 Suggests: 

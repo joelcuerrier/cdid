@@ -29,16 +29,15 @@ compute.aggte <- function(MP,
   # unpack MP object
   #-----------------------------------------------------------------------------
   # load parameters
-  
-  group <- MP$group
-  
-  
-  t <- MP$t
-  att <- MP$att
-  dp <- MP$DIDparams
-  
-  inffunc1 <- MP$inffunc
-  n <- MP$n
+  #The only thing thats different from regular aggte code:
+  unique_group <- MP[[1]][[3]]$annee_G
+  t <- MP[[1]][[3]]$annee
+  att <- MP[[1]][[3]]$att
+  dp <- MP[[1]]
+  # print(str(dp))
+  inffunc1 <- MP[[2]]
+  # n <- MP$n
+  n = dim((MP[[2]]))[1]
   
   
 
@@ -94,13 +93,11 @@ compute.aggte <- function(MP,
     inffunc1 <- inffunc1[, notna]
     #tlist <- sort(unique(t))
     glist <- sort(unique(group))
-    
+
     # If aggte is of the group type, ensure we have non-missing post-treatment ATTs for each group
     if(type == "group"){
-      
       # Get the groups that have some non-missing ATT(g,t) in post-treatmemt periods
       gnotna <- sapply(glist, function(g) {
-        
         # look at post-treatment periods for group g
         whichg <- which( (group == g) & (g <= t))
         attg <- att[whichg]
@@ -203,7 +200,7 @@ compute.aggte <- function(MP,
   #-----------------------------------------------------------------------------
 
   if (type == "simple") {
-    
+
     # simple att
     # averages all post-treatment ATT(g,t) with weights
     # given by group size
@@ -255,7 +252,6 @@ compute.aggte <- function(MP,
     selective.att.g <- sapply(glist, function(g) {
       # look at post-treatment periods for group g
       whichg <- which( (group == g) & (g <= t) & (t<= (group + max_e))) ### added last condition to allow for limit on longest period included in att
-      
       attg <- att[whichg]
       mean(attg)
     })
@@ -388,10 +384,10 @@ compute.aggte <- function(MP,
       # keep att(g,t) for the right g&t as well as ones that
       # are not trimmed out from balancing the sample
       whiche <- which( (originalt - originalgroup == e) & (include.balanced.gt) )
-      
-      
+      # View(cbind(originalt, originalgroup, originalt - originalgroup, include.balanced.gt))
+      # View(whiche) # e c'est la duree e. whiche contient l'index row respectant la condition.
       atte <- att[whiche]
-      
+      # View(cbind(whiche,sum(whiche)))
       pge <- pg[whiche]/(sum(pg[whiche]))  #pg c'est la probabilité de faire partie du groupe g et d'être sampled. On prend donc la probabilité à l'index[whiche] et on pondère par la somme de ces probabilités. Cela normalise les probabilités sélectionnées pour qu'elles représentent une distribution de probabilité valide où la somme de toutes les probabilités est égale à 1
       sum(atte*pge)
     })
@@ -644,7 +640,7 @@ wif <- function(keepers, pg, weights.ind, G, group) {
 #' @keywords internal
 get_agg_inf_func <- function(att, inffunc1, whichones, weights.agg, wif=NULL) {
   # enforce weights are in matrix form
-  
+  print(whichones)
   
   
 
@@ -652,10 +648,8 @@ get_agg_inf_func <- function(att, inffunc1, whichones, weights.agg, wif=NULL) {
   
 
 
-  
+  print(dim(inffunc1))  
   # multiplies influence function times weights and sums to get vector of weighted IF (of length n)
-  
-  
   thisinffunc <- inffunc1[,whichones]%*%weights.agg
   
  

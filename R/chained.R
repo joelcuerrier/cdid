@@ -56,28 +56,25 @@
 #' @return  \item{att}{The average treatment effect on the treated}
 
 
-#Éventuellement utiliser les fonctions de Callaway. Quelques modifications à faire avant.
-# library(did)
-# DIDparams <- did::DIDparams
-# mboot <- did::mboot
-# MP <- did::MP
-# pre_process_did <- did::pre_process_did
-# process_attgt <- did::process_attgt
-
-
+#Notes:
 #Ajouter une description pour l'inférence corolaire 1. On a pas considéré l'incertitude des propensity scores du first step
-#Faire des tests
-
 #comparer avec did. Et écrire une script simple qui permet aux utilisateurs de comparer.
+#remettre les t > debT dans compute et autres
+#dp calcule .w (les poids) mais de la mauvaise façon donc juste les remplacer avec les bons cdid.
+#trucs de hard coded dans chained.R
+# disdat$pp=disdat[[ponderation[1]]] #hard coded... dans compute
+#Enlevr la simul des fonctions
+#import les libraries en ce moment le path est celui de mon ordi...
+# # #Prochaines étapes
+# # # réparer group_ATT_estimators (valider les resulttats)
+# # # (voir function gg) et les betas de 0.25,50,.75 qui sont hard coded
+# # #améliorer l'efficacité fonction compute
+# # #je crois dans les fonctions d'aggregation de did, ils utilisent les poids pg du papier de callaway. voir les fonctions compute.aggte.R (les codes pour faire rouller aggte.)
 
-
-
-
-
-
-
-
-
+# #Vérifier les fonctions de compute.aggte.R et les résultats:
+            # lambda probleme de selection
+#         #enlever les effets fixes juste garder betas pour generer y att pour valider les betas .
+#         # cs pour valider 
 
 
 chained <-function(yname,
@@ -87,22 +84,22 @@ chained <-function(yname,
                    xformla=NULL,
                    propensityformla,
                    data,
-                   panel=TRUE,  #
-                   allow_unbalanced_panel=TRUE, #
+                   panel=TRUE, 
+                   allow_unbalanced_panel=TRUE, 
                    control_group=c("nevertreated","notyettreated"), #
-                   anticipation=0, #
+                   anticipation=0, 
                    weightsname=NULL,
                    weight_assumption=NULL,
                    alp=0.05,
                    bstrap=TRUE,
-                   cband=TRUE, #
+                   cband=TRUE, 
                    biters=1000,
-                   clustervars=NULL, #
-                   est_method="chained", #
-                   base_period="varying",#
-                   print_details=FALSE, #
-                   pl=FALSE, #
-                   cores=1, #
+                   clustervars=NULL, 
+                   est_method="chained", 
+                   base_period="varying",
+                   print_details=FALSE, 
+                   pl=FALSE, 
+                   cores=1, 
                    debT,
                    finT,
                    deb,
@@ -135,11 +132,10 @@ dp=pre_process_did(yname=yname,
                    ,treated=treated
                    )
 
-  #test
   #-----------------------------------------------------------------------------
   # Compute all ATT(g,t)
   #-----------------------------------------------------------------------------
-#remettre les t > debT dans compute et autres
+
 resultat=chained_estimPeriod_Boot(yname=yname,
                           tname=tname,
                           idname=idname,
@@ -154,45 +150,30 @@ resultat=chained_estimPeriod_Boot(yname=yname,
                           select=select,
                           weightsname=weightsname,
                           weight_assumption=weight_assumption,
-                          
                           cband=cband,
                           alp=0.05,
                           bstrap=bstrap,
                           biters=biters,
                           treated=treated)    
 
-  print(str((resultat)))
-  # View(resultat[[1]])
-
   #Les codes suivants sont basés sur les codes de la fonction att_gt.R du package did
   #https://cran.r-project.org/web/packages/did/did.pdf
-  attgt_list=resultat[[1]] 
+  attgt_list=resultat[[1]] #42x6
   attgt.list <- lapply(1:nrow(attgt_list), function(i) {
-    #Faire certain que tname pour groupe et gname poour year cest ok...
+    
   list(
     att = as.numeric(attgt_list[i, yname]),
     group = as.numeric(attgt_list[i, gname]),
     year = as.numeric(attgt_list[i, tname]),
     post = ifelse(attgt_list[i, gname] > attgt_list[i, tname], 1, 0))})
-  # print(dim(attgt_list)) #42x6
-  # class(attgt_list) #data.frame
-
-
+  
   inffunc=resultat[[2]] #dim 6597x1x42
-  inffunc <- inffunc[, 2,] #to verify, it seems hard coded.... JC...no ok... 2nd dim is the inffunc value, first is id
-  # print(dim(inffunc)) #6597   42
-  # class(inffunc) # array
+  inffunc <- inffunc[, 2,]  #6597   42
 
-  attgt.results=process_attgt(attgt.list) #
-  # View(as.data.frame(attgt.results))
+  attgt.results=process_attgt(attgt.list) 
   group=attgt.results$group
-  
   att=attgt.results$att
-  tt=attgt.results$tt
-  # View(tt)
-  
-  
-  
+  tt=attgt.results$tt 
   
   # analytical standard errors
   # estimate variance
@@ -236,22 +217,16 @@ resultat=chained_estimPeriod_Boot(yname=yname,
   #-----------------------------------------------------------------------------
   # compute Wald pre-test
   #-----------------------------------------------------------------------------
-
   # select which periods are pre-treatment
   pre <- which(group > tt)
-
-
-  
   # Drop group-periods that have variance equal to zero (singularity problems)
   if(length(zero_na_sd_entry)>0){
     pre <- pre[!(pre %in% zero_na_sd_entry)]
   }
   # pseudo-atts in pre-treatment periods
   preatt <- as.matrix(att[pre])
-
   # covariance matrix of pre-treatment atts
   preV <- as.matrix(V[pre,pre])
-
   # check if there are actually any pre-treatment periods
   if (length(preV) == 0) {
     message("No pre-treatment periods to test")
@@ -267,20 +242,17 @@ resultat=chained_estimPeriod_Boot(yname=yname,
     W <- NULL
     Wpval <- NULL
   } else {
-    
     W <- n*t(preatt)%*%solve(preV)%*%preatt
     q <- length(pre) # number of restrictions
     Wpval <- round(1-pchisq(W,q),10)
   }
 
-  
   #-----------------------------------------------------------------------------
   # compute confidence intervals / bands
   #-----------------------------------------------------------------------------
 
   # critical value from N(0,1), for pointwise
   cval <- qnorm(1-alp/2)
-
   # in order to get uniform confidence bands
   # HAVE to use the bootstrap
   if (bstrap){
@@ -304,6 +276,33 @@ resultat=chained_estimPeriod_Boot(yname=yname,
   }
 
   
-  # print(dim(inffunc)) #6597   42
-  return(MP(group=group, t=tt, att=att, V_analytical=V, se=se, c=cval, inffunc=inffunc, n=n, W=W, Wpval=Wpval, alp = alp, DIDparams=dp,debT=debT))  
+  results=MP(group=group, t=tt, att=att, V_analytical=V, se=se, c=cval, inffunc=inffunc, n=n, W=W, Wpval=Wpval, alp = alp, DIDparams=dp,debT=debT)
+
+  # Note: MP a été modifié pour rejetter les traités < debT. C'est pourquoi on a 36 combinaisons de g,t et non 42 (avec les données de la simulation).
+  # L'output est modifié afin de l'uniformiser au résulltats du package DiD. Ceci permet d'utiliser les fonctions d'aggrégation de DiD.
+  # Pour se faire, la matrice doit être transformée en dgc matrix. @p correspond au groupe g,t. 
+
+  unique_id <- unique(results$DIDparams$data$id)
+  unique_group <- unique(results$group)
+  unique_t <- unique(results$t)
+
+
+  inffunc_data <- expand.grid(id = unique_id,
+                              group = unique_group,
+                              t = unique_t)
+
+  inffunc_data$gt <- as.integer(factor(paste0(inffunc_data$group, inffunc_data$t), levels = unique(paste0(inffunc_data$group, inffunc_data$t))))
+  # inffunc_data$x=results$inffunc
+  inffunc_data$x <- if (length(results$inffunc) >= nrow(inffunc_data)) results$inffunc[1:nrow(inffunc_data)] else c(results$inffunc, rep(NA, nrow(inffunc_data) - length(results$inffunc)))
+  
+  sparse_matrix <- sparseMatrix(
+    i = inffunc_data$id,
+    j = inffunc_data$gt,
+    x = inffunc_data$x,
+    dimnames = list(NULL, NULL)
+  )
+  
+  results$inffunc=sparse_matrix
+  return(results)
+
   }

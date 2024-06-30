@@ -70,7 +70,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
     ## boucle sur la date : t, [1 2 3 4 5 6 7 8]. tlist[t+1] prend les valeurs 2, 3, 4, 5, 6, 7, 8. tlist[t] prend les valeurs 1, 2, 3, 4, 5, 6, 7.
     for (t in 1:(tlen - 1)) {  
         pret <- flist[f]-1 # cohorte G-1, flist est inclut dans [3 4 5 6 7 8], pret  est inclut dans [2,3,4,5,6,7].
-        print(counter)
+        
         
         
 
@@ -124,7 +124,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         ############################
         # Assumptions on Weights ###
         ############################
-          #print(first.treat.name)
+          
         if(!is.null(weight_assumption)){
             
             ################################
@@ -832,7 +832,7 @@ compute.mp.spatt.GMM <- function (  nom_outcome
       tbis = tlen - t #detlta att_k (les distances possibles)
       
       for (k in 1:tbis) {
-        print(counter)
+        
         #weights for ATT
         ### Fill the matrix W for ATT with positive weight (1), ATT with negative weight (-1), or ATT with zero weight (by default)
         #Possible d'améliorer avec un calcul matricielle. (à venir)
@@ -1720,9 +1720,9 @@ compute.mp.spatt.CS_Boot <- function (  nom_outcome
         mat_influence[,i,counter]=psi[,i]  
       }
     counter <- counter + 1
-    #print(t)
+    
     } ### fin boucle sur l'annee
-  #print(f)
+  
   } ## fin boucle sur le traitement f
   
   list(fatt,mat_influence,indiv)
@@ -1799,21 +1799,21 @@ compute.mp.spatt.Boot_longDID <- function (  nom_outcome
       pformla <- xformla
       ### On supprime les observations pour lesquelles le mod�le de score ne peut �tre d�fini
       LesX<-BMisc::rhs.vars(pformla)
-      # print(LesX)
+      
       bbb<-length(LesX)
       for (jj in 1:bbb){
         disdat<-disdat[is.na(disdat[,LesX[jj]])==FALSE,]
       }
-      # print(dim(disdat))
+      
       ## finlament d�finitio ndu mod�le de score
       pformla <- BMisc::toformula("G", BMisc::rhs.vars(pformla))
       base_score<-subset(disdat, C + G == 1)
       base_score=base_score[base_score$select==1,]
       pscore.reg <- glm(pformla, family = binomial(link = "logit"),
                         data = base_score)
-      # print(summary(pscore.reg ))
+      
       thet <- coef(pscore.reg)
-      #print(thet)
+      
       if (any(is.na(thet))) {
         warning(paste0("Problems estimating propensity score...likely perfectly predicting treatment for group: ",
                        flist[f], " at time period: ", tlist[t +1]))
@@ -1968,12 +1968,8 @@ compute.mp.spatt.Boot_longDID <- function (  nom_outcome
 
 
 
-          # print("dy")
-          # print(class(dy_i))
-          # print(dim(dy_i))
-          # print("wc1")
-          # print(class(wc1_i))
-          # print(dim(wc1_i))
+    
+    
 
           M_i <- as.matrix(apply(as.matrix((C_i/(1 - pscore))^2 * gg(x, thet) * (dy_i - mean(wc_i * dy_i)) * x), 2,mean)/mean(wc1_i))
           
@@ -2003,15 +1999,16 @@ compute.mp.spatt.Boot_longDID <- function (  nom_outcome
         ### mettre les siren dans psi
         psi<-as.data.frame(psi)
         colnames(psi)<-nom_outcome
+        
         # psi[,idname]<-disdat[,idname]
         psi[,idname]<-disdat[,..idname]
-        # print(dim(psi)); print(colnames(psi))
+        
         ### apparier psi avec indiv
         psi<-merge(indiv[idname], psi, by.x=idname, by.y=idname, all.x=TRUE)
         for (i in 1:length(nom_outcome)){
           psi[is.na(psi[,nom_outcome[i]]),nom_outcome[i]]<-0
         }
-        # print(dim(psi));
+        
 
         # Compter le nombre d'observations utilis�es pour l'estimation de chaque brique (moyenne sur les diff�rents outcomes �valu�s)
         # nG<-round(mean(colSums(disdat$G * 1 *(disdat[,ponderation]>0))))
@@ -2043,7 +2040,7 @@ compute.mp.spatt.Boot_longDID <- function (  nom_outcome
         mat_influence[,i,counter]=psi[,i]  
       }
       counter <- counter + 1
-      # print(counter)
+      
     } ### fin boucle sur l'annee
   } ## fin boucle sur le traitement f
 
