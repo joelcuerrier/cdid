@@ -48,34 +48,17 @@
 #'                 select='select',
 #'                 treated='traite_G')
 #' results
-#' 
-#' library(did)
-#' did
-#' 
-
 #' @return  \item{att}{The average treatment effect on the treated}
 
-
-#Notes:
-#Ajouter une description pour l'inférence corolaire 1. On a pas considéré l'incertitude des propensity scores du first step
-#comparer avec did. Et écrire une script simple qui permet aux utilisateurs de comparer.
-#remettre les t > debT dans compute et autres
-#dp calcule .w (les poids) mais de la mauvaise façon donc juste les remplacer avec les bons cdid.
-#trucs de hard coded dans chained.R
-# disdat$pp=disdat[[ponderation[1]]] #hard coded... dans compute
-#Enlevr la simul des fonctions
-#import les libraries en ce moment le path est celui de mon ordi...
-# # #Prochaines étapes
-# # # réparer group_ATT_estimators (valider les resulttats)
-# # # (voir function gg) et les betas de 0.25,50,.75 qui sont hard coded
-# # #améliorer l'efficacité fonction compute
-# # #je crois dans les fonctions d'aggregation de did, ils utilisent les poids pg du papier de callaway. voir les fonctions compute.aggte.R (les codes pour faire rouller aggte.)
-
-# #Vérifier les fonctions de compute.aggte.R et les résultats:
-            # lambda probleme de selection
-#         #enlever les effets fixes juste garder betas pour generer y att pour valider les betas .
-#         # cs pour valider 
-
+  library(devtools)
+  library(openxlsx)
+  library(data.table) 
+  library(BMisc)
+  library(did)
+  library(jsonlite)
+  library(devtools)
+  library(tidyr)
+  # set.seed(123)
 
 chained <-function(yname,
                    tname,
@@ -86,7 +69,7 @@ chained <-function(yname,
                    data,
                    panel=TRUE, 
                    allow_unbalanced_panel=TRUE, 
-                   control_group=c("nevertreated","notyettreated"), #
+                   control_group=c("nevertreated","notyettreated"), 
                    anticipation=0, 
                    weightsname=NULL,
                    weight_assumption=NULL,
@@ -278,7 +261,6 @@ resultat=chained_estimPeriod_Boot(yname=yname,
   
   results=MP(group=group, t=tt, att=att, V_analytical=V, se=se, c=cval, inffunc=inffunc, n=n, W=W, Wpval=Wpval, alp = alp, DIDparams=dp,debT=debT)
 
-  # Note: MP a été modifié pour rejetter les traités < debT. C'est pourquoi on a 36 combinaisons de g,t et non 42 (avec les données de la simulation).
   # L'output est modifié afin de l'uniformiser au résulltats du package DiD. Ceci permet d'utiliser les fonctions d'aggrégation de DiD.
   # Pour se faire, la matrice doit être transformée en dgc matrix. @p correspond au groupe g,t. 
 
@@ -286,13 +268,11 @@ resultat=chained_estimPeriod_Boot(yname=yname,
   unique_group <- unique(results$group)
   unique_t <- unique(results$t)
 
-
   inffunc_data <- expand.grid(id = unique_id,
                               group = unique_group,
                               t = unique_t)
 
   inffunc_data$gt <- as.integer(factor(paste0(inffunc_data$group, inffunc_data$t), levels = unique(paste0(inffunc_data$group, inffunc_data$t))))
-  # inffunc_data$x=results$inffunc
   inffunc_data$x <- if (length(results$inffunc) >= nrow(inffunc_data)) results$inffunc[1:nrow(inffunc_data)] else c(results$inffunc, rep(NA, nrow(inffunc_data) - length(results$inffunc)))
   
   sparse_matrix <- sparseMatrix(

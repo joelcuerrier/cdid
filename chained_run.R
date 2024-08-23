@@ -41,6 +41,7 @@ source("C:/Users/cuerr/Documents/cdid/R/chained.R")
 source("C:/Users/cuerr/Documents/cdid/R/compute.aggte.R")
 source("C:/Users/cuerr/Documents/cdid/R/aggte.R")
 source("C:/Users/cuerr/Documents/cdid/R/compute.aggte.R")
+
 data=fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
 # data=fonction_simu_attrition_nofe(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
 

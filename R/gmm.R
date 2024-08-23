@@ -55,12 +55,7 @@
 #'                 cband=TRUE,
 #'                 clustervars=NULL)
 #' results
-#' 
-#' 
-
 #' @return  \item{att}{The average treatment effect on the treated}
-
-
 
   library(devtools)
   library(openxlsx)
@@ -70,28 +65,7 @@
   library(jsonlite)
   library(devtools)
   library(tidyr)
-  set.seed(123)
-
-#Compare the results gmm vs chained 
-  # source("C:/Users/cuerr/Documents/cdid/R/fonction_simu_attrition.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/fonction_simu_attrition_nofe.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/fonctions_estimation_Boot.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/mp_spatt_Boot.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/compute_mp_spatt_Boot_alt.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/panelDiffV.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/gg.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/agregat.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/process_attgt.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/pre_process_did.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/DIDparams.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/mboot.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/MP.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/chained.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/compute.aggte.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/aggte.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/process_attgt_gmm.R")
-  # source("C:/Users/cuerr/Documents/cdid/R/MP.R")
-  
+#   set.seed(123)
  
   gmm <-function(yname,
                     tname,
@@ -172,8 +146,6 @@
                             biters=biters,
                             treated=treated)    
 
-
-
     attgt_list=results[[1]][1]
     attgt_list=as.data.frame(attgt_list)
 
@@ -184,7 +156,6 @@
     
     year = as.numeric(attgt_list[i, tname]),
     post = ifelse(attgt_list[i, gname] > attgt_list[i, tname], 1, 0))})
-    
     
     #Il y a un ajustement des résultats GMM pour les rendre compatibles avec les résultats de cDiD.
     #L'ajustement consiste à ajouter la dimension tbis. On a donc un ATT associé à chaque g,t et tbis. Sans quoi on a plusieurs ATT pour un seul g,t. 168 au lieu de 42.

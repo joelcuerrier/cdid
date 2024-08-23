@@ -59,7 +59,7 @@ Where $D_{i\tau} ∈ {0, 1}$ denotes whether individual i has been treated in $\
 • The treatment effect is constant over time: $\beta_{\tau} = 1$;
 • The error term is iid gaussian: $\varepsilon_{it} ∼ N(0, \alpha^2_{\varepsilon})$;
 • The probability to receive the treatment at time g, conditional on being treated at g or in the control group, is defined as: 
-$$Pr((G_{ig} = 1|X_i, \alpha_i, G_{ig} + C_i = 1)) = \frac{1}{1 + \exp(\theta_0 + \theta_1 X_i + \theta_2 \alpha_i \times g)}$$.
+$$Pr(G_{ig} = 1|X_i, \alpha_i, G_{ig} + C_i = 1) = \frac{1}{1 + \exp(\theta_0 + \theta_1 X_i + \theta_2 \alpha_i \times g)}$$.
 Where $X_i ∼ N(1, 1)$ is observable for every i, unlike $\alpha_i$, and $\theta_0 = −1, \theta_1 = 0.4$ and $\theta_2 = 0$ or $\theta_2 = 0.2$. In the latter case, the treatment probability varies with treatment timing and the unobserved individual heterogeneity;
 • The sampling probability in the consecutive periods t, t + 1 conditional on $\alpha_i$ is given by:
 $$Pr((S_{it} + 1 = 1|\alpha_i)) = \frac{1}{1 + \exp(\lambda_0 + \lambda_1 \alpha_i \times t)}$$
@@ -89,15 +89,19 @@ set.seed(123)
 library(devtools)
 remotes::install_github("joelcuerrier/cdid", ref = "june24")
 
-
+#You can observe that both libraries utilize the same .R files and are largely compatible with one another.
+# This is because our cdid library is primarily built upon the did library.
 library(cdid)
 ls("package:cdid")
 library(did)
 ls("package:did")
 
-# Using the function `fonction_simu_attrition` from the `cdid` package.
-# We simulate the data for the following parameter values: $\theta_2 = 0.2, \lambda_1 = 0.2, \sigma_{\alpha} = 2, \sigma_{\epsilon} = 0.5$.
-dta=cdid::fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
+library(BMisc)
+library(Matrix)
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@Il manque le no_fe dans les fichiers R de github
+# Using the function `fonction_simu_attrition` from the `cdid` package to generate a simulation dataset.
+# You can also use the function fonction_simu_attrition_no_fe to remove fixed effects.
+data=cdid::fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
 
 #      id annee  Y1_chaine       X         annee_G   P_Y1_chaine   traite_G  select  
 # 6616  1     1  0.7697235   1.3126786       0            0           0         1   
@@ -113,35 +117,30 @@ dta=cdid::fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha
 The function `cdid` estimates the average treatment effect for the chained DiD design. See the documentation here : https://www.davidbenatia.com/publication/chaineddid/.
 ```{r}
 
-library(BMisc)
-example_attgt <- chained(
-                  yname="Y1_chaine", 
-                  tname="annee",
-                  idname="id",
-                  gname="annee_G",
-                  xformla=~X,
-                  data=dta,      
-                  anticipation=0,      
-                  weightsname=c("P_Y1_chaine"), #St   
-                  # weight_assumption="missing_trends",
-                  link="logit",
-                  bstrap=FALSE,
-                  biters=1000,
-                  debT=3,
-                  finT=8,
-                  deb=1,
-                  fin=8,
-                  select='select',
-                  treated='traite_G',
-                  pl=FALSE,
-                  cores=1,
-                  clustervars=NULL)
-
-summary(example_attgt)
-example_attgt
-
-
-
+results=chained(
+                yname="Y1_chaine",
+                tname="annee",
+                idname="id",
+                gname="annee_G",
+                xformla=~X, 
+                propensityformla=c("X"), 
+                data=data,      
+                anticipation=0,      
+                weightsname=c("P_Y1_chaine"), #St   
+                # weight_assumption="missing_trends",
+                weight_assumption=NULL,
+                bstrap=FALSE, 
+                biters=1000,
+                debT=3,
+                finT=8,
+                deb=1,
+                fin=8,
+                select='select',
+                treated='traite_G',
+                pl=FALSE,
+                cores=1,
+                cband=TRUE,
+                clustervars=NULL)
 
 ```
 
@@ -151,7 +150,20 @@ Our function, 'chained', employs the Difference-in-Differences (DID) methodology
 knitr::include_graphics("https://raw.githubusercontent.com/joelcuerrier/cdid/library/R/outputs/plot.png?token=GHSAT0AAAAAACRZEHPGLRGULUUFEBJ6HZAWZR5MA2A")
 
 # Plotting the results
-did::ggdid(example_attgt)
+
+agg.es=aggte(MP = results, type = "dynamic") 
+summary(agg.es)
+ggdid(agg.es) 
+
+agg.gs <- aggte(MP = results, type = "group")
+summary(agg.gs)
+ggdid(agg.gs)
+
+agg.ct <- aggte(MP = results, type = "calendar")
+summary(agg.ct)
+ggdid(agg.ct)
+
+
 ```
 
 The resulting figure is one that contains separate plots for each group. Notice in the figure above, the first plot is labeled “Group 2”, the second “Group 3”, etc. Then, the figure contains estimates of group-time average treatment effects for each group in each time period along with a simultaneous confidence interval. The red dots in the plots are pre-treatment pseudo group-time average treatment effects and are most useful for pre-testing the parallel trends assumption. The blue dots are post-treatment group-time average treatment effects and should be interpreted as the average effect of participating in the treatment for units in a particular group at a particular point in time (Source: Callaway, Sant'Anna).
@@ -167,18 +179,3 @@ In many applications, there can be a large number of groups and time periods. In
 ## Simple Aggregation
 One idea that is likely to immediately come to mind is to just return a weighted average of all group-time average treatment effects with weights proportional to the group size. This is available by calling the aggte function with type = simple.
 
-```{r}
-#Mettre ca apres mais il manque une partie du code qui nest pas mise dans cdid encore
-# source("C:/Users/cuerr/Documents/cdid/R/aggte.R")
-# source("C:/Users/cuerr/Documents/cdid/R/compute.aggte.R")
-# agg.simple <- aggte(MP = example_attgt, type = "simple")
-
-
-
-# summary(agg.simple)
-# example_attgt
-# did::aggte(MP = example_attgt, type = "dynamic")
-
-
-# example_attgt
-```
