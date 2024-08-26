@@ -137,6 +137,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
                 # Calcule de matrices #
                 #######################
                 
+                
                 if (t>=debT){ #Pour exclure les valeurs avant le début du traitement. 
                 if (flag==FALSE){ # The values are calculated only once.
                     unique_ids <- unique(disdat[[idname]])
@@ -163,6 +164,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
 
                     for (i in 1:lenX) {
                          value <- pivot_wider(data = data[,c(idname,tname,propensityformla[i])], 
+                         
                          id_cols = id, 
                          names_from = annee, 
                          values_from = propensityformla[i])    
@@ -229,6 +231,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
                 # pp1= (nom/denom_g) * cit #unmute ca et valider ca devrait donner la meme affaire pour les c
                 pp1= (nom/denom_c) * cit #nom/denom 1x1 et ggi NxT.Cohérant, tu estime StSt+1 pour chq i et tu fais la moyenne.
                 pp0=pp2+pp1 # Nx1, le poids est le meme pour chaque i, cohérant puisqu'on fait des moyenne à t.
+                
                 #normal que les poids soient les memes pour chaque individu (+ ou -). oui St depend pas de X.
                 }
 
@@ -286,11 +289,26 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         
         
         #if pp0 exists, we reweight the ATT
+        
         if(!is.null(weight_assumption)){
           if (weight_assumption=="missing_trends"){
-        pp=pp*pp0 }
+            
+          if (exists("pp0")) {
+            pp <- pp * pp0
+        } else {
+        print("hihihihihihi")
         }
+  # Handle the case where pp0 doesn't exist, e.g., assign a default value
+  # pp <- pp * some_default_value
+      
+        }}
 
+
+
+        # pp=pp*pp0 }
+        
+        
+        
         pp_noDenom<- devant*(traiteS%*%(dommk*Denom))*(devant2*disdat[,ponderation])       
 
         ### ATT ###

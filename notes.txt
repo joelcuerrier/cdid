@@ -1,8 +1,9 @@
 #Notes:
-#Ajouter une description pour l'inférence corolaire 1. On a pas considéré l'incertitude des propensity scores du first step
-#comparer avec did. Et écrire une script simple qui permet aux utilisateurs de comparer.
-#remettre les t > debT dans compute et autres
+
+
+
 #dp calcule .w (les poids) mais de la mauvaise façon donc juste les remplacer avec les bons cdid.
+
 #trucs de hard coded dans chained.R
 # disdat$pp=disdat[[ponderation[1]]] #hard coded... dans compute
 #Enlevr la simul des fonctions
@@ -17,3 +18,6 @@
             # lambda probleme de selection
 #         #enlever les effets fixes juste garder betas pour generer y att pour valider les betas .
 #         # cs pour valider 
+
+
+dans compute mp spatt boot jai xit <- array(0, dim = c(6597, finT, lenX))cest hard coded #On a donc une dimension pour chacune des éléments de propensityformla d
