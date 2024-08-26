@@ -68,6 +68,7 @@ results=chained(
                 pl=FALSE,
                 cores=1,
                 cband=TRUE,
+                # panel=FALSE,
                 clustervars=NULL)
 
 agg.es=aggte(MP = results, type = "dynamic") 

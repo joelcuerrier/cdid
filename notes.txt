@@ -4,10 +4,7 @@
 
 #dp calcule .w (les poids) mais de la mauvaise façon donc juste les remplacer avec les bons cdid.
 
-#trucs de hard coded dans chained.R
-# disdat$pp=disdat[[ponderation[1]]] #hard coded... dans compute
-#Enlevr la simul des fonctions
-#import les libraries en ce moment le path est celui de mon ordi...
+
 # # #Prochaines étapes
 # # # réparer group_ATT_estimators (valider les resulttats)
 # # # (voir function gg) et les betas de 0.25,50,.75 qui sont hard coded
@@ -17,7 +14,6 @@
 # #Vérifier les fonctions de compute.aggte.R et les résultats:
             # lambda probleme de selection
 #         #enlever les effets fixes juste garder betas pour generer y att pour valider les betas .
-#         # cs pour valider 
 
 
-dans compute mp spatt boot jai xit <- array(0, dim = c(6597, finT, lenX))cest hard coded #On a donc une dimension pour chacune des éléments de propensityformla d
+

@@ -82,20 +82,26 @@ group. Second, we sample from this population using the specified process. We
 (d) Repeat steps 1(b)-2(c) 1,000 times and report the mean and standard deviation of the estimators.
 
 # Building the dataset
+****
+You can observe that both libraries utilize the same .R files and are largely compatible with one another.
+This is because our cdid library is primarily built upon the did library.
+
 
 ```{r}
+```{r, echo=FALSE, results='asis'}
+library(knitr)
+
+
 set.seed(123)
+options(warn = -1)
 
 library(devtools)
 remotes::install_github("joelcuerrier/cdid", ref = "august24")
-
-#You can observe that both libraries utilize the same .R files and are largely compatible with one another.
-# This is because our cdid library is primarily built upon the did library.
 library(cdid)
 ls("package:cdid")
 library(did)
 ls("package:did")
-
+library(tidyr)
 library(stargazer)
 library(BMisc)
 library(Matrix)
@@ -126,10 +132,6 @@ did.results = did::att_gt(
   gname = "annee_G",
   xformla = ~X,
   data = data,
-  # panel = TRUE,
-  # allow_unbalanced_panel = FALSE,
-  # control_group = c("nevertreated", "notyettreated"),
-  # anticipation = 0,
   weightsname = NULL,
   alp = 0.05,
   bstrap = TRUE,
@@ -143,7 +145,32 @@ did.results = did::att_gt(
   cores = 1
 )
 ```
-# Estimating the average treatment effect
+
+```{r}
+#DID Cross-Sectional
+did.cs.results = did::att_gt(
+  yname="Y1_chaine",
+  tname="annee",
+  idname = "id",
+  gname = "annee_G",
+  xformla = ~X,
+  data = data,
+  weightsname = NULL,
+  alp = 0.05,
+  bstrap = TRUE,
+  cband = TRUE,
+  biters = 1000,
+  clustervars = NULL,
+  est_method = "dr",
+  base_period = "varying",
+  print_details = FALSE,
+  pl = FALSE,
+  cores = 1,
+  panel = FALSE
+)
+
+```
+
 The function `cdid` estimates the average treatment effect for the chained DiD design. See the documentation here : https://www.davidbenatia.com/publication/chaineddid/.
 ```{r}
 #Chained Did
@@ -174,8 +201,7 @@ chained.results=chained(
 ```
 
 ```{r}
-#chained with Corollary 1
-
+#chained with Assumption 1
 chained.c1.results=chained(
                 yname="Y1_chaine",
                 tname="annee",
@@ -200,12 +226,6 @@ chained.c1.results=chained(
                 cband=TRUE,
                 clustervars=NULL)
 ```
-
-
-
-
-
-
 
 ```{r}
 #GMM 
@@ -260,33 +280,44 @@ plots <- function(type){
   
   # Calculating AGGTE for each method
   agg.es.chained <- aggte(MP = chained.results, type = type)
+  agg.es.chained.c1 <- aggte(MP = chained.c1.results, type = type)
   agg.es.did <- aggte(MP = did.results, type = type)
+  agg.es.did.cs <- aggte(MP = did.cs.results, type = type)
   agg.es.gmm <- aggte(MP = gmm.results, type = type)
   
   # Overall ATT comparison from DID and chained
   overall_df <- data.frame(
     "overall att did" = agg.es.did$overall.att,
+    "overall att did cs" = agg.es.did$overall.att,
+    "overall att chained c1" = agg.es.chained.c1$overall.att,
     "overall att chained" = agg.es.chained$overall.att,
     "overall att gmm" = agg.es.gmm$overall.att
   )
-  print(overall_df)
+  kable(overall_df, format = "html", table.attr = "style='width:100%;'")  # For HTML output
+  # print(overall_df)
   
   # Group ATT comparison from DID and chained
   group_df <- data.frame(
+    
     "gt att did" = agg.es.did$att.egt,
+    "gt att cs" = agg.es.did.cs$overall.att,
     "gt att chained" = agg.es.chained$att.egt,
+    "gt att chained c1" = agg.es.chained.c1$att.egt,
     "gt att gmm" = agg.es.gmm$att.egt
   )
-  print(group_df)
+  kable(group_df, format = "html", table.attr = "style='width:100%;'")  # For HTML output
+  # print(group_df)
   if (type != "simple"){
    
   
   # Plotting the results
   plot1 <- ggdid(agg.es.did) + ggtitle("DID")
-  plot2 <- ggdid(agg.es.chained) + ggtitle("Chained")
-  plot3 <- ggdid(agg.es.gmm) + ggtitle("GMM")
+  plot2 <- ggdid(agg.es.did.cs) + ggtitle("CS")
+  plot3 <- ggdid(agg.es.chained.c1) + ggtitle("DID.c1")
+  plot4 <- ggdid(agg.es.chained) + ggtitle("Chained")
+  plot5 <- ggdid(agg.es.gmm) + ggtitle("GMM")
   
-  combined_plot <- (plot1 | plot2 | plot3) +
+  combined_plot <- (plot1 | plot2 | plot3 | plot4 | plot5) +
     plot_annotation(
       caption = caption,
       theme = theme(plot.caption = element_text(hjust = 0.5)) # Center the caption
@@ -299,6 +330,15 @@ plots("dynamic")
 plots("group")
 plots("calendar")
 ```
+
+```{r img-with-knitr, echo=FALSE, fig.align='center', out.width='50%', fig.alt='Alternative text for the images'}
+library(here)
+knitr::include_graphics(c(here("R/outputs/dynamic.png"), here("R/outputs/group.png"), here("R/outputs/calendar.png")))
+```
+
+
+
+
 
 
 

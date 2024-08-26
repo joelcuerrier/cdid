@@ -142,6 +142,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
                 if (flag==FALSE){ # The values are calculated only once.
                     unique_ids <- unique(disdat[[idname]])
                     
+                    
                     #Matrice Gg
                     id_gg <- data.frame(id = unique(disdat[[idname]]), annee_G = disdat[[first.treat.name]][match(unique_ids, disdat[[idname]])])
                     ggi <- matrix(0, nrow = nrow(id_gg), ncol = finT)
@@ -160,7 +161,9 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
                     # Matrice pour xit et propensityformla
                     lenX=length(propensityformla) #"X"
                     #xit porte a confusion ajouter la 3e dim dans le nom de la var.
-                    xit <- array(0, dim = c(6597, finT, lenX)) #On a donc une dimension pour chacune des éléments de propensityformla
+                    # xit <- array(0, dim = c(6597, finT, lenX)) #On a donc une dimension pour chacune des éléments de propensityformla
+                    # nrow(cit) for the number of rows
+                    xit <- array(0, dim = c(nrow(cit), finT, lenX)) #On a donc une dimension pour chacune des éléments de propensityformla
 
                     for (i in 1:lenX) {
                          value <- pivot_wider(data = data[,c(idname,tname,propensityformla[i])], 
@@ -267,7 +270,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         disdat$G <- 1 * (disdat[, first.treat.name] == flist[f])
         
         NN<-dim(disdat)[1] ## d�finition de N pour boot
-        disdat$pp=disdat[[ponderation[1]]] #hard coded...meme chose pour gmm...
+        disdat$pp=disdat[[ponderation[1]]] #hard coded...meme chose pour gmm... Ok, puisque la simulation utilisait 2 colonnes de pondération et elles sont identiques. 
         
         # Calcul de matrices pour calcul strate 
         traite<-cbind(disdat$G,disdat$C)
@@ -296,7 +299,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
           if (exists("pp0")) {
             pp <- pp * pp0
         } else {
-        print("hihihihihihi")
+        
         }
   # Handle the case where pp0 doesn't exist, e.g., assign a default value
   # pp <- pp * some_default_value
