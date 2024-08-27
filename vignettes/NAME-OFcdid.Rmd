@@ -106,7 +106,7 @@ ls("package:did")
 
 #See the Vignettes and package documentation for the packages:
 # browseVignettes("did")
-browseVignettes("cdid")
+# browseVignettes("cdid")
 ```
 ```
 
