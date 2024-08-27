@@ -18,13 +18,7 @@ knitr::opts_chunk$set(
 ```
 
 
-```{r}
-#See the Vignettes and package documentation for the packages:
-# browseVignettes("did")
-install.packages("C:/Users/cuerr/Documents/cdid_0.1.0.tar.gz", repos = NULL, type = "source")
 
-browseVignettes("cdid")
-```
 
 <!-- rmarkdown::pandoc_version() -->
 
@@ -102,11 +96,18 @@ You can observe that both libraries utilize the same .R files and are largely co
 This is because our cdid library is primarily built upon the did library.
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 library(devtools)
-remotes::install_github("joelcuerrier/cdid", ref = "august24")
+# remotes::install_github("joelcuerrier/cdid", ref = "august26",force=TRUE)
+remotes::install_github("joelcuerrier/cdid", ref = "august26", force = TRUE)
+
 library(cdid)
 ls("package:cdid")
 library(did)
 ls("package:did")
+
+#See the Vignettes and package documentation for the packages:
+# browseVignettes("did")
+browseVignettes("cdid")
+```
 ```
 
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
@@ -213,7 +214,7 @@ chained.results=chained(
 
 ```
 
-Chained difference with Assumption 1 (missing trends)
+## Chained difference with Assumption 1 (missing trends)
 ```{r}
 chained.c1.results=chained(
                 yname="Y1_chaine",
@@ -239,7 +240,7 @@ chained.c1.results=chained(
                 cband=TRUE,
                 clustervars=NULL)
 ```
-# GMM 
+## GMM 
 ```{r}
 gmm.results=gmm(
                 yname="Y1_chaine",
