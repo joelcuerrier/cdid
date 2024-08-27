@@ -98,7 +98,8 @@ This is because our cdid library is primarily built upon the did library.
 library(devtools)
 # remotes::install_github("joelcuerrier/cdid", ref = "august26",force=TRUE)
 
-remotes::install_github("joelcuerrier/cdid", ref = "august26", force = TRUE)
+# remotes::install_github("joelcuerrier/cdid", ref = "august26", force = TRUE)
+remotes::install_github("joelcuerrier/cdid", ref = "august26", build_vignettes = TRUE, force = TRUE)
 
 library(cdid)
 ls("package:cdid")
