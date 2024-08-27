@@ -97,6 +97,7 @@ This is because our cdid library is primarily built upon the did library.
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 library(devtools)
 # remotes::install_github("joelcuerrier/cdid", ref = "august26",force=TRUE)
+
 remotes::install_github("joelcuerrier/cdid", ref = "august26", force = TRUE)
 
 library(cdid)
@@ -106,7 +107,7 @@ ls("package:did")
 
 #See the Vignettes and package documentation for the packages:
 # browseVignettes("did")
-# browseVignettes("cdid")
+browseVignettes("cdid")
 ```
 ```
 
