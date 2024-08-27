@@ -3,43 +3,10 @@
 \name{chained}
 \alias{chained}
 \title{Chained}
-\usage{
-chained(
-  yname,
-  tname,
-  idname = NULL,
-  gname,
-  xformla = NULL,
-  propensityformla,
-  data,
-  panel = TRUE,
-  allow_unbalanced_panel = TRUE,
-  control_group = c("nevertreated", "notyettreated"),
-  anticipation = 0,
-  weightsname = NULL,
-  weight_assumption = NULL,
-  alp = 0.05,
-  bstrap = TRUE,
-  cband = TRUE,
-  biters = 1000,
-  clustervars = NULL,
-  est_method = "chained",
-  base_period = "varying",
-  print_details = FALSE,
-  pl = FALSE,
-  cores = 1,
-  debT,
-  finT,
-  deb,
-  fin,
-  select,
-  treated
-)
-}
 \arguments{
-\item{yname}{The name of the outcome variable}
-
 \item{tname}{The name of the column containing the time periods}
+
+\item{yname}{The name of the outcome variable}
 
 \item{idname}{The individual (cross-sectional unit) id name}
 
@@ -61,11 +28,7 @@ chained(
 
 \item{bstrap}{Boolean for whether or not to compute standard errors using the multiplier bootstrap. If standard errors are clustered, then one must set bstrap=TRUE. Default is TRUE (in addition, cband is also by default TRUE indicating that uniform confidence bands will be returned. If bstrap is FALSE, then analytical standard errors are reported.}
 
-\item{cband}{Boolean for whether or not to compute a uniform confidence band that covers all of the group-time average treatment effects with fixed probability \code{1-alp}.  In order to compute uniform confidence bands, \code{bstrap} must also be set to \code{TRUE}.  The default is \code{TRUE}.}
-
 \item{biters}{The number of bootstrap iterations to use. The default is 1000, and this is only applicable if bstrap=TRUE.}
-
-\item{clustervars}{The name of the column containing the clustering variable. Default is NULL.}
 
 \item{base_period}{Whether to use a "varying" base period or a "universal" base period. Either choice results in the same post-treatment estimates of ATT(g,t)'s. In pre-treatment periods, using a varying base period amounts to computing a pseudo-ATT in each treatment period by comparing the change in outcomes for a particular group relative to its comparison group in the pre-treatment periods (i.e., in pre-treatment periods this setting computes changes from period t-1 to period t, but repeatedly changes the value of t). A universal base period fixes the base period to always be (g-anticipation-1). This does not compute pseudo-ATT(g,t)'s in pre-treatment periods, but rather reports average changes in outcomes from period t to (g-anticipation-1) for a particular group relative to its comparison group. This is analogous to what is often reported in event study regressions. Using a varying base period results in an estimate of ATT(g,t) being reported in the period immediately before treatment. Using a universal base period normalizes the estimate in the period right before treatment (or earlier when the user allows for anticipation) to be equal to 0, but one extra estimate in an earlier period.}
 
@@ -86,6 +49,10 @@ chained(
 \item{select}{A vector of observations to select.}
 
 \item{treated}{The name of the column containing the treatment indicator.}
+
+\item{clustervars}{The name of the column containing the clustering variable. Default is NULL.}
+
+\item{cband}{Boolean for whether or not to compute a uniform confidence band that covers all of the group-time average treatment effects with fixed probability \code{1-alp}.  In order to compute uniform confidence bands, \code{bstrap} must also be set to \code{TRUE}.  The default is \code{TRUE}.}
 }
 \value{
 \item{att}{The average treatment effect on the treated}
@@ -114,8 +81,4 @@ results = chained(
                 select='select',
                 treated='traite_G')
 results
-
-library(did)
-did
-
 }

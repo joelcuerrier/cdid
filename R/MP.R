@@ -1,3 +1,5 @@
+# Callaway, B. (2024). The did Library. Department of Economics, University of Georgia. Available at: https://github.com/bcallaway11/did
+
 #' @title MP
 #'
 #' @description Multi-period objects that hold results for group-time average treatment effects

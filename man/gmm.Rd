@@ -87,6 +87,4 @@ results=gmm(
                 cband=TRUE,
                 clustervars=NULL)
 results
-
-
 }

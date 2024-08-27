@@ -1,15 +1,5 @@
-#Notes:
-
-
 
 #dp calcule .w (les poids) mais de la mauvaise façon donc juste les remplacer avec les bons cdid.
-
-
-# # #Prochaines étapes
-# # # réparer group_ATT_estimators (valider les resulttats)
-# # # (voir function gg) et les betas de 0.25,50,.75 qui sont hard coded
-# # #améliorer l'efficacité fonction compute
-# # #je crois dans les fonctions d'aggregation de did, ils utilisent les poids pg du papier de callaway. voir les fonctions compute.aggte.R (les codes pour faire rouller aggte.)
 
 # #Vérifier les fonctions de compute.aggte.R et les résultats:
             # lambda probleme de selection
@@ -17,3 +7,4 @@
 
 
 
+# Faire certain que tous les codes qui ne sont pas de moi sont bien cités

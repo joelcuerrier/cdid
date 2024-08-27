@@ -1,3 +1,5 @@
+# Callaway, B. (2024). The did Library. Department of Economics, University of Georgia. Available at: https://github.com/bcallaway11/did
+
 #' @title Multiplier Bootstrap
 #'
 #' @description A function to take an influence function and use the

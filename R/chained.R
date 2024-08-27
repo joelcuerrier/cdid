@@ -1,5 +1,6 @@
 # The vignettes included in this library are based on those authored by [Brantly Callaway and Pedro H.C. Sant'Anna] for the 'did' package. We have adapted the content for use in this library to provide users with accessible and informative documentation. The original vignettes authored by [Brantly Callaway and Pedro H.C. Sant'Anna] can be found in the 'did' package documentation [https://bcallaway11.github.io/did/articles/did-basics.html].
 #' @title Chained
+#' @name chained
 #' @description The chained difference-in-differences, leverages the overlapping structure of many unbalanced panel data set.
 #' @param tname The name of the column containing the time periods
 #' @param yname The name of the outcome variable

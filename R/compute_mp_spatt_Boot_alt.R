@@ -189,7 +189,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
                 # numérateur #
                 ##############
                 # repeated_ssi <- matrix(rep(ssit[,t], ncol(ggi)), ncol = ncol(ggi), byrow = TRUE) # nom=mean(repeated_ssi * ggi) 
-                nom=mean(ssit[,t] * ggi[,t]) # 1x1. mean(list). Je prend [,t], sinon le calcul n'est pas intuitif. Voir ci-dessous.
+                nom=mean(ssit[,t] * ggi[,t]) # 1x1.
                 #colMeans
 
                 #Une autre option est de conserver le code initial pour le nominateur. (similaire a christophe)
@@ -353,11 +353,6 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
 
           psi[,nom_outcome[i]]<-subset(psi,select=nom_outcome[i])-correction_i
         }
-
-
-
-
-
 
         
         ### mettre les siren dans psi
