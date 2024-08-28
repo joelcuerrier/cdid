@@ -5,9 +5,9 @@ date:  "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to cDiD with Multiple Time Periods}
-  %\VignetteEngine{knitr::rmarkdown}    
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  
+
 ---
 
 ```{r setup, include = FALSE}
@@ -98,8 +98,8 @@ This is because our cdid library is primarily built upon the did library.
 library(devtools)
 # remotes::install_github("joelcuerrier/cdid", ref = "august26",force=TRUE)
 
-# remotes::install_github("joelcuerrier/cdid", ref = "august26", force = TRUE)
-remotes::install_github("joelcuerrier/cdid", ref = "august26", build_vignettes = TRUE, force = TRUE)
+remotes::install_github("joelcuerrier/cdid", ref = "august26", force = TRUE)
+# remotes::install_github("joelcuerrier/cdid", ref = "august26", build_vignettes = TRUE, force = TRUE)
 
 library(cdid)
 ls("package:cdid")
@@ -109,6 +109,8 @@ ls("package:did")
 #See the Vignettes and package documentation for the packages:
 # browseVignettes("did")
 browseVignettes("cdid")
+
+
 ```
 ```
 

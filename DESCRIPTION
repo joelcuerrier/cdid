@@ -33,7 +33,7 @@ Imports:
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 BugReports: https://github.com/joelcuerrier/cdid/issues
-VignetteBuilder: knitr
+# VignetteBuilder: knitr
 Depends:
     R (>= 3.5.0)
 Suggests: 
