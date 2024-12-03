@@ -100,14 +100,14 @@ This is because our cdid library is primarily built upon the did library.
 library(devtools)
 
 remotes::install_github("joelcuerrier/cdid", ref = "main", force = TRUE, dependencies=TRUE)
-remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = TRUE, force = TRUE)
+#remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = TRUE, force = TRUE)
 
-library(cdid)
-ls("package:cdid")
+# library(cdid)
+# ls("package:cdid")
 
 #See the Vignettes and package documentation for the packages:
 # browseVignettes("did")
-browseVignettes("cdid")
+# browseVignettes("cdid")
 
 
 
