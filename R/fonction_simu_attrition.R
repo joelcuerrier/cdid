@@ -1,22 +1,22 @@
 #' Cross-sectional data simulation
 #' 
 #' @docType data
-#' @usage data=data_sim=fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
+#' @usage data=data_sim=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
 #' @format data: a data frame
 #' @description This function generates a simulated dataset with attrition. The dataset is used to estimate the treatment effect using the chained method. See the simulation in "The Chained Difference-in-Differences" paper.
 #' @keywords datasets
 #' @examples 
-#' data=data_sim=fonction_simu_attrition(nbsimu = 1, theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5,alpha_percentile=0.75)
+#' data=data_sim=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5,alpha_percentile=0.75)
 #' @export
 
-fonction_simu_attrition <- function(nbsimu = 100, theta2_alpha_Gg, lambda1_alpha_St, sigma_alpha, sigma_epsilon, alpha_percentile){
+fonction_simu_attrition <- function(theta2_alpha_Gg, lambda1_alpha_St, sigma_alpha, sigma_epsilon, alpha_percentile){
 # Remarque : pour l'estimateur long DID, on l'estime sur un panel cylindr� qui drop les observations manquantes
 # c-à-d, on utilise pour cet estimateur la pond�ration utilis�e pour l'estimateur en Cross Section !!!
 
 # Settings
 T = 9           # periods 
 N0 = 150        # individuals (per two periods!), so N0*2 per periods 
-nsims = nbsimu  # simulations
+nsims = 1  # simulations hard coded to 1
   
 ### Uncertainty parameters
 mu_a = 1  # Moyenne de alpha_i
