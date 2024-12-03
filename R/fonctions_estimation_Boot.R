@@ -1,66 +1,77 @@
 #Fonctions d'estimation des effets de traitement
 
+# ###### ----------------------------------------------------------------------------------------------------------------------------------------
+# ###### Basic EstimPeriod_Boot ------------------------------------------------------------------------------------------------------------------
+# ###### ----------------------------------------------------------------------------------------------------------------------------------------
+# estimPeriod_Boot<-function(yname,
+#                            tname,
+#                            idname,
+#                            gname,
+#                            xformla,
+#                            data,
+#                            debT,
+#                            finT,
+#                            deb,
+#                            fin,
+#                            select,
+#                            weightsname,
+#                            alp=0.05,
+#                            bstrap,
+#                            biters=1000,
+#                            STRATE,
+#                            pond_RD=NULL,
+#                            treated){
+
+#   ### Créer un siren numérique (id)
+#   list_id <-as.data.frame(unique(data[,c(idname)]))
+#   list_id$iden_num<-1:dim(list_id)[1] 
+#   colnames(list_id)[1]=idname
+#   data=merge(data,list_id,by.x=idname,by.y=idname,all.x=TRUE)
+  
+#   ### selection des données 
+#   bebe<-data[data[[tname]]>=deb & data[[tname]] <= fin ,]
+#   bebe<-bebe[bebe[,gname]>=debT | bebe[,gname]==0,]
+  
+#   ## Pour les observations traitées après finT on met une pondération nulle pour les observation après finT
+#   ## puis on bascule entièrement dans le  contrefactuel les traités après finT
+#   for(i in 1:length(weightsname)){
+#   bebe[(bebe[,gname]>finT)&(bebe[[tname]]>=finT),weightsname[i]]<-0}
+#   bebe[bebe[,gname]>finT,gname]<-0
+  
+#   ### definition du modèele utilisant le score 
+#   xxF<-as.formula(paste(" ~ ",paste(xformla, collapse=" + "),sep=""))
+    
+#   # resultat: objet liste avec trois éléments dans la liste: (1) att, (2) mat_influence et (3) indiv la liste des individus 
+#   resultat<- mp.spatt.Boot(nom_outcome=yname,nom_traitement=treated,xformla=xxF,data=bebe,
+#                          first.treat.name = gname,
+#                          idname = idname, tname=tname,
+#                          bstrap = FALSE,se=TRUE,cband =FALSE
+#                          ,selection=select,ponderation=weightsname,debT2=debT,finT2=finT,strate=STRATE,POND_RD=pond_RD)
+  
+
+
+
+
+
+
+
+  
+#   # Poids pour aggréger les effets des différentes cohortes de traitement 
+#   list_id<-merge(list_id,resultat[[3]])
+#   list_id_poids=resultat[[3]]
+#   list_id_poids=list_id_poids[list_id_poids[,gname]>0,]
+#   list_id_poids<-unique(list_id_poids)
+#   dum<-as.data.frame(table(list_id_poids[,gname]))
+  
+#   result<-agregatChris(tab=resultat[[1]],nom_outcome=yname,tname=tname,first.treat.name=gname,dum)
+#   influ<-agregat_influence(tab=resultat[[1]],array_inf=resultat[[2]],listG=resultat[[3]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
+#   list(result,influ,list_id)
+# }
+
+
 ###### ----------------------------------------------------------------------------------------------------------------------------------------
 ###### ESTIMATEUR EN CHAINES ------------------------------------------------------------------------------------------------------------------
 ###### ----------------------------------------------------------------------------------------------------------------------------------------
-estimPeriod_Boot<-function(yname,
-                           tname,
-                           idname,
-                           gname,
-                           xformla,
-                           data,
-                           debT,
-                           finT,
-                           deb,
-                           fin,
-                           select,
-                           weightsname,
-                           alp=0.05,
-                           bstrap,
-                           biters=1000,
-                           STRATE,
-                           pond_RD=NULL,
-                           treated){
-
-  ### Créer un siren numérique (id)
-  list_id <-as.data.frame(unique(data[,c(idname)]))
-  list_id$iden_num<-1:dim(list_id)[1] 
-  colnames(list_id)[1]=idname
-  data=merge(data,list_id,by.x=idname,by.y=idname,all.x=TRUE)
-  
-  ### selection des données 
-  bebe<-data[data[[tname]]>=deb & data[[tname]] <= fin ,]
-  bebe<-bebe[bebe[,gname]>=debT | bebe[,gname]==0,]
-  
-  ## Pour les observations traitées après finT on met une pondération nulle pour les observation après finT
-  ## puis on bascule entièrement dans le  contrefactuel les traités après finT
-  for(i in 1:length(weightsname)){
-  bebe[(bebe[,gname]>finT)&(bebe[[tname]]>=finT),weightsname[i]]<-0}
-  bebe[bebe[,gname]>finT,gname]<-0
-  
-  ### definition du modèele utilisant le score 
-  xxF<-as.formula(paste(" ~ ",paste(xformla, collapse=" + "),sep=""))
-    
-  # resultat: objet liste avec trois éléments dans la liste: (1) att, (2) mat_influence et (3) indiv la liste des individus 
-  resultat<- mp.spatt.Boot(nom_outcome=yname,nom_traitement=treated,xformla=xxF,data=bebe,
-                         first.treat.name = gname,
-                         idname = idname, tname=tname,
-                         bstrap = FALSE,se=TRUE,cband =FALSE
-                         ,selection=select,ponderation=weightsname,debT2=debT,finT2=finT,strate=STRATE,POND_RD=pond_RD)
-  
-  # Poids pour aggréger les effets des différentes cohortes de traitement 
-  list_id<-merge(list_id,resultat[[3]])
-  list_id_poids=resultat[[3]]
-  list_id_poids=list_id_poids[list_id_poids[,gname]>0,]
-  list_id_poids<-unique(list_id_poids)
-  dum<-as.data.frame(table(list_id_poids[,gname]))
-  
-  result<-agregatChris(tab=resultat[[1]],nom_outcome=yname,tname=tname,first.treat.name=gname,dum)
-  influ<-agregat_influence(tab=resultat[[1]],array_inf=resultat[[2]],listG=resultat[[3]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
-  list(result,influ,list_id)
-}
-
-
 chained_estimPeriod_Boot<-function(yname,
                                    tname,
                                    idname,
@@ -788,49 +799,49 @@ CS_estimPeriod_Boot<-function(yname,tname,idname,gname,xformla,data,debT,finT,de
 #   sauve(vv$t0,nom_t0,CHEMI)
 #   vv}
 
-###### ----------------------------------------------------------------------------------------------------------------------------------------
-###### ESTIMATEUR EN LONG DID  ----------------------------------------------------------------------------------------------------------------
-###### ----------------------------------------------------------------------------------------------------------------------------------------
-longDID_estimPeriod_Boot<-function(yname,tname,idname,gname,xformla,data,debT,finT,deb,fin,select,weightsname,alp=0.05,bstrap,biters=1000,STRATE,pond_RD=NULL,treated){
+# ###### ----------------------------------------------------------------------------------------------------------------------------------------
+# ###### ESTIMATEUR EN LONG DID  ----------------------------------------------------------------------------------------------------------------
+# ###### ----------------------------------------------------------------------------------------------------------------------------------------
+# longDID_estimPeriod_Boot<-function(yname,tname,idname,gname,xformla,data,debT,finT,deb,fin,select,weightsname,alp=0.05,bstrap,biters=1000,STRATE,pond_RD=NULL,treated){
   
   
-  ### Créer un siren numérique (id)
-  list_id <-as.data.frame(unique(data[,c(idname)]))
-  list_id$iden_num<-1:dim(list_id)[1]
-  colnames(list_id)[1]=idname
-  data=merge(data,list_id,by.x=idname,by.y=idname,all.x=TRUE)
+#   ### Créer un siren numérique (id)
+#   list_id <-as.data.frame(unique(data[,c(idname)]))
+#   list_id$iden_num<-1:dim(list_id)[1]
+#   colnames(list_id)[1]=idname
+#   data=merge(data,list_id,by.x=idname,by.y=idname,all.x=TRUE)
   
-  ### selection des données 
-  bebe<-data[data[[tname]]>=deb & data[[tname]] <= fin ,]
-  bebe<-bebe[bebe[,gname]>=debT | bebe[,gname]==0,]
+#   ### selection des données 
+#   bebe<-data[data[[tname]]>=deb & data[[tname]] <= fin ,]
+#   bebe<-bebe[bebe[,gname]>=debT | bebe[,gname]==0,]
   
-  ## Pour les observations traitées après finT on met une pondération nulle pour les observation après finT
-  ## puis on bascule entièrement dans le  contrefactuel les traités après finT
-  for(i in 1:length(weightsname)){
-  bebe[(bebe[,gname]>finT)&(bebe[[tname]]>=finT),weightsname[i]]<-0}
-  bebe[bebe[,gname]>finT,gname]<-0
+#   ## Pour les observations traitées après finT on met une pondération nulle pour les observation après finT
+#   ## puis on bascule entièrement dans le  contrefactuel les traités après finT
+#   for(i in 1:length(weightsname)){
+#   bebe[(bebe[,gname]>finT)&(bebe[[tname]]>=finT),weightsname[i]]<-0}
+#   bebe[bebe[,gname]>finT,gname]<-0
   
-  ### definition du modèle utilisant le score 
-  xxF<-as.formula(paste(" ~ ",paste(xformla, collapse=" + "),sep=""))
+#   ### definition du modèle utilisant le score 
+#   xxF<-as.formula(paste(" ~ ",paste(xformla, collapse=" + "),sep=""))
   
-  # resultat: objet liste avec trois éléments dans la liste: (1) att, (2) mat_influence et (3) indiv la liste des individus 
-  resultat<- mp.spatt.Boot_longDID(nom_outcome=yname,nom_traitement=treated,xformla=xxF,data=bebe,
-                            first.treat.name = gname,
-                            idname = idname, tname=tname,
-                            bstrap = FALSE,se=TRUE,cband =FALSE
-                            ,selection=select,ponderation=weightsname,debT2=debT,finT2=finT,strate=STRATE)
+#   # resultat: objet liste avec trois éléments dans la liste: (1) att, (2) mat_influence et (3) indiv la liste des individus 
+#   resultat<- mp.spatt.Boot_longDID(nom_outcome=yname,nom_traitement=treated,xformla=xxF,data=bebe,
+#                             first.treat.name = gname,
+#                             idname = idname, tname=tname,
+#                             bstrap = FALSE,se=TRUE,cband =FALSE
+#                             ,selection=select,ponderation=weightsname,debT2=debT,finT2=finT,strate=STRATE)
   
-  # Poids pour aggréger les effets des différentes cohortes de traitement 
-  list_id<-merge(list_id,resultat[[3]])
-  list_id_poids=resultat[[3]]
-  list_id_poids=list_id_poids[list_id_poids[,gname]>0,]
-  list_id_poids<-unique(list_id_poids)
-  dum<-as.data.frame(table(list_id_poids[,gname]))
+#   # Poids pour aggréger les effets des différentes cohortes de traitement 
+#   list_id<-merge(list_id,resultat[[3]])
+#   list_id_poids=resultat[[3]]
+#   list_id_poids=list_id_poids[list_id_poids[,gname]>0,]
+#   list_id_poids<-unique(list_id_poids)
+#   dum<-as.data.frame(table(list_id_poids[,gname]))
   
-  result<-agregatChris_longDID(tab=resultat[[1]],nom_outcome=yname,tname=tname,first.treat.name=gname,dum)
-  influ<-agregat_influence_longDID(tab=resultat[[1]],array_inf=resultat[[2]],listG=resultat[[3]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
-  list(result,influ,list_id)
-}
+#   result<-agregatChris_longDID(tab=resultat[[1]],nom_outcome=yname,tname=tname,first.treat.name=gname,dum)
+#   influ<-agregat_influence_longDID(tab=resultat[[1]],array_inf=resultat[[2]],listG=resultat[[3]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
+#   list(result,influ,list_id)
+# }
 
 
 

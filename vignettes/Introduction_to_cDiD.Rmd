@@ -99,9 +99,11 @@ This is because our cdid library is primarily built upon the did library.
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 library(devtools)
 
+options(warn = 2)  # Treat warnings as errors
 
-remotes::install_github("joelcuerrier/cdid", ref = "august26", force = TRUE)
+remotes::install_github("joelcuerrier/cdid", ref = "main", force = TRUE, dependencies=TRUE)
 # remotes::install_github("joelcuerrier/cdid", ref = "august26", build_vignettes = TRUE, force = TRUE)
+
 
 library(cdid)
 ls("package:cdid")
@@ -111,6 +113,18 @@ ls("package:did")
 #See the Vignettes and package documentation for the packages:
 # browseVignettes("did")
 browseVignettes("cdid")
+
+
+
+
+
+
+
+
+
+# > ?mp.spatt.Boot
+# No documentation for ‘mp.spatt.Boot’ in specified packages and libraries:
+# you could try ‘??mp.spatt.Boot’
 
 
 ```
@@ -237,7 +251,8 @@ chained.results=chained(
                 cband=TRUE,
                 clustervars=NULL)
 
-
+agg <- aggte(MP = chained.results, type = 'dynamic')
+agg
 
 ```
 
