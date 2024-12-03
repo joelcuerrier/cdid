@@ -302,7 +302,7 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
         
         }
   # Handle the case where pp0 doesn't exist, e.g., assign a default value
-  # pp <- pp * some_default_value
+  
       
         }}
 
@@ -316,6 +316,8 @@ chained.compute.mp.spatt.Boot <- function ( nom_outcome
 
         ### ATT ###
         att<- colSums(pp * dy) 
+        
+        
 
         ########################################################
         ### Bootstrap  : calcul de la fonction d'influence de la brique

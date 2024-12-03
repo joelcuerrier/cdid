@@ -100,37 +100,11 @@ This is because our cdid library is primarily built upon the did library.
 library(devtools)
 
 remotes::install_github("joelcuerrier/cdid", ref = "main", force = TRUE, dependencies=TRUE)
-#remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = TRUE, force = TRUE)
-
-# library(cdid)
-# ls("package:cdid")
-
-#See the Vignettes and package documentation for the packages:
-# browseVignettes("did")
-# browseVignettes("cdid")
-
-
-
-
-
-
-
-
-
-# > ?mp.spatt.Boot
-# No documentation for ‘mp.spatt.Boot’ in specified packages and libraries:
-# you could try ‘??mp.spatt.Boot’
-
-
+library(cdid)
+library(did)
+ls("package:cdid")
 ```
-```{r}
-if (requireNamespace("rhs.vars", quietly = TRUE)) {
-  cat("The 'rhs.vars' package is installed.\n")
-} else {
-  cat("The 'rhs.vars' package is NOT installed.\n")
-}
 
-```
 
 
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
@@ -146,9 +120,10 @@ library(ggplot2)
 library(patchwork)
 library(knitr)
 library(here)
+source("R/fonction_simu_attrition_nofe.R")
 
 # Using the function `fonction_simu_attrition` from the `cdid` package to generate a simulation dataset.
-data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5,alpha_percentile=0.9)
+data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
 # We are fixing the missing observations
 data$Y1_longDID[data$P_Y1_longDID!=1] <- NA
 
@@ -214,7 +189,7 @@ did.cs.results = did::att_gt(
   panel = FALSE
 )
 
-aggte(MP = did.cs.results, type = "dynamic")
+
 ```
 
 ## Chained Difference-in-Differences
@@ -245,9 +220,57 @@ chained.results=chained(
                 cores=1,
                 cband=TRUE,
                 clustervars=NULL)
+```
+```{r}
+# Debugging
+#Vérification des ATT sans les preprocess.
 
-agg <- aggte(MP = chained.results, type = 'dynamic')
-agg
+
+source("R/fonction_simu_attrition.R")
+source("R/fonction_simu_attrition.R")
+source("R/fonction_simu_attrition_nofe.R")
+source("R/fonctions_estimation_Boot.R")
+source("R/mp_spatt_Boot.R")
+source("R/compute_mp_spatt_Boot_alt.R")
+source("R/panelDiffV.R")
+source("R/gg.R")
+source("R/agregat.R")
+source("R/process_attgt.R")
+source("R/pre_process_did.R")
+source("R/DIDparams.R")
+source("R/mboot.R")
+source("R/MP.R")
+source("R/chained.R")
+source("R/compute.aggte.R")
+source("R/aggte.R")
+source("R/compute.aggte.R")
+
+resultat= chained_estimPeriod_Boot(yname="Y1_chaine",
+                tname="annee",
+                idname="id",
+                gname="annee_G",
+                xformla=~X, 
+                propensityformla=c("X"), 
+                data=data,      
+                # anticipation=0,      
+                weightsname=c("P_Y1_chaine"), #St   
+                weight_assumption=NULL,
+                bstrap=FALSE, 
+                biters=1000,
+                debT=3,
+                finT=8,
+                deb=1,
+                fin=8,
+                select='select',
+                treated='traite_G',
+                # pl=FALSE,
+                # cores=1,
+                # cband=TRUE,
+                # clustervars=NULL)
+  )
+
+str(resultat)
+
 
 ```
 
@@ -276,7 +299,7 @@ chained.c1.results=chained(
                 cores=1,
                 cband=TRUE,
                 clustervars=NULL)
-
+str(chained.c1.results)
                 
 ```
 ## GMM 
@@ -306,6 +329,13 @@ gmm.results=gmm(
                 cband=TRUE,
                 clustervars=NULL)
 ```
+
+
+
+
+
+
+
 
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 plots <- function(type){
@@ -384,4 +414,5 @@ browseVignettes("cdid")
 ## Future Improvements will include
 - The ability to accountn for the uncertainty in the propensity scores from the first step.
 - Efficiency in the GMM funtion compute.
+
 
