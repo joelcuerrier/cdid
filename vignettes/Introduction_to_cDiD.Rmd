@@ -160,7 +160,7 @@ did.results = did::att_gt(
   pl = FALSE,
   cores = 1
 )
-
+did.results
 
 ```
 
@@ -244,6 +244,8 @@ source("R/chained.R")
 source("R/compute.aggte.R")
 source("R/aggte.R")
 source("R/compute.aggte.R")
+# data=fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5,alpha_percentile=0.9)
+data=fonction_simu_attrition_nofe(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5)
 
 resultat= chained_estimPeriod_Boot(yname="Y1_chaine",
                 tname="annee",
@@ -268,8 +270,7 @@ resultat= chained_estimPeriod_Boot(yname="Y1_chaine",
                 # cband=TRUE,
                 # clustervars=NULL)
   )
-
-str(resultat)
+resultat[[1]]
 
 
 ```
