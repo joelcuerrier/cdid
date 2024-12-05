@@ -120,12 +120,22 @@ chained_estimPeriod_Boot<-function(yname,
                          bstrap = FALSE,se=TRUE,cband =FALSE
                          ,selection=select,ponderation=weightsname,weight_assumption=weight_assumption,debT=debT,finT=finT)
   
-  #intialement
-  # result<-agregatChris(tab=resultat[[1]],nom_outcome=Les_outcome,tname="annee",first.treat.name=anneeT,dum)
-  # View(result)
-  # influ<-agregat_influence(tab=resultat[[1]],array_inf=resultat[[2]],listG=resultat[[3]],nom_outcome=Les_outcome,tname="annee",first.treat.name=anneeT,poids=dum)
-  # list(result,influ,list_id)
+  # # Ajouté le 4 décembre pour reproduire l'aggrégation inititiale réalisée par Christophe.
+  # # Poids pour aggr�ger les effets des diff�rentes cohortes de traitement 
+  list_id_poids=resultat[[3]]
+  list_id_poids=list_id_poids[list_id_poids[,gname]>0,]
+  list_id_poids<-unique(list_id_poids)
+  dum<-as.data.frame(table(list_id_poids[,gname]))
 
+  # #intialement
+
+  # result<-agregatChris(tab=resultat[[1]],nom_outcome=Les_outcome,tname="annee",first.treat.name=anneeT,dum)
+  result<-agregatChris(tab=resultat[[1]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
+# influ<-agregat_influence(tab=resultat[[1]],array_inf=resultat[[2]],listG=resultat[[3]],nom_outcome=Les_outcome,tname="annee",first.treat.name=anneeT,poids=dum)
+  influ<-agregat_influence(tab=resultat[[1]],array_inf=resultat[[2]],listG=resultat[[3]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
+  list(result,influ,list_id)
+#  list(resultat,influ)
+#  list(result)
 }
 
 

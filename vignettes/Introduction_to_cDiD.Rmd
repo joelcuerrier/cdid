@@ -223,7 +223,8 @@ chained.results=chained(
 ```
 ```{r}
 # Debugging
-#Vérification des ATT sans les preprocess.
+#Vérification des ATT sans les preprocess. Checked
+# Vérification des std.
 
 
 source("R/fonction_simu_attrition.R")
@@ -244,8 +245,8 @@ source("R/chained.R")
 source("R/compute.aggte.R")
 source("R/aggte.R")
 source("R/compute.aggte.R")
-# data=fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5,alpha_percentile=0.9)
-data=fonction_simu_attrition_nofe(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5)
+data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5,alpha_percentile=0.75)
+# data=fonction_simu_attrition_nofe(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5)
 
 resultat= chained_estimPeriod_Boot(yname="Y1_chaine",
                 tname="annee",
@@ -270,7 +271,147 @@ resultat= chained_estimPeriod_Boot(yname="Y1_chaine",
                 # cband=TRUE,
                 # clustervars=NULL)
   )
-resultat[[1]]
+
+
+
+
+# Fonction d'influence (agregat_influence)
+# influ<-agregat_influence(tab=resultat[[1]][[1]],array_inf=resultat[[2]],listG=resultat[[1]][[3]],nom_outcome=nom_outcome,tname=tname,first.treat.name=first.treat.name,poids=dum)
+
+tname = 'annee'
+first.treat.name = 'annee_G'
+nom_outcome = c('Y1_chaine')
+tab = resultat[[1]][[1]]
+array_inf = resultat[[1]][[2]]
+listG=resultat[[1]][[3]]
+poids = resultat[[2]]
+str(array_inf)
+  
+  nb_an<-unique(tab[,tname])
+  nn<-length(nb_an)
+  nb_an_long<-c(min(nb_an)-1,nb_an)
+  an_cohort<-unique(tab[,first.treat.name])
+  NN<-length(an_cohort)
+  agreg_influence = array(0,dim=c(dim(array_inf)[1],(1+length(nom_outcome)),nn*NN))
+
+  cumsum_after<-function(array_f){
+    for (k in 2:dim(array_f)[3]){
+      array_f[,,k]=array_f[,,k]+array_f[,,k-1]
+    }
+    array_f
+  }
+  cumsum_befor<-function(array_f){
+    len = dim(array_f)[3]
+    for (k in 1:(len-1)){
+      j=len-k
+      array_f[,,j]=array_f[,,j]+array_f[,,j+1]
+    }
+    array_f[,,1:len]=(-1)*array_f[,,1:len]
+  }
+  sum_array<-function(array_f){
+    len = dim(array_f)[3]
+    mat_result=array_f[,,1]
+    if (len>1){
+    for (k in 2:len){
+      mat_result=mat_result+array_f[,,k]
+      }
+    }
+    mat_result
+  }
+
+  #delete
+  
+
+  ATT=data.frame()
+  for (i in 1:NN){
+    tab_cohort=tab[(nn*(i-1)+1):(nn*i),]
+    after=tab_cohort[tab_cohort[,tname]>=an_cohort[i],]
+    befor=tab_cohort[tab_cohort[,tname]<an_cohort[i],]
+    after$time_to_treatment=after[,tname]-after[,first.treat.name]
+    befor$time_to_treatment=befor[,tname]-befor[,first.treat.name]-1
+    after$compteur
+    befor$compteur
+    
+    influence_cohort_after=array_inf[,,after$compteur]
+    influence_cohort_befor=array_inf[,,befor$compteur]
+    if (is.na(dim(influence_cohort_after)[3])==TRUE){
+      influence_cohort_after=array_inf[,,after$compteur]
+    } else if (dim(influence_cohort_after)[3]==0) {
+      influence_cohort_after=array_inf[,,after$compteur]
+    } else {
+      influence_cohort_after=cumsum_after(influence_cohort_after)
+      # Modif
+      influence_cohort_after[,1,]=array_inf[,1,after$compteur]
+    }
+    if (is.na(dim(influence_cohort_befor)[3])==TRUE){
+      influence_cohort_befor=array_inf[,,befor$compteur]
+    } else if (dim(influence_cohort_befor)[3]==0) {
+      influence_cohort_befor=array_inf[,,befor$compteur]
+    } else {
+      influence_cohort_befor=cumsum_befor(influence_cohort_befor)
+      # Modif
+      influence_cohort_befor[,1,]=array_inf[,1,befor$compteur]
+    }
+
+
+    agreg_influence[,,after$compteur]<-influence_cohort_after
+    agreg_influence[,,befor$compteur]<-influence_cohort_befor
+    ATT_temp=rbind(befor,after)
+    ATT_temp=merge(ATT_temp,poids,by.x=first.treat.name, by.y="Var1",all.x)
+    
+    ATT=rbind(ATT,ATT_temp)
+  }
+
+
+
+  ttt=unique(sort(ATT$time_to_treatment))
+  agreg_influence_final = array(0,dim=c(dim(array_inf)[1],(1+length(nom_outcome)),length(ttt)+1))
+  for (i in 1:length(ttt)){
+    ATTi=ATT[ATT$time_to_treatment==ttt[i],]
+    ATTi$Freq=ATTi$Freq/sum(ATTi$Freq)
+    agreg_inf_i=agreg_influence[,,ATTi$compteur]
+    if (is.na(dim(agreg_inf_i)[3])==TRUE){
+      agreg_inf_i=array(0,dim=c(dim(array_inf)[1],(1+length(nom_outcome)),1))
+      agreg_inf_i[,,1]=agreg_influence[,,ATTi$compteur]
+    } else {
+        agreg_inf_i=agreg_influence[,,ATTi$compteur]
+        for (j in 1:dim(ATTi)[1]){
+          agreg_inf_i[,,j]=ATTi$Freq[j]*agreg_inf_i[,,j]
+        }
+        # Modif
+        agreg_inf_i[,1,]=agreg_influence[,1,ATTi$compteur]
+    }
+    # D�but modif
+    # Comme les poids sont des fr�quences empiriques, ils sont al�atoires, 
+    # il faut ajouter un terme suppl�mentaire dans la fonction d'influence pour ne pas sous-�valuer la variance
+    for (j in 1:dim(ATTi)[1]){
+      traitement_j <- listG
+      traitement_j[,1][traitement_j[,1]!= ATTi[j,1]] <- 0
+      traitement_j[,1][traitement_j[,1]== ATTi[j,1]] <- 1
+      traitement_j[,1] <- (traitement_j[,1]-mean(traitement_j[,1])) * 1/(dim(ATTi)[1])
+      # Doute sur le fait que listG & agreg_inf_i ait le m�me nb d'observations
+      # mat_gamma <- as.data.frame(agreg_inf_i[,1,j])
+      # colnames(mat_gamma) <- c("var1")
+      # mat_gamma$gamma <- merge(mat_gamma,traitement_j,by.x="var1", by.y="iden_num",all.x)
+      # agreg_inf_i[,(2:dim(agreg_inf_i)[2]),j] <- agreg_inf_i[,(2:dim(agreg_inf_i)[2]),j]+ mat_gamma$gamma%*%ATTi[j,nom_outcome]
+      agreg_inf_i[,(2:dim(agreg_inf_i)[2]),j] <- agreg_inf_i[,(2:dim(agreg_inf_i)[2]),j]+ t(t(traitement_j[,1]))%*%as.matrix(ATTi[j,nom_outcome])
+    }
+    # End modif
+    if (ttt[i]< -1 ) {
+      agreg_influence_final[,,i]=sum_array(agreg_inf_i)
+    } else {
+      agreg_influence_final[,,i+1]=sum_array(agreg_inf_i)
+    }
+  }
+  # Remettre les identifiants des individus
+  for (i in 1:(length(ttt)+1)){
+    agreg_influence_final[,1,i]=array_inf[,1,1]
+  }
+  
+  
+
+
+
 
 
 ```

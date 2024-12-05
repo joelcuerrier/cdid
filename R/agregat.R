@@ -1,17 +1,60 @@
 ## fonction d'agr�gation 
 library(Matrix)
-#Voir l'équation de la page 17. Tu vas catch aussi pouruqoi il fait cumsum.
+
+# # Version initiale. Une nouvelle version a été ajusté pour la librairie cdid.
+# #Voir l'équation de la page 17. Tu vas catch aussi pouruqoi il fait cumsum.
+# agregatChris<-function(tab,nom_outcome,tname,first.treat.name,poids){
+  
+#   nb_an<-unique(tab[,tname])
+#   nn<-length(nb_an)
+#   nb_an_long<-c(min(nb_an)-1,nb_an)
+#   an_cohort<-unique(tab[,first.treat.name])
+#   NN<-length(an_cohort)
+#   ATT=data.frame()
+  
+#   for (i in 1:NN){
+#     tab_cohort=tab[(nn*(i-1)+1):(nn*i),]
+#     after=tab_cohort[tab_cohort[,tname]>=an_cohort[i],]
+#     befor=tab_cohort[tab_cohort[,tname]<an_cohort[i],]
+#     befor=befor[order(-befor[,tname]),]
+#     ATT_after=cumsum(after[,nom_outcome])
+#     ATT_befor=cumsum(-befor[,nom_outcome])
+#     ATT_after=cbind(after[,2:5],ATT_after)
+#     ATT_befor=cbind(befor[,2:5],ATT_befor)
+#     ATT_after$time_to_treatment=ATT_after[,tname]-ATT_after[,first.treat.name]+1
+#     ATT_befor$time_to_treatment=ATT_befor[,tname]-ATT_befor[,first.treat.name]
+#     ATT_temp=rbind(ATT_after,ATT_befor)
+#     ATT_temp=merge(ATT_temp,poids,by.x=first.treat.name, by.y="Var1",all.x)
+#     ATT=rbind(ATT,ATT_temp)
+#   }
+  
+#   num=ATT[,nom_outcome]*ATT$Freq
+#   num$time_to_treatment=ATT$time_to_treatment
+#   num$nobsG=ATT$nobsG
+#   num$nobsC=ATT$nobsC
+#   num=aggregate(num[,c(nom_outcome,"nobsG","nobsC")],by=list(num$time_to_treatment),FUN=sum) 
+#   denom=aggregate(ATT$Freq,by=list(ATT$time_to_treatment),FUN=sum)
+#   denom=1/denom$x
+#   result=num 
+  
+#   result[,nom_outcome]=result[,nom_outcome]*denom
+#   result=rbind(result,c(0,rep(0,length(nom_outcome)+2)))
+#   result[result$Group.1==-1,"nobsG"]=result[result$Group.1==-2,"nobsG"]
+#   result[result$Group.1==-1,"nobsC"]=result[result$Group.1==-2,"nobsC"]
+#   result=result[order(result[,"Group.1"]),]
+#   result
+# }
 agregatChris<-function(tab,nom_outcome,tname,first.treat.name,poids){
   
-
   nb_an<-unique(tab[,tname])
   nn<-length(nb_an)
   nb_an_long<-c(min(nb_an)-1,nb_an)
   an_cohort<-unique(tab[,first.treat.name])
   NN<-length(an_cohort)
   ATT=data.frame()
-  
+
   for (i in 1:NN){
+    
     tab_cohort=tab[(nn*(i-1)+1):(nn*i),]
     after=tab_cohort[tab_cohort[,tname]>=an_cohort[i],]
     befor=tab_cohort[tab_cohort[,tname]<an_cohort[i],]
@@ -22,30 +65,42 @@ agregatChris<-function(tab,nom_outcome,tname,first.treat.name,poids){
     ATT_befor=cbind(befor[,2:5],ATT_befor)
     ATT_after$time_to_treatment=ATT_after[,tname]-ATT_after[,first.treat.name]+1
     ATT_befor$time_to_treatment=ATT_befor[,tname]-ATT_befor[,first.treat.name]
+    
+    #I think new version of R requires to rename. 
+    names(ATT_after)[names(ATT_after) == "ATT_after"] <- nom_outcome
+    names(ATT_befor)[names(ATT_befor) == "ATT_befor"] <- nom_outcome
+
     ATT_temp=rbind(ATT_after,ATT_befor)
+    ATT_after
+    ATT_befor
     ATT_temp=merge(ATT_temp,poids,by.x=first.treat.name, by.y="Var1",all.x)
     ATT=rbind(ATT,ATT_temp)
   }
-  num=ATT[,nom_outcome]*ATT$Freq
+
+  num=ATT[,nom_outcome]*ATT$Freq #Pourquoi?
+
+  num <- as.data.frame(num)
+  colnames(num) <- nom_outcome
+
   num$time_to_treatment=ATT$time_to_treatment
   num$nobsG=ATT$nobsG
   num$nobsC=ATT$nobsC
   num=aggregate(num[,c(nom_outcome,"nobsG","nobsC")],by=list(num$time_to_treatment),FUN=sum) 
-  denom=aggregate(ATT$Freq,by=list(ATT$time_to_treatment),FUN=sum)
+
+  denom=aggregate(ATT$Freq,by=list(ATT$time_to_treatment),FUN=sum) #fréquences de chaque groupe.
   denom=1/denom$x
+
   result=num 
-  
+
   result[,nom_outcome]=result[,nom_outcome]*denom
-  
   result=rbind(result,c(0,rep(0,length(nom_outcome)+2)))
-  
-  
   result[result$Group.1==-1,"nobsG"]=result[result$Group.1==-2,"nobsG"]
   result[result$Group.1==-1,"nobsC"]=result[result$Group.1==-2,"nobsC"]
-  
+
   result=result[order(result[,"Group.1"]),]
   result
 }
+
 
 
 agregatChris_GMM<-function(tab,nom_outcome,tname,first.treat.name,poids){
@@ -239,6 +294,7 @@ agregat_influence<-function(tab,array_inf,listG,nom_outcome,tname,first.treat.na
   }
   agreg_influence_final
 }  
+
 
 
 
