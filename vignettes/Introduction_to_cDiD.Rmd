@@ -101,12 +101,9 @@ ls("package:cdid")
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 set.seed(123)
 options(warn = -1)
-
+source("R/fonction_simu_attrition.R")
 # Using the function `fonction_simu_attrition` from the `cdid` package to generate a simulation dataset.
 data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.75)
-View(data)
-# We are fixing the missing observations.
-
 
 #      id annee  Y1_chaine       X         annee_G   P_Y1_chaine   traite_G  select  
 # 6616  1     1  0.7697235   1.3126786       0            0           0         1   
@@ -141,7 +138,8 @@ did.results = did::att_gt(
   pl = FALSE,
   cores = 1
 )
-did.results
+#Dynamic Effect of the treatment
+aggte(MP = did.results, type = 'dynamic')
 
 ```
 
@@ -169,15 +167,14 @@ did.cs.results = did::att_gt(
   cores = 1,
   panel = FALSE
 )
-
+#Dynamic Effect of the treatment
+agg.es.chained <- aggte(MP = did.cs.results, type = 'dynamic')
 
 ```
 
 ## Chained Difference-in-Differences
 The function `chained` estimates the average treatment effect for the chained DiD design. See the documentation here : https://www.davidbenatia.com/publication/chaineddid/.
 ```{r}
-data=fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5,alpha_percentile=0.9)
-
 chained.results=chained(
                 yname="Y1_chaine",
                 tname="annee",
@@ -201,6 +198,7 @@ chained.results=chained(
                 cores=1,
                 cband=TRUE,
                 clustervars=NULL)
+
 ```
 ```{r}
 # Debugging

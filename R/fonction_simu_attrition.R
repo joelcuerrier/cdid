@@ -188,8 +188,10 @@ for (simu_i in 1:nsims){
 
   # Added 5th od December
   # We are fixing the missing observations.
-  data$Y1_longDID[data$P_Y1_longDID!=1] <- NA
-  data$Y1_CS[data$P_Y1_longDID!=1] <- NA
+  # We remove Y2.
+  data_sim$Y1_longDID[data_sim$P_Y1_longDID!=1] <- NA
+  data_sim$Y1_CS[data_sim$P_Y1_longDID!=1] <- NA
+  
   data_sim <- subset(data_sim, select = -Y2_chaine)
   data_sim <- subset(data_sim, select = -Y2_CS)
   data_sim <- subset(data_sim, select = -Y2_longDID)
@@ -198,7 +200,7 @@ for (simu_i in 1:nsims){
   data_sim <- subset(data_sim, select = -P_Y2_CS)
   data_sim <- subset(data_sim, select = -P_Y2_longDID)
   
-  View(data)
+  
 
 
 
