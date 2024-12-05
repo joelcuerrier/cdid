@@ -19,12 +19,9 @@ source("R/compute.aggte.R")
 source("R/aggte.R")
 source("R/compute.aggte.R")
 
-
 beta_hat_chaine  = matrix(NA,nsims,6)
 IC_inf_chaine  = matrix(NA,nsims,6)
 IC_sup_chaine  = matrix(NA,nsims,6)
-# mat.att <- matrix(nrow = 0, ncol = 0)
-# mat.se <- matrix(nrow = 0, ncol = 0)
 
 for (simu_i in 1:nsims){
     print(simu_i)
@@ -60,28 +57,8 @@ for (simu_i in 1:nsims){
     IC_inf_chaine[simu_i, 1:length(IC[[2]][IC[[2]][,1]>0, 2])] = IC[[2]][IC[[2]][,1]>0,2]
     IC_sup_chaine[simu_i, 1:length(IC[[3]][IC[[3]][,1]>0, 2])] = IC[[3]][IC[[3]][,1]>0,2]
     simu_attri=list(beta_hat_chaine,IC_inf_chaine,IC_sup_chaine)
-    # agg <- aggte(MP = chained.results, type = 'dynamic')
-    # if (nrow(mat.att) == 0) {
-    # mat.att <- matrix(nrow = length(agg$att.egt), ncol = 0)} #we adjust the size of the matrix for cbind.
-    # if (nrow(mat.se) == 0) {
-    # mat.se <- matrix(nrow = length(agg$se.egt), ncol = 0)} #we adjust the size of the matrix for cbind.
-    
-    
-    # mat.att <- cbind(mat.att, agg$att.egt)
-    # mat.se <- cbind(mat.se, unlist(agg$se.egt))
+
 }
-
-# row_averages = rowMeans(mat.att, na.rm = TRUE)
-# results.att <- matrix(row_averages, ncol = 1)
-# row_averages = rowMeans(mat.se, na.rm = TRUE)
-# results.se <- matrix(row_averages, ncol = 1)
-# results.final <- cbind(results.att, results.se)
-
-# num_rows <- nrow(results.final)
-# tt <- c(-(num_rows %/% 2):((num_rows - 1) %/% 2))
-# results.final <- cbind(tt, results.final)
-# results.final
-
 
 result_sim_attri = data.frame()
 
@@ -94,7 +71,6 @@ for (j in 1:nb_estimateur){
     
   }
 }
-
 
 result_sim_attri
 

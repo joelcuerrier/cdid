@@ -29,7 +29,9 @@ Imports:
     ggplot2,
     patchwork,
     tidyr,
-    here
+    here,
+    knitr,
+    did
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 BugReports: https://github.com/joelcuerrier/cdid/issues

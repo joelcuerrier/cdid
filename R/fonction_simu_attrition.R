@@ -185,6 +185,25 @@ for (simu_i in 1:nsims){
   pondRDi<-paste0("pondRD",as.character(i))
   data_sim[,pondRDi] = 1
   }
+
+  # Added 5th od December
+  # We are fixing the missing observations.
+  data$Y1_longDID[data$P_Y1_longDID!=1] <- NA
+  data$Y1_CS[data$P_Y1_longDID!=1] <- NA
+  data_sim <- subset(data_sim, select = -Y2_chaine)
+  data_sim <- subset(data_sim, select = -Y2_CS)
+  data_sim <- subset(data_sim, select = -Y2_longDID)
+  
+  data_sim <- subset(data_sim, select = -PY2_chaine)
+  data_sim <- subset(data_sim, select = -PY2_CS)
+  data_sim <- subset(data_sim, select = -PY2_longDID)
+  
+
+
+
+
+  
+  
   return(data_sim)
     } 
   }

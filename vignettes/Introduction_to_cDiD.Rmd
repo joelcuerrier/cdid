@@ -16,9 +16,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-
-
-
 install.packages("pandoc")
 ```
 
@@ -28,8 +25,6 @@ install.packages("pandoc")
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
-
-
 )
 ```
 
@@ -98,34 +93,20 @@ You can observe that both libraries utilize the same .R files and are largely co
 This is because our cdid library is primarily built upon the did library.
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 library(devtools)
-
 remotes::install_github("joelcuerrier/cdid", ref = "main", force = TRUE, dependencies=TRUE)
 library(cdid)
-library(did)
 ls("package:cdid")
 ```
-
-
 
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 set.seed(123)
 options(warn = -1)
-library(knitr)
-library(tidyr)
-library(stargazer)
-library(BMisc)
-library(Matrix)
-library(gridExtra)
-library(ggplot2)
-library(patchwork)
-library(knitr)
-library(here)
-source("R/fonction_simu_attrition_nofe.R")
 
 # Using the function `fonction_simu_attrition` from the `cdid` package to generate a simulation dataset.
-data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
-# We are fixing the missing observations
-data$Y1_longDID[data$P_Y1_longDID!=1] <- NA
+data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.75)
+View(data)
+# We are fixing the missing observations.
+
 
 #      id annee  Y1_chaine       X         annee_G   P_Y1_chaine   traite_G  select  
 # 6616  1     1  0.7697235   1.3126786       0            0           0         1   
