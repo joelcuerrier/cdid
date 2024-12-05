@@ -128,14 +128,11 @@ chained_estimPeriod_Boot<-function(yname,
   dum<-as.data.frame(table(list_id_poids[,gname]))
 
   # #intialement
-
   # result<-agregatChris(tab=resultat[[1]],nom_outcome=Les_outcome,tname="annee",first.treat.name=anneeT,dum)
   result<-agregatChris(tab=resultat[[1]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
 # influ<-agregat_influence(tab=resultat[[1]],array_inf=resultat[[2]],listG=resultat[[3]],nom_outcome=Les_outcome,tname="annee",first.treat.name=anneeT,poids=dum)
   influ<-agregat_influence(tab=resultat[[1]],array_inf=resultat[[2]],listG=resultat[[3]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
   list(result,influ,list_id)
-#  list(resultat,influ)
-#  list(result)
 }
 
 
@@ -372,9 +369,10 @@ wild_bootstrap<-function(result,influ,list_id,nom_outcome,biters,nivtest,seedvec
 
 ###### ----------------------------------------------------------------------------------------------------------------------------------------
 ###### ESTIMATEUR GMM -------------------------------------------------------------------------------------------------------------------------
+###### Version du 5 décembre 2024
 ###### ----------------------------------------------------------------------------------------------------------------------------------------
 
-  GMM_estimPeriod_Boot<-function(yname,
+GMM_estimPeriod_Boot<-function(yname,
                                  tname,
                                  idname,
                                  gname,
@@ -423,7 +421,7 @@ wild_bootstrap<-function(result,influ,list_id,nom_outcome,biters,nivtest,seedvec
                            ,selection=select,ponderation=weightsname,weight_assumption=weight_assumption,debT=debT,finT=finT)
   
   
-  # str(resultat)
+  
   # Poids pour aggréger les effets des différentes cohortes de traitement 
   list_id<-merge(list_id,resultat[[3]]) #indiv
   list_id_poids=resultat[[3]] #id, gname
@@ -485,13 +483,12 @@ wild_bootstrap<-function(result,influ,list_id,nom_outcome,biters,nivtest,seedvec
     #Equation 50 fonction influence ATTgt, pas delta attgt.
     PHI_influence_ATTgt[,i,] <- t(MASS::ginv(t(mat_W)%*%MASS::ginv(omega_deltaATT[i,,])%*%mat_W)%*%t(mat_W)%*%MASS::ginv(omega_deltaATT[i,,])%*%t(resultat[[2]][,i+1,]))
   }
-    
-  
+  View(ATTgt)
+  return(list(ATTgt,PHI_influence_ATTgt,resultat,list_id,dum))
   # Agregation des effets dynamiques à partir de ATTgt
-  # result<-agregatChris_GMM(tab=ATTgt,nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
+  result<-agregatChris_GMM(tab=ATTgt,nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
   # Calculer la fonction d'influence des effets agreges dynamiques
-
-  # influ<-agregat_influence_GMM(tab=ATTgt,array_influ=resultat[[2]],agreg_influence=PHI_influence_ATTgt,listG=resultat[[3]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
+  influ<-agregat_influence_GMM(tab=ATTgt,array_influ=resultat[[2]],agreg_influence=PHI_influence_ATTgt,listG=resultat[[3]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
   #influ calcule les effets dynamiques (?) #sum pondéré donc moins de dim
   # Liste des sorties utiles
   # list(result,influ,list_id)
@@ -502,6 +499,139 @@ wild_bootstrap<-function(result,influ,list_id,nom_outcome,biters,nivtest,seedvec
 
   list(resultat,PHI_influence_ATTgt)
 }
+###### ----------------------------------------------------------------------------------------------------------------------------------------
+###### ESTIMATEUR GMM -------------------------------------------------------------------------------------------------------------------------
+###### Version avant le 5 décembre 2024
+###### ----------------------------------------------------------------------------------------------------------------------------------------
+
+#   GMM_estimPeriod_Boot<-function(yname,
+#                                  tname,
+#                                  idname,
+#                                  gname,
+#                                  xformla,
+#                                  propensityformla,
+#                                  data,
+#                                  debT,
+#                                  finT,
+#                                  deb,
+#                                  fin,
+#                                  select,
+#                                  weightsname, #ST
+#                                  weight_assumption,
+#                                  cband=cband,
+#                                  alp=0.05,
+#                                  bstrap=FALSE,
+#                                  biters=1000,
+                                 
+                                 
+#                                  treated){
+ 
+#   ### Créer un siren numérique (id)
+#   list_id <-as.data.frame(unique(data[,c(idname)]))
+#   list_id$iden_num<-1:dim(list_id)[1]
+#   colnames(list_id)[1]=idname
+#   data=merge(data,list_id,by.x=idname,by.y=idname,all.x=TRUE)
+
+#   ### selection des données 
+#   bebe<-data[data[[tname]]>=deb & data[[tname]] <= fin ,]
+#   bebe<-bebe[bebe[,gname]>=debT | bebe[,gname]==0,]
+
+#   ## Pour les observations traitées après finT on met une pondération nulle pour les observation après finT
+#   ## puis on bascule entièrement dans le  contrefactuel les traités après finT
+#   for(i in 1:length(weightsname)){
+#   bebe[(bebe[,gname]>finT)&(bebe[[tname]]>=finT),weightsname[i]]<-0}
+#   bebe[bebe[,gname]>finT,gname]<-0
+  
+#   ### definition du modèle utilisant le score 
+#   xxF<-as.formula(paste(" ~ ",paste(xformla, collapse=" + "),sep=""))
+  
+#   # resultat: objet liste avec trois éléments dans la liste: (1) att, (2) mat_influence et (3) indiv la liste des individus 
+#   resultat<- mp.spatt.GMM(nom_outcome=yname,nom_traitement=treated,xformla=xxF,propensityformla=propensityformla,data=bebe,
+#                            first.treat.name = gname,
+#                            idname = idname, tname=tname,
+#                            bstrap = FALSE,se=TRUE,cband =FALSE
+#                            ,selection=select,ponderation=weightsname,weight_assumption=weight_assumption,debT=debT,finT=finT)
+  
+  
+#   # str(resultat)
+#   # Poids pour aggréger les effets des différentes cohortes de traitement 
+#   list_id<-merge(list_id,resultat[[3]]) #indiv
+#   list_id_poids=resultat[[3]] #id, gname
+#   list_id_poids=list_id_poids[list_id_poids[,gname]>0,]
+#   list_id_poids<-unique(list_id_poids)
+#   dum<-as.data.frame(table(list_id_poids[,gname]))
+
+#   flist<-resultat[[5]]
+#   tlist<-resultat[[6]]
+#   flen <- length(flist)
+#   tlen <- length(tlist)
+
+#   # Covariance matrix of delta ATT estimator 
+#   #VERIFIER QUE J'AI LE BON NOMBRE D'OBSERVATIONS POUR NN ??
+#   omega_deltaATT <- array(0,dim=c(length(yname),dim(resultat[[1]])[1],dim(resultat[[1]])[1]))
+#   for(i in 1:length(yname)){
+#     omega_deltaATT[i,,] <- (1/dim(resultat[[2]])[1]) * t(resultat[[2]][,i+1,]) %*% resultat[[2]][,i+1,]   
+#   }
+#   # Remove columns from mat_W 
+#   mat_W <- resultat[[4]]
+#   remov_col=c()
+#   for (f in 1:flen) { 
+#     for (t in 1:tlen) {
+#       if (flist[f]-1 == tlist[t]){remov_col<-c(remov_col,(f-1)*tlen+t)}
+#     }
+#   }
+#   mat_W <- subset( mat_W, select = -c(remov_col ) )
+#   mat_W <- as.matrix(mat_W)
+#   # Covariance Matrix of ATTgt
+#   Sigma_ATTgt <- array(0,dim=c(length(yname),dim(mat_W)[2],dim(mat_W)[2]))
+#   for(i in 1:length(yname)){
+#     Sigma_ATTgt[i,,] <- MASS::ginv(t(mat_W)%*%MASS::ginv(omega_deltaATT[i,,])%*%mat_W)
+#   }
+#   # Optimal estimator of ATTgt
+#   delta_ATT <- as.matrix(resultat[[1]][,yname])
+#   ATTgt <- matrix(NA,ncol(mat_W),length(yname))
+#   colnames(ATTgt) <- yname
+#   rownames(ATTgt) <- colnames(mat_W)
+#   for(i in 1:length(yname)){
+#     #donc laTT est défini ici et non dans compute. Donc att dépend de l'inffluence.
+#     ATTgt[,i] <- MASS::ginv(t(mat_W)%*%MASS::ginv(omega_deltaATT[i,,])%*%mat_W)%*%t(mat_W)%*%MASS::ginv(omega_deltaATT[i,,])%*%delta_ATT[,i]
+#   }
+#   #inf pour inference
+#   # Mise en forme de la matrice ATTgt pour pouvoir l'agreger a des effets dynamiques
+#   ATTgt<-as.data.frame(ATTgt)
+#   ncol_ATTgt<-ncol(ATTgt)
+#   for (f in 1:flen) { 
+#     for (t in 1:(tlen-1)) {
+      
+#       ATTgt[(f-1)*(tlen-1)+t,ncol_ATTgt+1]<-flist[f]
+#       if(flist[f]-1>tlist[t]){ATTgt[(f-1)*(tlen-1)+t,ncol_ATTgt+2]<-tlist[t]}else{ATTgt[(f-1)*(tlen-1)+t,ncol_ATTgt+2]<-tlist[t]+1}
+#     }
+#   }
+#   colnames(ATTgt)[ncol_ATTgt+1]<-gname
+#   colnames(ATTgt)[ncol_ATTgt+2]<-tname
+#   # Influence function of ATTgt : PHI
+#   PHI_influence_ATTgt=array(0,dim=c(dim(resultat[[2]])[1],length(yname),dim(ATTgt)[1])) #6000,1,attgt
+#   for(i in 1:length(yname)){
+#     #Equation 50 fonction influence ATTgt, pas delta attgt.
+#     PHI_influence_ATTgt[,i,] <- t(MASS::ginv(t(mat_W)%*%MASS::ginv(omega_deltaATT[i,,])%*%mat_W)%*%t(mat_W)%*%MASS::ginv(omega_deltaATT[i,,])%*%t(resultat[[2]][,i+1,]))
+#   }
+    
+  
+#   # Agregation des effets dynamiques à partir de ATTgt
+#   # result<-agregatChris_GMM(tab=ATTgt,nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
+#   # Calculer la fonction d'influence des effets agreges dynamiques
+
+#   # influ<-agregat_influence_GMM(tab=ATTgt,array_influ=resultat[[2]],agreg_influence=PHI_influence_ATTgt,listG=resultat[[3]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
+#   #influ calcule les effets dynamiques (?) #sum pondéré donc moins de dim
+#   # Liste des sorties utiles
+#   # list(result,influ,list_id)
+#   # View(as.data.frame(influ))
+#   # print(rownames(influ))
+  
+
+
+#   list(resultat,PHI_influence_ATTgt)
+# }
 
 # ###### ----------------------------------------------------------------------------------------------------------------------------------------
 # ###### back up (sans modifications) ESTIMATEUR GMM -------------------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-nsims=1000
+nsims=100
 set.seed(123)
 source("R/fonction_simu_attrition.R")
 source("R/fonction_simu_attrition.R")

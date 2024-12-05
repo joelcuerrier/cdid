@@ -12,7 +12,7 @@
 fonction_simu_attrition <- function(theta2_alpha_Gg, lambda1_alpha_St, sigma_alpha, sigma_epsilon, alpha_percentile){
 # Remarque : pour l'estimateur long DID, on l'estime sur un panel cylindr� qui drop les observations manquantes
 # c-à-d, on utilise pour cet estimateur la pond�ration utilis�e pour l'estimateur en Cross Section !!!
-
+set.seed(123)
 # Settings
 T = 9           # periods 
 N0 = 150        # individuals (per two periods!), so N0*2 per periods 
@@ -142,7 +142,7 @@ for (simu_i in 1:nsims){
   # Mixture sur la probabilit� d'�tre observ� deux ann�es de suite:
   # Les individus qui ont un alpha_i sup�rieur au quantile � 75% sont tout le temps observ�
   for (t in 1:T){
-    St_CS[alpha[,t] > quantile(alpha[,1], prob=c(0.75)), t] = 1
+    St_CS[alpha[,t] > quantile(alpha[,1], prob=c(alpha_percentile)), t] = 1
   }
   
   ID = matrix(seq.int(nrow(Y)),nrow=(N*T), ncol=T)
@@ -189,8 +189,8 @@ for (simu_i in 1:nsims){
   # Added 5th od December
   # We are fixing the missing observations.
   # We remove Y2.
-  data_sim$Y1_longDID[data_sim$P_Y1_longDID!=1] <- NA
-  data_sim$Y1_CS[data_sim$P_Y1_longDID!=1] <- NA
+  # data_sim$Y1_longDID[data_sim$P_Y1_longDID!=1] <- NA
+  # data_sim$Y1_CS[data_sim$P_Y1_longDID!=1] <- NA
   
   data_sim <- subset(data_sim, select = -Y2_chaine)
   data_sim <- subset(data_sim, select = -Y2_CS)
