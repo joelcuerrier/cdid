@@ -176,15 +176,13 @@ agg.es.chained <- aggte(MP = did.cs.results, type = 'dynamic')
 
 
 
-devtools::document()
-devtools::build()
-devtools::install()
 
 ```
 
 ## Chained Difference-in-Differences
 The function `chained` estimates the average treatment effect for the chained DiD design. See the documentation here : https://www.davidbenatia.com/publication/chaineddid/.
 ```{r}
+# library(BMisc)
 chained.results=chained(
                 yname="Y1_chaine",
                 tname="annee",
