@@ -194,10 +194,11 @@ for (simu_i in 1:nsims){
   data_sim <- subset(data_sim, select = -Y2_CS)
   data_sim <- subset(data_sim, select = -Y2_longDID)
   
-  data_sim <- subset(data_sim, select = -PY2_chaine)
-  data_sim <- subset(data_sim, select = -PY2_CS)
-  data_sim <- subset(data_sim, select = -PY2_longDID)
+  data_sim <- subset(data_sim, select = -P_Y2_chaine)
+  data_sim <- subset(data_sim, select = -P_Y2_CS)
+  data_sim <- subset(data_sim, select = -P_Y2_longDID)
   
+  View(data)
 
 
 
