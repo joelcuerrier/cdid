@@ -483,8 +483,9 @@ GMM_estimPeriod_Boot<-function(yname,
     #Equation 50 fonction influence ATTgt, pas delta attgt.
     PHI_influence_ATTgt[,i,] <- t(MASS::ginv(t(mat_W)%*%MASS::ginv(omega_deltaATT[i,,])%*%mat_W)%*%t(mat_W)%*%MASS::ginv(omega_deltaATT[i,,])%*%t(resultat[[2]][,i+1,]))
   }
-  View(ATTgt)
-  return(list(ATTgt,PHI_influence_ATTgt,resultat,list_id,dum))
+  
+  # return(list(ATTgt,PHI_influence_ATTgt,resultat,list_id,dum))
+  
   # Agregation des effets dynamiques à partir de ATTgt
   result<-agregatChris_GMM(tab=ATTgt,nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
   # Calculer la fonction d'influence des effets agreges dynamiques
@@ -497,7 +498,8 @@ GMM_estimPeriod_Boot<-function(yname,
   
 
 
-  list(resultat,PHI_influence_ATTgt)
+  # list(resultat,PHI_influence_ATTgt)
+  list(result,influ,list_id)
 }
 ###### ----------------------------------------------------------------------------------------------------------------------------------------
 ###### ESTIMATEUR GMM -------------------------------------------------------------------------------------------------------------------------

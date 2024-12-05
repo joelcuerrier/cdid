@@ -244,131 +244,10 @@ chained.c1.results[[1]]
 ```{r}
 # data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.75)
 
-source("R/fonction_simu_attrition.R")
-source("R/fonction_simu_attrition.R")
-source("R/fonction_simu_attrition_nofe.R")
-source("R/fonctions_estimation_Boot.R")
-source("R/mp_spatt_Boot.R")
-source("R/compute_mp_spatt_Boot_alt.R")
-source("R/panelDiffV.R")
-source("R/gg.R")
-source("R/agregat.R")
-source("R/process_attgt.R")
-source("R/pre_process_did.R")
-source("R/DIDparams.R")
-source("R/mboot.R")
-source("R/MP.R")
-source("R/chained.R")
-source("R/compute.aggte.R")
-source("R/aggte.R")
-source("R/compute.aggte.R")
+
 
 # data=fonction_simu_attrition_nofe(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5)
-data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5,alpha_percentile = 0.9)
-View(data)
-
-
-
-
-resultat= GMM_estimPeriod_Boot(yname="Y1_chaine",
-                tname="annee",
-                idname="id",
-                gname="annee_G",
-                xformla=~X, 
-                propensityformla=c("X"), 
-                data=data,      
-                # anticipation=0,      
-                weightsname=c("P_Y1_chaine"), #St   
-                # weight_assumption=NULL,
-                bstrap=FALSE, 
-                biters=1000,
-                debT=3,
-                finT=8,
-                deb=1,
-                fin=8,
-                select='select',
-                treated='traite_G',
-                # pl=FALSE,
-                # cores=1,
-                # cband=TRUE,
-                # clustervars=NULL)
-  )
-
-
-
-resultat[[1]]
-
-tab =resultat[[1]]
-tname = "annee"
-first.treat.name = "annee_G"
-poids=resultat[[5]]
-nom_outcome = 'Y1_chaine'
-
-
-
-  # View(tab)
-  tab$time_to_treatment=tab[,tname]-(tab[,first.treat.name]-1)
-  tab=merge(tab,poids,by.x=first.treat.name, by.y="Var1",all.x)
-  
-  tab
-  
-  num=tab[,nom_outcome]*tab$Freq
-  num = as.data.frame(num)
-  colnames(num) <- nom_outcome
-  num$time_to_treatment=tab$time_to_treatment
-  num
-  num=aggregate(num[,c(nom_outcome)],by=list(num$time_to_treatment),FUN=sum) 
-  colnames(num)[2] <- nom_outcome 
-  num
-  
-  
-
-  denom=aggregate(tab$Freq,by=list(tab$time_to_treatment),FUN=sum)
-  denom=1/denom$x
-  denom
-  result=num 
-  result
-  result[,nom_outcome]=result[,nom_outcome]*denom
-  result
-  
-  
-  
-  # print(c(0,rep(0,length(nom_outcome)+2))) #Voir la matrice results, elle est differente avec le 3.6.1. Dans celle ci, il y am oins de colonne donc j'enleve le +2 pour ne pas avoir le message d'avertissement...
-  result=rbind(result,c(0,rep(0,length(nom_outcome))))
-  
-  
-
-  result=result[order(result[,"Group.1"]),]
-  result
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5,alpha_percentile = 0.6)
 
 gmm.results=gmm(
                 yname="Y1_chaine",
@@ -396,8 +275,8 @@ gmm.results=gmm(
                 clustervars=NULL)
 
 
-gmm.results
-aggte(MP = gmm.results, type = 'dynamic')
+gmm.results[[1]]
+
 ```
 
 

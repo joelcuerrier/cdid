@@ -102,30 +102,52 @@ agregatChris<-function(tab,nom_outcome,tname,first.treat.name,poids){
 }
 
 
-
-agregatChris_GMM<-function(tab,nom_outcome,tname,first.treat.name,poids){
-
-  # View(tab)
+# Version du 5 décembre
+agregatChris_GMM<-function(tab,nom_outcome,tname,first.treat.name,poids){  
   tab$time_to_treatment=tab[,tname]-(tab[,first.treat.name]-1)
   tab=merge(tab,poids,by.x=first.treat.name, by.y="Var1",all.x)
   num=tab[,nom_outcome]*tab$Freq
+  num = as.data.frame(num)
+  colnames(num) <- nom_outcome
   num$time_to_treatment=tab$time_to_treatment
   num=aggregate(num[,c(nom_outcome)],by=list(num$time_to_treatment),FUN=sum) 
+  colnames(num)[2] <- nom_outcome 
   denom=aggregate(tab$Freq,by=list(tab$time_to_treatment),FUN=sum)
   denom=1/denom$x
   result=num 
   result[,nom_outcome]=result[,nom_outcome]*denom
-  
-  
-  
   # print(c(0,rep(0,length(nom_outcome)+2))) #Voir la matrice results, elle est differente avec le 3.6.1. Dans celle ci, il y am oins de colonne donc j'enleve le +2 pour ne pas avoir le message d'avertissement...
   result=rbind(result,c(0,rep(0,length(nom_outcome))))
-  
-  
-
   result=result[order(result[,"Group.1"]),]
   result
 }
+
+
+# Version Avant le 5 décembre
+# # Version Inititale. J'ai fais des modifications dans une nouvelle version pour corriger des bugs.
+# agregatChris_GMM<-function(tab,nom_outcome,tname,first.treat.name,poids){
+
+
+#   tab$time_to_treatment=tab[,tname]-(tab[,first.treat.name]-1)
+#   tab=merge(tab,poids,by.x=first.treat.name, by.y="Var1",all.x)
+#   num=tab[,nom_outcome]*tab$Freq
+#   num$time_to_treatment=tab$time_to_treatment
+#   num=aggregate(num[,c(nom_outcome)],by=list(num$time_to_treatment),FUN=sum) 
+#   denom=aggregate(tab$Freq,by=list(tab$time_to_treatment),FUN=sum)
+#   denom=1/denom$x
+#   result=num 
+#   result[,nom_outcome]=result[,nom_outcome]*denom
+  
+  
+  
+#   # print(c(0,rep(0,length(nom_outcome)+2))) #Voir la matrice results, elle est differente avec le 3.6.1. Dans celle ci, il y am oins de colonne donc j'enleve le +2 pour ne pas avoir le message d'avertissement...
+#   result=rbind(result,c(0,rep(0,length(nom_outcome))))
+  
+  
+
+#   result=result[order(result[,"Group.1"]),]
+#   result
+# }
 
 agregatChris_CS<-function(tab,nom_outcome,tname,first.treat.name,poids){
   nb_an<-unique(tab[,tname])
