@@ -236,7 +236,8 @@ chained.c1.results=chained(
                 cores=1,
                 cband=TRUE,
                 clustervars=NULL)
-str(chained.c1.results)
+#Dynamic Effect of the treatment
+chained.c1.results[[1]]
                 
 ```
 ## GMM 

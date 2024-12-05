@@ -23,6 +23,7 @@ import(BMisc)
 importFrom(BMisc, rhs.vars)
 import(tidyr)
 importFrom(tidyr, pivot_wider)
+import(Matrix)
 
 
 
