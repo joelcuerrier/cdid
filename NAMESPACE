@@ -19,5 +19,5 @@ export(mboot)
 export(pre_process_did)
 export(process_attgt)
 export(process_attgt_gmm)
-importFrom(BMisc, rhs.vars)
+importFrom(BMisc)
 
