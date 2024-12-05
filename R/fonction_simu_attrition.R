@@ -192,13 +192,13 @@ for (simu_i in 1:nsims){
   data_sim$Y1_longDID[data_sim$P_Y1_longDID!=1] <- NA
   data_sim$Y1_CS[data_sim$P_Y1_longDID!=1] <- NA
   
-  data_sim <- subset(data_sim, select = -Y2_chaine)
-  data_sim <- subset(data_sim, select = -Y2_CS)
-  data_sim <- subset(data_sim, select = -Y2_longDID)
+  # data_sim <- subset(data_sim, select = -Y2_chaine)
+  # data_sim <- subset(data_sim, select = -Y2_CS)
+  # data_sim <- subset(data_sim, select = -Y2_longDID)
   
-  data_sim <- subset(data_sim, select = -P_Y2_chaine)
-  data_sim <- subset(data_sim, select = -P_Y2_CS)
-  data_sim <- subset(data_sim, select = -P_Y2_longDID)
+  # data_sim <- subset(data_sim, select = -P_Y2_chaine)
+  # data_sim <- subset(data_sim, select = -P_Y2_CS)
+  # data_sim <- subset(data_sim, select = -P_Y2_longDID)
   
   
 
