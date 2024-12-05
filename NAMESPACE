@@ -21,5 +21,8 @@ export(process_attgt)
 export(process_attgt_gmm)
 import(BMisc)
 importFrom(BMisc, rhs.vars)
+import(tidyr)
+importFrom(tidyr, pivot_wider)
+
 
 
