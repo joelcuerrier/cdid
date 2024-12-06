@@ -295,6 +295,7 @@ source("R/chained.R")
 source("R/compute.aggte.R")
 source("R/aggte.R")
 source("R/compute.aggte.R")
+source("R/gmm.R")
 
 set.seed(123)
 gmm.results=gmm(

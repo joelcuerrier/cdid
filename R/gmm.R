@@ -145,7 +145,7 @@
                             bstrap=bstrap,
                             biters=biters,
                             treated=treated)    
-    View(results[[1]])
+    
     # attgt_list=results[[1]][1]
     # attgt_list=as.data.frame(attgt_list)
 
@@ -306,7 +306,7 @@
 
     # # results$inffunc=sparse_matrix
     # results$inffunc=inffunc
-    return(results)
+    
     }  
             
         
