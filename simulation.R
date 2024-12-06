@@ -95,7 +95,7 @@ write.csv(result_sim_attri, "simu_attri4.csv") #result
 # ===============================
 #  Gmm
 # ===============================
-nsims=2
+nsims=1000
 
 set.seed(123)
 beta_hat_chaine  = matrix(NA,nsims,6)
