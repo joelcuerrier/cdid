@@ -51,14 +51,14 @@
 #' results
 #' @return  \item{att}{The average treatment effect on the treated}
 
-  library(devtools)
-  library(openxlsx)
-  library(data.table) 
-  library(BMisc)
-  library(did)
-  library(jsonlite)
-  library(devtools)
-  library(tidyr)
+  # library(devtools)
+  # library(openxlsx)
+  # library(data.table) 
+  # library(BMisc)
+  # library(did)
+  # library(jsonlite)
+  # library(devtools)
+  # library(tidyr)
   # set.seed(123)
 
 chained <-function(yname,
