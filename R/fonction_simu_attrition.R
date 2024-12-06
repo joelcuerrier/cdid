@@ -12,7 +12,7 @@
 fonction_simu_attrition <- function(theta2_alpha_Gg, lambda1_alpha_St, sigma_alpha, sigma_epsilon, alpha_percentile){
 # Remarque : pour l'estimateur long DID, on l'estime sur un panel cylindr� qui drop les observations manquantes
 # c-à-d, on utilise pour cet estimateur la pond�ration utilis�e pour l'estimateur en Cross Section !!!
-set.seed(123)
+
 # Settings
 T = 9           # periods 
 N0 = 150        # individuals (per two periods!), so N0*2 per periods 

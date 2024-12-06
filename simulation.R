@@ -1,23 +1,24 @@
 
-set.seed(123)
-source("R/fonction_simu_attrition.R")
-source("R/fonction_simu_attrition.R")
-source("R/fonction_simu_attrition_nofe.R")
-source("R/fonctions_estimation_Boot.R")
-source("R/mp_spatt_Boot.R")
-source("R/compute_mp_spatt_Boot_alt.R")
-source("R/panelDiffV.R")
-source("R/gg.R")
-source("R/agregat.R")
-source("R/process_attgt.R")
-source("R/pre_process_did.R")
-source("R/DIDparams.R")
-source("R/mboot.R")
-source("R/MP.R")
-source("R/chained.R")
-source("R/compute.aggte.R")
-source("R/aggte.R")
-source("R/compute.aggte.R")
+  set.seed(123)
+  source("R/fonction_simu_attrition.R")
+  source("R/fonction_simu_attrition.R")
+  source("R/fonction_simu_attrition_nofe.R")
+  source("R/fonctions_estimation_Boot.R")
+  source("R/mp_spatt_Boot.R")
+  source("R/compute_mp_spatt_Boot_alt.R")
+  source("R/panelDiffV.R")
+  source("R/gg.R")
+  source("R/agregat.R")
+  source("R/process_attgt.R")
+  source("R/pre_process_did.R")
+  source("R/DIDparams.R")
+  source("R/mboot.R")
+  source("R/MP.R")
+  source("R/chained.R")
+  source("R/compute.aggte.R")
+  source("R/aggte.R")
+  source("R/compute.aggte.R")
+  source("R/gmm.R")
 
 
 
@@ -99,8 +100,8 @@ result_sim_attri
 # ===============================
 #  Gmm
 # ===============================
-nsims=1
-
+nsims=100
+library(readxl)
 set.seed(123)
 beta_hat_chaine  = matrix(NA,nsims,6)
 IC_inf_chaine  = matrix(NA,nsims,6)
@@ -108,8 +109,9 @@ IC_sup_chaine  = matrix(NA,nsims,6)
 
 for (simu_i in 1:nsims){
     print(simu_i)
-    # data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.9)
-    data = read_excel('data_sim.xlsx')
+    
+    data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.6)
+    # data = read_excel('data_sim_06.xlsx')
     
     chained.results=gmm(
                 yname="Y1_chaine",
@@ -135,8 +137,15 @@ for (simu_i in 1:nsims){
                 cband=TRUE,
                 clustervars=NULL)
 
+
+
+
+
+
+
     yname = "Y1_chaine" #I kepts the same variable name but they are defined as GMM outputs.
     beta_hat_chaine[simu_i, 1:length(chained.results[[1]][chained.results[[1]][,1]>0, 2])] = chained.results[[1]][chained.results[[1]][,1]>0,2]
+
     IC<-wild_bootstrap(chained.results[[1]],chained.results[[2]],chained.results[[3]],nom_outcome=yname,biters=1000,nivtest=0.05,seedvec=NULL)
     IC_inf_chaine[simu_i, 1:length(IC[[2]][IC[[2]][,1]>0, 2])] = IC[[2]][IC[[2]][,1]>0,2]
     IC_sup_chaine[simu_i, 1:length(IC[[3]][IC[[3]][,1]>0, 2])] = IC[[3]][IC[[3]][,1]>0,2]
@@ -156,5 +165,7 @@ for (j in 1:nb_estimateur){
   }
 }
 
-result_sim_attri
 
+
+simu_attri[[1]]
+result_sim_attri

@@ -422,8 +422,12 @@ GMM_estimPeriod_Boot<-function(yname,
                            bstrap = FALSE,se=TRUE,cband =FALSE
                            ,selection=select,ponderation=weightsname,weight_assumption=weight_assumption,debT=debT,finT=finT)
   
+  # Patch to replace invalid numbers to 0. Added december 5th.
+  resultat[[1]][] <- lapply(resultat[[1]], function(x) as.numeric(as.character(x)))
+  resultat[[1]][is.na(resultat[[1]])] <- 0
+
   
-  View(resultat[[1]])
+
 
   
   # Poids pour aggréger les effets des différentes cohortes de traitement 
