@@ -107,7 +107,7 @@ set.seed(123)
 
 # Using the function `fonction_simu_attrition` from the `cdid` package to generate a simulation dataset.
 data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.75)
-
+library(readxl)
 data = read_excel('data_sim.xlsx')
 
 
@@ -307,7 +307,7 @@ gmm.results=gmm(
                 propensityformla=c("X"), 
                 data=data,      
                 anticipation=0,      
-                weightsname=c("P_Y1_chaine"), 
+                weightsname=c("P_Y1_CS"), 
                 # weight_assumption="missing_trends", #Not yet implemented.
                 weight_assumption=NULL,
                 bstrap=FALSE, 

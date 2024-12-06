@@ -394,8 +394,8 @@ GMM_estimPeriod_Boot<-function(yname,
                                  
                                  treated){
  
-  set.seed(123)
-  View(class(data))
+  
+  
   ### Créer un siren numérique (id)
   list_id <-as.data.frame(unique(data[,c(idname)]))
   list_id$iden_num<-1:dim(list_id)[1]
