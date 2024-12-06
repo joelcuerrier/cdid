@@ -92,7 +92,7 @@ chained_estimPeriod_Boot<-function(yname,
                                    bstrap,
                                    biters=1000,
                                    treated){
-  set.seed(123)
+  
   
   ### Créer un siren numérique (id)
   list_id <-as.data.frame(unique(data[,c(idname)]))
@@ -119,7 +119,7 @@ chained_estimPeriod_Boot<-function(yname,
                          idname = idname, tname=tname,
                          bstrap = FALSE,se=TRUE,cband =FALSE
                          ,selection=select,ponderation=weightsname,weight_assumption=weight_assumption,debT=debT,finT=finT)
-  View(resultat[[1]])
+  
   # # Ajouté le 4 décembre pour reproduire l'aggrégation inititiale réalisée par Christophe.
   # # Poids pour aggr�ger les effets des diff�rentes cohortes de traitement 
   list_id_poids=resultat[[3]]

@@ -1,5 +1,6 @@
 
   set.seed(123)
+
   source("R/fonction_simu_attrition.R")
   source("R/fonction_simu_attrition.R")
   source("R/fonction_simu_attrition_nofe.R")
@@ -25,12 +26,13 @@
 # ===============================
 #  Chained
 # ===============================
-nsims=1
+nsims=100
 
 beta_hat_chaine  = matrix(NA,nsims,6)
 IC_inf_chaine  = matrix(NA,nsims,6)
 IC_sup_chaine  = matrix(NA,nsims,6)
 
+set.seed(123)
 for (simu_i in 1:nsims){
     print(simu_i)
     data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.9)
@@ -80,19 +82,12 @@ for (j in 1:nb_estimateur){
   }
 }
 
-result_sim_attri
-# comparer le nombre d'observation C et G avec les codes originaux.
-
-
-
-
-
-
-
-
-
-
-
+# export to csv
+library(readxl)
+write.csv(simu_attri[[1]], "simu_attri1.csv") #ATT g,t
+write.csv(simu_attri[[2]], "simu_attri2.csv") #IC inf
+write.csv(simu_attri[[3]], "simu_attri3.csv") #IC sup
+write.csv(result_sim_attri, "simu_attri4.csv") #result
 
 
 
@@ -100,8 +95,8 @@ result_sim_attri
 # ===============================
 #  Gmm
 # ===============================
-nsims=100
-library(readxl)
+nsims=2
+
 set.seed(123)
 beta_hat_chaine  = matrix(NA,nsims,6)
 IC_inf_chaine  = matrix(NA,nsims,6)
@@ -137,12 +132,6 @@ for (simu_i in 1:nsims){
                 cband=TRUE,
                 clustervars=NULL)
 
-
-
-
-
-
-
     yname = "Y1_chaine" #I kepts the same variable name but they are defined as GMM outputs.
     beta_hat_chaine[simu_i, 1:length(chained.results[[1]][chained.results[[1]][,1]>0, 2])] = chained.results[[1]][chained.results[[1]][,1]>0,2]
 
@@ -154,18 +143,19 @@ for (simu_i in 1:nsims){
 }
 
 result_sim_attri = data.frame()
-
 nb_estimateur=1
 for (j in 1:nb_estimateur){
   for (i in 1:6){
-    
+
     result_sim_attri[(i*2-1),j]=round(mean(round(mean(beta_hat_chaine[,i]),digits=3)),digits=3)
     result_sim_attri[(i*2),1]=paste0(paste0("(",round(sd(simu_attri[[1]][,i]),digits=3)),")")
-    
   }
 }
 
+# export to csv
+library(readxl)
+write.csv(simu_attri[[1]], "simu_attri1.csv") #ATT g,t
+write.csv(simu_attri[[2]], "simu_attri2.csv") #IC inf
+write.csv(simu_attri[[3]], "simu_attri3.csv") #IC sup
+write.csv(result_sim_attri, "simu_attri4.csv") #result
 
-
-simu_attri[[1]]
-result_sim_attri

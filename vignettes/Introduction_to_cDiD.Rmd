@@ -97,7 +97,7 @@ library(cdid)
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 set.seed(123)
 # Using the function `fonction_simu_attrition` from the `cdid` package to generate a simulation dataset.
-data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.75)
+data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.6)
 #      id annee  Y1_chaine       X         annee_G   P_Y1_chaine   traite_G  select  
 # 6616  1     1  0.7697235   1.3126786       0            0           0         1   
 # 6617  2     1  1.4992124   1.6380014       0            0           0         1   
@@ -265,6 +265,20 @@ results <- cbind(results, chained.c1.results[[1]]$Y1_chaine[chained.c1.results[[
 results <- cbind(results, gmm.results[[1]]$Y1_chaine[gmm.results[[1]]$Y1_chaine != 0])
 colnames(results) <- c('egt',"did",'cs', "chained", "chained.c1", "gmm")
 results
+
+#   egt          did           cs     chained  chained.c1         gmm
+#  [1,]  -6 -0.023192128 -0.023192128 0.018773743 0.051447428 0.158418166
+#  [2,]  -5  0.028772110  0.028772110 0.226410290 0.062243934 0.340923707
+#  [3,]  -4 -0.008196688 -0.008196688 0.261808536 0.057724295 0.289995152
+#  [4,]  -3 -0.023662929 -0.023662929 0.072111650 0.027282049 0.104370292
+#  [5,]  -2  0.014451281  0.014451281 0.006321048 0.008650356 0.009247556
+#  [6,]  -1 -0.009325674 -0.009325674 0.013556643 0.009034653 0.007426487
+#  [7,]   0  1.768588115  1.768588115 1.804821635 0.676924064 1.793826033
+#  [8,]   1  1.504632175  1.504632175 1.475766308 0.682760540 1.447589351
+#  [9,]   2  1.230794057  1.230794057 1.206665217 0.714062317 1.173587281
+# [10,]   3  1.011681168  1.011681168 1.083972077 0.819782252 1.039624263
+# [11,]   4  0.742904789  0.742904789 0.760405871 0.953095596 0.766727933
+# [12,]   5  0.539301624  0.539301624 0.554298317 1.468383357 0.537639496
 
 ```
 
