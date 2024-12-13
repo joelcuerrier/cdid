@@ -113,29 +113,28 @@ chained_estimPeriod_Boot<-function(yname,
   ### definition du modèele utilisant le score 
   xxF<-as.formula(paste(" ~ ",paste(xformla, collapse=" + "),sep=""))
   
-  # resultat: objet liste avec trois éléments dans la liste: (1) att, (2) mat_influence et (3) indiv la liste des individus 
+  # resultat: objet liste avec trois éléments dans la liste: (1) delta_att, (2) delta_influence et (3) indiv la liste des individus 
   resultat<- chained.mp.spatt.Boot(nom_outcome=yname,nom_traitement=treated,xformla=xxF,propensityformla=propensityformla,data=bebe,
                          first.treat.name = gname,
                          idname = idname, tname=tname,
                          bstrap = FALSE,se=TRUE,cband =FALSE
                          ,selection=select,ponderation=weightsname,weight_assumption=weight_assumption,debT=debT,finT=finT)
   
-  # # Ajouté le 4 décembre pour reproduire l'aggrégation inititiale réalisée par Christophe.
-  # # Poids pour aggr�ger les effets des diff�rentes cohortes de traitement 
   list_id_poids=resultat[[3]]
   list_id_poids=list_id_poids[list_id_poids[,gname]>0,]
   list_id_poids<-unique(list_id_poids)
   dum<-as.data.frame(table(list_id_poids[,gname]))
 
-  # #intialement
-  # result<-agregatChris(tab=resultat[[1]],nom_outcome=Les_outcome,tname="annee",first.treat.name=anneeT,dum)
+  # On utilise ces fonctions pour obtenir les ATT, et les fonctions d'influence
+  # Ces fonctions output une variable différente que celle du code original.
   result<-agregatChris(tab=resultat[[1]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
-# influ<-agregat_influence(tab=resultat[[1]],array_inf=resultat[[2]],listG=resultat[[3]],nom_outcome=Les_outcome,tname="annee",first.treat.name=anneeT,poids=dum)
   influ<-agregat_influence(tab=resultat[[1]],array_inf=resultat[[2]],listG=resultat[[3]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
-  list(result,influ,list_id)
+  
+  
+  list(result[[1]],influ[[1]],list_id,result[[2]],influ[[2]])
 }
 
-
+#Voulons nous intégrer le wildbootstrap dans les fonctions de callaway?
 wild_bootstrap<-function(result,influ,list_id,nom_outcome,biters,nivtest,seedvec=NULL){
   NN=dim(list_id)[1]
   borne_inf<-result
@@ -421,15 +420,11 @@ GMM_estimPeriod_Boot<-function(yname,
                            idname = idname, tname=tname,
                            bstrap = FALSE,se=TRUE,cband =FALSE
                            ,selection=select,ponderation=weightsname,weight_assumption=weight_assumption,debT=debT,finT=finT)
-  
+  # La fonction pour GMM est légèrement différente de celle pour le Chained. Ici on calcule les ATT et les fonctions d'influences à partir de leur delta à l'extérieur de la fonction d'agrégat.
   # Patch to replace invalid numbers to 0. Added december 5th.
   resultat[[1]][] <- lapply(resultat[[1]], function(x) as.numeric(as.character(x)))
   resultat[[1]][is.na(resultat[[1]])] <- 0
 
-  
-
-
-  
   # Poids pour aggréger les effets des différentes cohortes de traitement 
   list_id<-merge(list_id,resultat[[3]]) #indiv
   list_id_poids=resultat[[3]] #id, gname
@@ -498,16 +493,10 @@ GMM_estimPeriod_Boot<-function(yname,
   result<-agregatChris_GMM(tab=ATTgt,nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
   # Calculer la fonction d'influence des effets agreges dynamiques
   influ<-agregat_influence_GMM(tab=ATTgt,array_influ=resultat[[2]],agreg_influence=PHI_influence_ATTgt,listG=resultat[[3]],nom_outcome=yname,tname=tname,first.treat.name=gname,poids=dum)
-  #influ calcule les effets dynamiques (?) #sum pondéré donc moins de dim
-  # Liste des sorties utiles
-  # list(result,influ,list_id)
-  # View(as.data.frame(influ))
-  # print(rownames(influ))
+ 
+  # list(resultat,PHI_influence_ATTgt) #Initialement la fonction retourne les résultats de l'estimation GMM agrégés. Nous utilisons maintenant les fonctions d'aggrégation de Callaway. 
   
-
-
-  # list(resultat,PHI_influence_ATTgt)
-  list(result,influ,list_id)
+  list(result,PHI_influence_ATTgt,list_id,result[[2]],influ)
 }
 ###### ----------------------------------------------------------------------------------------------------------------------------------------
 ###### ESTIMATEUR GMM -------------------------------------------------------------------------------------------------------------------------

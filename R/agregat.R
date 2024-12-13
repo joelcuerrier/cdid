@@ -1,51 +1,8 @@
 ## fonction d'agr�gation 
 library(Matrix)
 
-# # Version initiale. Une nouvelle version a été ajusté pour la librairie cdid.
-# #Voir l'équation de la page 17. Tu vas catch aussi pouruqoi il fait cumsum.
-# agregatChris<-function(tab,nom_outcome,tname,first.treat.name,poids){
-  
-#   nb_an<-unique(tab[,tname])
-#   nn<-length(nb_an)
-#   nb_an_long<-c(min(nb_an)-1,nb_an)
-#   an_cohort<-unique(tab[,first.treat.name])
-#   NN<-length(an_cohort)
-#   ATT=data.frame()
-  
-#   for (i in 1:NN){
-#     tab_cohort=tab[(nn*(i-1)+1):(nn*i),]
-#     after=tab_cohort[tab_cohort[,tname]>=an_cohort[i],]
-#     befor=tab_cohort[tab_cohort[,tname]<an_cohort[i],]
-#     befor=befor[order(-befor[,tname]),]
-#     ATT_after=cumsum(after[,nom_outcome])
-#     ATT_befor=cumsum(-befor[,nom_outcome])
-#     ATT_after=cbind(after[,2:5],ATT_after)
-#     ATT_befor=cbind(befor[,2:5],ATT_befor)
-#     ATT_after$time_to_treatment=ATT_after[,tname]-ATT_after[,first.treat.name]+1
-#     ATT_befor$time_to_treatment=ATT_befor[,tname]-ATT_befor[,first.treat.name]
-#     ATT_temp=rbind(ATT_after,ATT_befor)
-#     ATT_temp=merge(ATT_temp,poids,by.x=first.treat.name, by.y="Var1",all.x)
-#     ATT=rbind(ATT,ATT_temp)
-#   }
-  
-#   num=ATT[,nom_outcome]*ATT$Freq
-#   num$time_to_treatment=ATT$time_to_treatment
-#   num$nobsG=ATT$nobsG
-#   num$nobsC=ATT$nobsC
-#   num=aggregate(num[,c(nom_outcome,"nobsG","nobsC")],by=list(num$time_to_treatment),FUN=sum) 
-#   denom=aggregate(ATT$Freq,by=list(ATT$time_to_treatment),FUN=sum)
-#   denom=1/denom$x
-#   result=num 
-  
-#   result[,nom_outcome]=result[,nom_outcome]*denom
-#   result=rbind(result,c(0,rep(0,length(nom_outcome)+2)))
-#   result[result$Group.1==-1,"nobsG"]=result[result$Group.1==-2,"nobsG"]
-#   result[result$Group.1==-1,"nobsC"]=result[result$Group.1==-2,"nobsC"]
-#   result=result[order(result[,"Group.1"]),]
-#   result
-# }
 agregatChris<-function(tab,nom_outcome,tname,first.treat.name,poids){
-  
+  # The first part provides the ATT derived from delta ATT. (pg. 61)
   nb_an<-unique(tab[,tname])
   nn<-length(nb_an)
   nb_an_long<-c(min(nb_an)-1,nb_an)
@@ -54,7 +11,6 @@ agregatChris<-function(tab,nom_outcome,tname,first.treat.name,poids){
   ATT=data.frame()
 
   for (i in 1:NN){
-    
     tab_cohort=tab[(nn*(i-1)+1):(nn*i),]
     after=tab_cohort[tab_cohort[,tname]>=an_cohort[i],]
     befor=tab_cohort[tab_cohort[,tname]<an_cohort[i],]
@@ -65,11 +21,8 @@ agregatChris<-function(tab,nom_outcome,tname,first.treat.name,poids){
     ATT_befor=cbind(befor[,2:5],ATT_befor)
     ATT_after$time_to_treatment=ATT_after[,tname]-ATT_after[,first.treat.name]+1
     ATT_befor$time_to_treatment=ATT_befor[,tname]-ATT_befor[,first.treat.name]
-    
-    #I think new version of R requires to rename. 
     names(ATT_after)[names(ATT_after) == "ATT_after"] <- nom_outcome
     names(ATT_befor)[names(ATT_befor) == "ATT_befor"] <- nom_outcome
-
     ATT_temp=rbind(ATT_after,ATT_befor)
     ATT_after
     ATT_befor
@@ -77,11 +30,10 @@ agregatChris<-function(tab,nom_outcome,tname,first.treat.name,poids){
     ATT=rbind(ATT,ATT_temp)
   }
 
-  num=ATT[,nom_outcome]*ATT$Freq #Pourquoi?
-
+  # The second part aggregates the ATT.
+  num=ATT[,nom_outcome]*ATT$Freq 
   num <- as.data.frame(num)
   colnames(num) <- nom_outcome
-
   num$time_to_treatment=ATT$time_to_treatment
   num$nobsG=ATT$nobsG
   num$nobsC=ATT$nobsC
@@ -91,14 +43,15 @@ agregatChris<-function(tab,nom_outcome,tname,first.treat.name,poids){
   denom=1/denom$x
 
   result=num 
-
   result[,nom_outcome]=result[,nom_outcome]*denom
   result=rbind(result,c(0,rep(0,length(nom_outcome)+2)))
   result[result$Group.1==-1,"nobsG"]=result[result$Group.1==-2,"nobsG"]
   result[result$Group.1==-1,"nobsC"]=result[result$Group.1==-2,"nobsC"]
-
   result=result[order(result[,"Group.1"]),]
-  result
+  View(result)
+  # Returns
+  # result #Modified on Dec 11th. Initially this function returned result. Now it returns ATT. We will use Callaways' aggregation function to get the ATT.
+  list(ATT,result)
 }
 
 
@@ -106,6 +59,7 @@ agregatChris<-function(tab,nom_outcome,tname,first.treat.name,poids){
 agregatChris_GMM<-function(tab,nom_outcome,tname,first.treat.name,poids){  
   tab$time_to_treatment=tab[,tname]-(tab[,first.treat.name]-1)
   tab=merge(tab,poids,by.x=first.treat.name, by.y="Var1",all.x)
+  
   num=tab[,nom_outcome]*tab$Freq
   num = as.data.frame(num)
   colnames(num) <- nom_outcome
@@ -119,35 +73,9 @@ agregatChris_GMM<-function(tab,nom_outcome,tname,first.treat.name,poids){
   # print(c(0,rep(0,length(nom_outcome)+2))) #Voir la matrice results, elle est differente avec le 3.6.1. Dans celle ci, il y am oins de colonne donc j'enleve le +2 pour ne pas avoir le message d'avertissement...
   result=rbind(result,c(0,rep(0,length(nom_outcome))))
   result=result[order(result[,"Group.1"]),]
-  result
+  # result #Modified on Dec 11th. Initially this function returned result. Now it returns tab. We will use Callaways' aggregation function to get the ATT.
+  list(tab,result)
 }
-
-
-# Version Avant le 5 décembre
-# # Version Inititale. J'ai fais des modifications dans une nouvelle version pour corriger des bugs.
-# agregatChris_GMM<-function(tab,nom_outcome,tname,first.treat.name,poids){
-
-
-#   tab$time_to_treatment=tab[,tname]-(tab[,first.treat.name]-1)
-#   tab=merge(tab,poids,by.x=first.treat.name, by.y="Var1",all.x)
-#   num=tab[,nom_outcome]*tab$Freq
-#   num$time_to_treatment=tab$time_to_treatment
-#   num=aggregate(num[,c(nom_outcome)],by=list(num$time_to_treatment),FUN=sum) 
-#   denom=aggregate(tab$Freq,by=list(tab$time_to_treatment),FUN=sum)
-#   denom=1/denom$x
-#   result=num 
-#   result[,nom_outcome]=result[,nom_outcome]*denom
-  
-  
-  
-#   # print(c(0,rep(0,length(nom_outcome)+2))) #Voir la matrice results, elle est differente avec le 3.6.1. Dans celle ci, il y am oins de colonne donc j'enleve le +2 pour ne pas avoir le message d'avertissement...
-#   result=rbind(result,c(0,rep(0,length(nom_outcome))))
-  
-  
-
-#   result=result[order(result[,"Group.1"]),]
-#   result
-# }
 
 agregatChris_CS<-function(tab,nom_outcome,tname,first.treat.name,poids){
   nb_an<-unique(tab[,tname])
@@ -204,8 +132,9 @@ agregatChris_longDID<-function(tab,nom_outcome,tname,first.treat.name,poids){
   result
 }
 
-
 agregat_influence<-function(tab,array_inf,listG,nom_outcome,tname,first.treat.name,poids){
+  
+  # The first part provides the influence matrix derived from delta influence. (pg. 61)
   nb_an<-unique(tab[,tname])
   nn<-length(nb_an)
   nb_an_long<-c(min(nb_an)-1,nb_an)
@@ -265,12 +194,17 @@ agregat_influence<-function(tab,array_inf,listG,nom_outcome,tname,first.treat.na
       # Modif
       influence_cohort_befor[,1,]=array_inf[,1,befor$compteur]
     }
-    agreg_influence[,,after$compteur]<-influence_cohort_after
+    agreg_influence[,,after$compteur]<-influence_cohort_after #utiliser ceux-ci pour les influs. 
     agreg_influence[,,befor$compteur]<-influence_cohort_befor
+    
+
     ATT_temp=rbind(befor,after)
     ATT_temp=merge(ATT_temp,poids,by.x=first.treat.name, by.y="Var1",all.x)
     ATT=rbind(ATT,ATT_temp)
   }
+  View(agreg_influence[,2,])
+
+  # This part aggregates the influence matrix.
   ttt=unique(sort(ATT$time_to_treatment))
   agreg_influence_final = array(0,dim=c(dim(array_inf)[1],(1+length(nom_outcome)),length(ttt)+1))
   for (i in 1:length(ttt)){
@@ -314,11 +248,11 @@ agregat_influence<-function(tab,array_inf,listG,nom_outcome,tname,first.treat.na
   for (i in 1:(length(ttt)+1)){
     agreg_influence_final[,1,i]=array_inf[,1,1]
   }
-  agreg_influence_final
+  # agreg_influence_final #Modified on Dec 11th. Initially this function returned agreg_influence_final which is an aggregation of the influence matrix. Now it returns the influence matrix. We will use Callaways' aggregation function.
+  
+  
+  list(agreg_influence,agreg_influence_final)
 }  
-
-
-
 
 agregat_influence_CS<-function(tab,array_inf,listG,nom_outcome,tname,first.treat.name,poids){
   nb_an<-unique(tab[,tname])
@@ -510,31 +444,13 @@ agregat_influence_GMM<-function(tab,array_influ,agreg_influence,listG,nom_outcom
       }
     }
   
-    
-    # Début modif
-    # Comme les poids sont des fréquences empiriques, ils sont aléatoires, 
-    # il faut ajouter un terme supplémentaire dans la fonction d'influence pour ne pas sous-évaluer la variance
     for (j in 1:dim(ATTgti)[1]){
       traitement_j <- listG
       traitement_j[,1][traitement_j[,1]!= ATTgti[j,1]] <- 0
       traitement_j[,1][traitement_j[,1]== ATTgti[j,1]] <- 1
       traitement_j[,1] <- (traitement_j[,1]-mean(traitement_j[,1])) * 1/(dim(ATTgti)[1])
       agreg_inf_i[,(1:dim(agreg_inf_i)[2]),j] <- agreg_inf_i[,(1:dim(agreg_inf_i)[2]),j]+ t(t(traitement_j[,1]))%*%as.matrix(ATTgti[j,nom_outcome])
-      
-      # View(cbind(traitement_j,as.matrix(ATTgti[j,nom_outcome])))
-      # annee_G -0.0514 et attgti[j,outcome] cest 0.7414 a repetition dans le dataframe.les valeurs sont differents pour chq iterations.
-      # View(agreg_inf_i[,(1:dim(agreg_inf_i)[2]),j])
-#       c(-0.0380987867925241, 2.46125134205987, -0.0380987867925241, 
-# -0.0380987867925241, -0.0380987867925241, -1.44488465317681, 
-# -0.0380987867925241, -0.0380987867925241, 6.2228414112023, -0.0380987867925241, 
-# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
-# 0.492520020616457, -0.0380987867925241, -0.0380987867925241, 
-# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
-      #Seule difference avec 3.6.1 cest que eux cest un dataframe avec 2 output alors que moi jai une liste car jai un output donc dim1.
     }
-
-  
-   
 
     # End modif
     if (ttt[i]< 0 ) {
@@ -543,114 +459,14 @@ agregat_influence_GMM<-function(tab,array_influ,agreg_influence,listG,nom_outcom
       agreg_influence_final[,2:dim(agreg_influence_final)[2],i+1]=sum_array(agreg_inf_i)
     }
   }
-  # View(sum_array(agreg_inf_i))
-  #Seule difference avec 3.6.1 cest que eux cest un dataframe avec 2 output alors que moi jai une liste car jai un output donc dim1.
-
-# c(-0.0380987867925241, 2.46125134205987, -0.0380987867925241, 
-# -0.0380987867925241, -0.0380987867925241, -1.44488465317681, 
-# -0.0380987867925241, -0.0380987867925241, 6.2228414112023, -0.0380987867925241, 
-# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
-# 0.492520020616457, -0.0380987867925241, -0.0380987867925241, 
-# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
-# -0.0380987867925241, -0.0380987867925241, -2.99456499984133, 
-# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
-# -0.0380987867925241, 2.11081322870858, -0.0380987867925241, 4.4147590187473, 
-# -0.0380987867925241, -6.17050931748603, -0.0380987867925241, 
-# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
-# -5.0656937473256, -0.0380987867925241, 1.4469771848768, -2.3420234426436, 
-# -0.0380987867925241, -0.0380987867925241, -0.0380987867925241, 
-
+  
   # Remettre les identifiants des individus
   for (i in 1:(length(ttt)+1)){
     agreg_influence_final[,1,i]=array_influ[,1,1]
   }
-  # View(agreg_influence_final) #output ok
   agreg_influence_final
   
 }
-
-#back up
-
-# agregat_influence_GMM<-function(tab,array_influ,agreg_influence,listG,nom_outcome,tname,first.treat.name,poids){
-#   print(dim(agreg_influence))
-  
-#   # fonction pour agreger les fonctions d'influence PHI_influence_ATTgt
-#   sum_array<-function(array_f){
-#     len = dim(array_f)[3]
-#     mat_result=array_f[,,1]
-#     if (len>1){
-#       for (k in 2:len){
-#         mat_result=mat_result+array_f[,,k]
-#       }
-#     }
-#     mat_result
-#   }
-
-#   tab$time_to_treatment<-tab[,tname]-(tab[,first.treat.name]-1)
-#   tab$compteur<-1:nrow(tab)
-#   tab=merge(tab,poids,by.x=first.treat.name, by.y="Var1",all.x)
-#   ttt=unique(sort(tab$time_to_treatment))
-  
-
-#   agreg_influence_final <- array(0,dim=c(dim(agreg_influence)[1],length(nom_outcome)+1,length(ttt)+1))
-#   for (i in 1:length(ttt)){
-#     ATTgti=tab[tab$time_to_treatment==ttt[i],]
-#     ATTgti$Freq=ATTgti$Freq/sum(ATTgti$Freq)
-    
-#     agreg_inf_i=agreg_influence[,,ATTgti$compteur]
-
-#     ###JC###
-#     agreg_inf_i=as.matrix(agreg_inf_i)
-#     print(dim(agreg_inf_i)) #si compteur est vide/aucune donnees dans attgti, la troisieme dimension est vide. 
-#     View(agreg_inf_i)
-   
-#     if (is.na(dim(agreg_inf_i)[3])==TRUE){    
-#       print('lol')
-#       agreg_inf_i=array(0,dim=c(dim(agreg_influence)[1],length(nom_outcome),1))
-#       agreg_inf_i[,,1]=agreg_influence[,,ATTgti$compteur]
-#     } else {
-#       print('xd')
-#       agreg_inf_i=agreg_influence[,,ATTgti$compteur]
-#       for (j in 1:dim(ATTgti)[1]){
-#         agreg_inf_i[,,j]=ATTgti$Freq[j]*agreg_inf_i[,,j]
-#       }
-#     }
-   
-
-#     # Début modif
-#     # Comme les poids sont des fréquences empiriques, ils sont aléatoires, 
-#     # il faut ajouter un terme supplémentaire dans la fonction d'influence pour ne pas sous-évaluer la variance
-#     for (j in 1:dim(ATTgti)[1]){
-#       traitement_j <- listG
-#       traitement_j[,1][traitement_j[,1]!= ATTgti[j,1]] <- 0
-#       traitement_j[,1][traitement_j[,1]== ATTgti[j,1]] <- 1
-#       traitement_j[,1] <- (traitement_j[,1]-mean(traitement_j[,1])) * 1/(dim(ATTgti)[1])
-#       agreg_inf_i[,(1:dim(agreg_inf_i)[2]),j] <- agreg_inf_i[,(1:dim(agreg_inf_i)[2]),j]+ t(t(traitement_j[,1]))%*%as.matrix(ATTgti[j,nom_outcome])
-#     }
-
-#     # View(sum_array(agreg_inf_i))
-
-
-
-#     # End modif
-#     if (ttt[i]< 0 ) {
-#       agreg_influence_final[,2:dim(agreg_influence_final)[2],i]=sum_array(agreg_inf_i)
-#     } else {
-#       agreg_influence_final[,2:dim(agreg_influence_final)[2],i+1]=sum_array(agreg_inf_i)
-#     }
-#   }
-#   # Remettre les identifiants des individus
-#   for (i in 1:(length(ttt)+1)){
-#     agreg_influence_final[,1,i]=array_influ[,1,1]
-#   }
-#   agreg_influence_final
-# }
-
-
-
-
-
-
 
 # Fonction qui calcule les pvalues � partir des bootstraps
 pvalue<-function(tab,agreg_inf,nom_outcome){
@@ -660,7 +476,6 @@ pvalue<-function(tab,agreg_inf,nom_outcome){
     # View(influ[,i,j])
   }
 }
-
 
 agg1<-function(vv,typ){aggregate(vv,by=list(vv[,typ]),FUN=mean)}
 
@@ -725,62 +540,3 @@ agregatP<-function(tab,nom_outcome,tname,first.treat.name,poids){
   ma[,nom_outcome]<-mo[,nom_outcome]/mo[,"poids"]
   ma
 } 
-
-
-  
-# tete<-essai1[[1]]
-# agregat(tab=tete,nom_outcome=outcomeF,tname="annee",first.treat.name="annee_FUI") 
-# agregatP(tab=tete,nom_outcome=outcomeF,tname="annee",first.treat.name="annee_FUI",c(100,100,200)) 
-# 
-# tete<-essai1[[2]]
-# agregat(tab=tete,nom_outcome=outcomeD,tname="annee",first.treat.name="annee_FUI") 
-# agregatP(tab=tete,nom_outcome=outcomeD,tname="annee",first.treat.name="annee_FUI",c(100,100,200)) 
-# 
-# 
-# tete<-essai1[[3]]
-# agregat(tab=tete,nom_outcome=outcomeDS,tname="annee",first.treat.name="annee_FUI")   
-# agregatP(tab=tete,nom_outcome=outcomeDS,tname="annee",first.treat.name="annee_FUI",c(100,100,200)) 
-# 
-# tete<-essai2[[2]]
-# agregat(tab=tete,nom_outcome=outcomeD,tname="annee",first.treat.name="annee_FUI")
-# 
-# ujj<-c(4634,6986,6608,6020,5292,4284,4438,4102,1890,3318,2688)
-# length(ujj)
-# agregatP(tab=tete,nom_outcome=outcomeD,tname="annee",first.treat.name="annee_FUI",poids=ujj)
-
-# 
-# 
-# 
-# lk<-agregat(tab=tete,nom_outcome=outcomeF,tname="annee",first.treat.name="annee_FUI")   
-# 
-# 
-# 
-# mean2<-function(hh){
-#   weighted.mean(hh, w)
-# }
-# 
-# 
-# tete<-essai1[[2]]
-# agregat(tab=tete,nom_outcome=outcomeD,tname="annee",first.treat.name="annee_FUI")   
-# tete<-essai1[[3]]
-# agregat(tab=tete,nom_outcome=outcomeDS,tname="annee",first.treat.name="annee_FUI")   
-# 
-# 
-# #   
-# # mlist<-list(matrix(1:8,2,2),matrix(1:20,4,5),matrix(1:5,1,5))
-# # lo<-bdiag(mlist)
-# # mm<-matrix(1,1,7)
-# # mm%*%lo
-# # matrix(c(1,1,0,0,0),nrow=10,ncol=5,byrow=TRUE)  
-# # jj<-matrix(0,length(looo)+1,length(looo))
-# # jj[lower.tri(jj)]<-1
-# # jj
-# # tete<-essai1[[1]]
-# # looo<-unique(tete$annee)
-# # laaa<-unique(tete$annee_FUI)
-# # looo
-# # laaa
-# # ## annee-annee_trai : donne la bonnne position
-# # ## des matrcies carr�e de longuer le nombre total d'annn�e, c'est � dire annee +1
-
-

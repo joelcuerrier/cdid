@@ -92,7 +92,10 @@ install.packages("devtools")
 library(devtools)
 remotes::install_github("joelcuerrier/cdid", ref = "main", force = TRUE, dependencies=TRUE)
 library(cdid)
+
 ```
+
+#Voulons nous intégrer le wildbootstrap dans les fonctions de callaway?
 
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 set.seed(123)
@@ -111,6 +114,7 @@ data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_al
 # Code Implementation and Comparative Results
 ## Difference-in-Differences
 ```{r}
+#changer le Y ici...
 did.results = did::att_gt(
   yname="Y1_chaine",
   tname="annee",
@@ -137,6 +141,7 @@ aggte(MP = did.results, type = 'dynamic')
 
 ## Cross-Sectional
 ```{r}
+#changer le Y ici...
 did.cs.results = did::att_gt(
   yname="Y1_chaine",
   tname="annee",
@@ -164,6 +169,32 @@ agg.es.chained <- aggte(MP = did.cs.results, type = 'dynamic')
 ## Chained Difference-in-Differences
 The function `chained` estimates the average treatment effect for the chained DiD design. See the documentation here : https://www.davidbenatia.com/publication/chaineddid/.
 ```{r}
+#ajouter une référence au papier de David quand le code est roullé.
+
+  source("R/fonction_simu_attrition.R")
+  source("R/fonction_simu_attrition.R")
+  source("R/fonction_simu_attrition_nofe.R")
+  source("R/fonctions_estimation_Boot.R")
+  source("R/mp_spatt_Boot.R")
+  source("R/compute_mp_spatt_Boot_alt.R")
+  source("R/panelDiffV.R")
+  source("R/gg.R")
+  source("R/agregat.R")
+  source("R/process_attgt.R")
+  source("R/pre_process_did.R")
+  source("R/DIDparams.R")
+  source("R/mboot.R")
+  source("R/MP.R")
+  source("R/chained.R")
+  source("R/compute.aggte.R")
+  source("R/aggte.R")
+  source("R/compute.aggte.R")
+  source("R/gmm.R")
+
+set.seed(123)
+data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.6)
+data <- subset(data, select = -c(Y1_CS, Y1_longDID)) 
+
 chained.results=chained(
                 yname="Y1_chaine",
                 tname="annee",
@@ -172,9 +203,7 @@ chained.results=chained(
                 xformla=~X, 
                 propensityformla=c("X"), 
                 data=data,      
-                anticipation=0,      
-                weightsname=c("P_Y1_chaine"), #St   
-                weight_assumption=NULL,
+                weightsname="P_Y1_chaine",  
                 bstrap=FALSE, 
                 biters=1000,
                 debT=3,
@@ -183,48 +212,43 @@ chained.results=chained(
                 fin=8,
                 select='select',
                 treated='traite_G',
-                pl=FALSE,
-                cores=1,
-                cband=TRUE,
-                clustervars=NULL)
+                cband=TRUE)
+# chained.results[[1]]
 
-# The function returns c(delta att, influence, iden_num)
-#Dynamic Effect of the treatment
-chained.results[[1]]
+
+agg.es.chained <- aggte(MP = chained.results, type = 'dynamic')
+agg.es.chained
+str(agg.es.chained)
 ```
 
-## Chained difference with Assumption 1 (missing trends)
-```{r}
-chained.c1.results=chained(
-                yname="Y1_chaine",
-                tname="annee",
-                idname="id",
-                gname="annee_G",
-                xformla=~X, 
-                propensityformla=c("X"), 
-                data=data,      
-                anticipation=0,      
-                weightsname=c("P_Y1_chaine"), #St   
-                weight_assumption="missing_trends",
-                bstrap=FALSE, 
-                biters=1000,
-                debT=3,
-                finT=8,
-                deb=1,
-                fin=8,
-                select='select',
-                treated='traite_G',
-                pl=FALSE,
-                cores=1,
-                cband=TRUE,
-                clustervars=NULL)
-
-# The function returns c(delta att, influence, iden_num)
-#Dynamic Effect of the treatment
-chained.c1.results[[1]]
-```
 ## GMM 
 ```{r}
+
+  source("R/fonction_simu_attrition.R")
+  source("R/fonction_simu_attrition.R")
+  source("R/fonction_simu_attrition_nofe.R")
+  source("R/fonctions_estimation_Boot.R")
+  source("R/mp_spatt_Boot.R")
+  source("R/compute_mp_spatt_Boot_alt.R")
+  source("R/panelDiffV.R")
+  source("R/gg.R")
+  source("R/agregat.R")
+  source("R/process_attgt.R")
+  source("R/pre_process_did.R")
+  source("R/DIDparams.R")
+  source("R/mboot.R")
+  source("R/MP.R")
+  source("R/chained.R")
+  source("R/compute.aggte.R")
+  source("R/aggte.R")
+  source("R/compute.aggte.R")
+  source("R/gmm.R")
+
+
+set.seed(123)
+data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.6)
+data <- subset(data, select = -c(Y1_CS, Y1_longDID)) 
+
 gmm.results=gmm(
                 yname="Y1_chaine",
                 tname="annee",
@@ -235,7 +259,6 @@ gmm.results=gmm(
                 data=data,      
                 anticipation=0,      
                 weightsname=c("P_Y1_CS"), 
-                # weight_assumption="missing_trends", #Not yet implemented.
                 weight_assumption=NULL,
                 bstrap=FALSE, 
                 biters=1000,
@@ -245,14 +268,26 @@ gmm.results=gmm(
                 fin=8,
                 select='select',
                 treated='traite_G',
-                pl=FALSE,
-                cores=1,  
                 cband=TRUE,
                 clustervars=NULL)
 
-# The function returns c(delta att, influence, iden_num)
-#Dynamic Effect of the treatment
-gmm.results[[1]]
+gmm.results
+
+
+
+
+
+
+
+
+
+
+# l'erreur est dans gmm. l'output est un vecteur atomique...
+# Devrait avoir:
+#  Group Time ATT(g,t) Std. Error [95% Pointwise  Conf. Band]
+# View(gmm.results)
+agg.es.gmm <- aggte(MP = gmm.results, type = 'dynamic',bstrap=TRUE)
+agg.es.gmm
 ```
 
 ```{r}
@@ -364,3 +399,81 @@ browseVignettes("cdid")
 - Efficiency in the GMM funtion compute.
 
 
+
+
+List of 14
+ $ group       : num [1:42] 3 3 3 3 3 3 3 4 4 4 ...
+ $ t           : num [1:42] 1 3 4 5 6 7 8 1 2 4 ...
+ $ att         : num [1:42] 0.0247 1.7607 1.485 1.1492 1.0551 ...
+ $ V_analytical: num [1:42, 1:42] 63.5 34.2 38.3 32.2 32.1 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : chr [1:42] "V1" "V2" "V3" "V4" ...
+  .. ..$ : chr [1:42] "V1" "V2" "V3" "V4" ...
+ $ se          : Named num [1:42] 0.0981 0.0847 0.0943 0.0917 0.0963 ...
+  ..- attr(*, "names")= chr [1:42] "V1" "V2" "V3" "V4" ...
+ $ c           : num 1.96
+ $ inffunc     : num [1:6597, 1:42] 0 0.318 0 0 1 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : NULL
+  .. ..$ : chr [1:42] "V1" "V2" "V3" "V4" ...
+ $ n           : int 6597
+ $ W           : num [1, 1] 83.2
+ $ Wpval       : num [1, 1] 2.3e-09
+ $ aggte       : NULL
+ $ alp         : num 0.05
+ $ DIDparams   :List of 27
+  ..$ yname                       : chr "Y1_chaine"
+  ..$ tname                       : chr "annee"
+  ..$ idname                      : chr "id"
+  ..$ gname                       : chr "annee_G"
+  ..$ xformla                     :Class 'formula'  language ~X
+  .. .. ..- attr(*, ".Environment")=<environment: R_GlobalEnv> 
+  ..$ data                        :'data.frame':        52776 obs. of  22 variables:
+  .. ..$ id           : int [1:52776] 1 1 1 1 1 1 1 1 2 2 ...
+  .. ..$ annee        : int [1:52776] 1 2 3 4 5 6 7 8 1 2 ...
+  .. ..$ Y1_chaine    : num [1:52776] 2.06 3.3 2.49 3.63 3.1 ...
+  .. ..$ X            : num [1:52776] 0.974 0.974 0.974 0.974 0.974 ...
+  .. ..$ annee_G      : num [1:52776] 0 0 0 0 0 0 0 0 0 0 ...
+  .. ..$ P_Y1_chaine  : num [1:52776] 0 0 0 0 0 0 0 0 1 1 ...
+  .. ..$ P_Y1_CS      : num [1:52776] 0 0 0 0 0 0 0 0 1 1 ...
+  .. ..$ P_Y1_longDID : num [1:52776] 0 0 0 0 0 0 0 0 1 1 ...
+  .. ..$ traite_G     : num [1:52776] 0 0 0 0 0 0 0 0 0 0 ...
+  .. ..$ select       : num [1:52776] 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..$ pondRD1      : num [1:52776] 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..$ pondRD2      : num [1:52776] 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..$ pondRD3      : num [1:52776] 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..$ pondRD4      : num [1:52776] 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..$ pondRD5      : num [1:52776] 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..$ pondRD6      : num [1:52776] 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..$ pondRD7      : num [1:52776] 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..$ pondRD8      : num [1:52776] 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..$ strate       : num [1:52776] 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..$ control_group: num [1:52776] 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..$ .w           : num [1:52776] 0 0 0 0 0 0 0 0 1 1 ...
+  .. ..$ .rowid       : int [1:52776] 1 1 1 1 1 1 1 1 2 2 ...
+  ..$ control_group               : chr "nevertreated"
+  ..$ anticipation                : num 0
+  ..$ weightsname                 : chr "P_Y1_CS"
+  ..$ alp                         : num 0.05
+  ..$ bstrap                      : logi FALSE
+  ..$ biters                      : num 1000
+  ..$ clustervars                 : NULL
+  ..$ cband                       : logi TRUE
+  ..$ print_details               : logi FALSE
+  ..$ pl                          : logi FALSE
+  ..$ cores                       : num 1
+  ..$ est_method                  : chr "chained"
+  ..$ base_period                 : chr "varying"
+  ..$ panel                       : logi FALSE
+  ..$ true_repeated_cross_sections: logi FALSE
+  ..$ n                           : int 6597
+  ..$ nG                          : int 6
+  ..$ nT                          : int 8
+  ..$ tlist                       : int [1:8] 1 2 3 4 5 6 7 8
+  ..$ glist                       : num [1:6] 3 4 5 6 7 8
+  ..$ call                        : language gmm(yname = "Y1_chaine", tname = "annee", idname = "id", gname = "annee_G",      xformla = ~X, propensityformla =| __truncated__ ...
+  ..- attr(*, "class")= chr "DIDparams"
+ $ call        : language gmm(yname = "Y1_chaine", tname = "annee", idname = "id", gname = "annee_G",      xformla = ~X, propensityformla =| __truncated__ ...
+ - attr(*, "class")= chr "MP"
+NULL
+> 
