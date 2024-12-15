@@ -1,3 +1,5 @@
+# Callaway, B. (2024). The did Library. Department of Economics, University of Georgia. Available at: https://github.com/bcallaway11/did
+
 #' @title Aggregate Group-Time Average Treatment Effects
 #'
 #' @description A function to take group-time average treatment effects
@@ -93,7 +95,7 @@
 #'
 #'
 #' @export
-aggte.gmm <- function(MP,
+aggte <- function(MP,
                   type = "group",
                   balance_e = NULL,
                   min_e = -Inf,
@@ -108,7 +110,7 @@ aggte.gmm <- function(MP,
 
   call <- match.call()
 
-  compute.aggte.gmm(MP = MP,
+  compute.aggte(MP = MP,
                 type = type,
                 balance_e = balance_e,
                 min_e = min_e,

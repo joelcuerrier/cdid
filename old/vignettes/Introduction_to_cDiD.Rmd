@@ -192,7 +192,8 @@ The function `chained` estimates the average treatment effect for the chained Di
   source("R/gmm.R")
 
 set.seed(123)
-data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.6)
+# data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.6)
+data=fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=1)
 data <- subset(data, select = -c(Y1_CS, Y1_longDID)) 
 
 chained.results=chained(
@@ -246,7 +247,8 @@ str(agg.es.chained)
 
 
 set.seed(123)
-data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.6)
+data=fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=1)
+# data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.6)
 data <- subset(data, select = -c(Y1_CS, Y1_longDID)) 
 
 gmm.results=gmm(

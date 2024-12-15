@@ -201,6 +201,13 @@ for (simu_i in 1:nsims){
   data_sim <- subset(data_sim, select = -P_Y2_CS)
   data_sim <- subset(data_sim, select = -P_Y2_longDID)
   
+  
+
+
+
+
+  
+  
   return(data_sim)
     } 
   }
