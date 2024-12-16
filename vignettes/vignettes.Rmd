@@ -82,11 +82,7 @@ group. Second, we sample from this population using the specified process.
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
 
 library(cdid)
-library(did)
 library(dplyr)
-
-
-
 set.seed(123)
 
 # 0. We generate data in several steps.

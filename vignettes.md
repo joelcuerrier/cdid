@@ -75,19 +75,34 @@ group. Second, we sample from this population using the specified process.
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
 #> Using GitHub PAT from the git credential store.
 #> Downloading GitHub repo joelcuerrier/cdid@main
+#> These packages have more recent versions available.
+#> It is recommended to update all of them.
+#> Which would you like to update?
+#> 
+#> 1: All                            
+#> 2: CRAN packages only             
+#> 3: None                           
+#> 4: openssl (2.2.2 -> 2.3.0) [CRAN]
+#> 
+#> openssl (2.2.2 -> 2.3.0) [CRAN]
+#> Installing 1 packages: openssl
+#> 
+#> The downloaded binary packages are in
+#> 	/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T//RtmpmNT903/downloaded_packages
 #> ── R CMD build ─────────────────────────────────────────────────────────
-#>      checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpOAWaFA/remotes94a9269c3716/joelcuerrier-cdid-074b419/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpOAWaFA/remotes94a9269c3716/joelcuerrier-cdid-074b419/DESCRIPTION’
+#>      checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpmNT903/remotes9d92690dd2a1/joelcuerrier-cdid-03bdacc/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpmNT903/remotes9d92690dd2a1/joelcuerrier-cdid-03bdacc/DESCRIPTION’
 #>   ─  preparing ‘cdid’:
 #>    checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
 #>   ─  checking for LF line-endings in source and make files and shell scripts
 #>   ─  checking for empty or unneeded directories
 #>      Removed empty directory ‘cdid/chained previous version/inst’
-#>   ─  building ‘cdid_0.0.0.9000.tar.gz’
+#>      Omitted ‘LazyData’ from DESCRIPTION
+#>   ─  building ‘cdid_0.1.0.tar.gz’
 #>      
 #> 
+
 library(cdid)
 library(dplyr)
-
 set.seed(123)
 
 # 0. We generate data in several steps.
@@ -157,15 +172,45 @@ chained.results =chained(
                     select='select',
                     treated='treated',
                     cband=TRUE)
-#> Error in rhs.vars(xformla): could not find function "rhs.vars"
 
 # 2. Aggregation
 agg.es.chained <- aggte(MP = chained.results, type = 'dynamic')
-#> Error in aggte(MP = chained.results, type = "dynamic"): could not find function "aggte"
+#> Warning in compute.aggte(MP = MP, type = type, balance_e = balance_e, min_e =
+#> min_e, : Used bootstrap procedure to compute simultaneous confidence band
 
 # 3. Print results
 agg.es.chained
-#> Error: object 'agg.es.chained' not found
+#> 
+#> Call:
+#> aggte(MP = chained.results, type = "dynamic")
+#> 
+#> Reference: Callaway, Brantly and Pedro H.C. Sant'Anna.  "Difference-in-Differences with Multiple Time Periods." Journal of Econometrics, Vol. 225, No. 2, pp. 200-230, 2021. <https://doi.org/10.1016/j.jeconom.2020.12.001>, <https://arxiv.org/abs/1803.09015> 
+#> 
+#> 
+#> Overall summary of ATT's based on event-study/dynamic aggregation:  
+#>    ATT    Std. Error     [ 95%  Conf. Int.]  
+#>  1.605        0.2396     1.1354      2.0746 *
+#> 
+#> 
+#> Dynamic Effects:
+#>  Event time Estimate Std. Error [95% Pointwise  Conf. Band]  
+#>          -6   0.1772     0.4876         -1.1263      1.4807  
+#>          -5   0.0872     0.3613         -0.8787      1.0531  
+#>          -4  -0.1860     0.2767         -0.9257      0.5537  
+#>          -3  -0.2290     0.1999         -0.7632      0.3052  
+#>          -2  -0.1439     0.1419         -0.5232      0.2355  
+#>          -1  -0.2554     0.0892         -0.4937     -0.0171 *
+#>           0   1.7951     0.0884          1.5589      2.0313 *
+#>           1   1.7615     0.1351          1.4002      2.1227 *
+#>           2   1.6541     0.2084          1.0971      2.2110 *
+#>           3   1.4875     0.2813          0.7356      2.2395 *
+#>           4   1.5304     0.4042          0.4499      2.6109 *
+#>           5   1.4014     0.6096         -0.2281      3.0308  
+#> ---
+#> Signif. codes: `*' confidence band does not cover 0
+#> 
+#> Control Group:  Never Treated,  Anticipation Periods:  0
+#> Estimation Method:  chained
 ```
 
 
@@ -252,14 +297,172 @@ gmm.results = GMM(
                     select='select',
                     treated='treated',
                     cband=TRUE)
-#> Error in rhs.vars(xformla): could not find function "rhs.vars"
+#> List of 14
+#>  $ group       : num [1:42] 3 3 3 3 3 3 3 4 4 4 ...
+#>  $ t           : num [1:42] 1 3 4 5 6 7 8 1 2 4 ...
+#>  $ att         : num [1:42] 0.0531 1.7305 1.5166 1.2282 1.0269 ...
+#>  $ V_analytical: num [1:42, 1:42] 7.27 4.05 3.41 4.31 3.81 ...
+#>   ..- attr(*, "dimnames")=List of 2
+#>   .. ..$ : chr [1:42] "V1" "V2" "V3" "V4" ...
+#>   .. ..$ : chr [1:42] "V1" "V2" "V3" "V4" ...
+#>  $ se          : num [1:42] 0.0437 0.0494 0.0445 0.0491 0.0448 ...
+#>  $ c           : Named num 3.2
+#>   ..- attr(*, "names")= chr "95%"
+#>  $ inffunc     : num [1:3690, 1:42] 1.216 0.685 -0.214 -0.769 -0.132 ...
+#>   ..- attr(*, "dimnames")=List of 2
+#>   .. ..$ : NULL
+#>   .. ..$ : chr [1:42] "V1" "V2" "V3" "V4" ...
+#>  $ n           : int 3690
+#>  $ W           : num [1, 1] 15.6
+#>  $ Wpval       : num [1, 1] 0.793
+#>  $ aggte       : NULL
+#>  $ alp         : num 0.05
+#>  $ DIDparams   :List of 29
+#>   ..$ yname                       : chr "Y"
+#>   ..$ tname                       : chr "date"
+#>   ..$ idname                      : chr "id"
+#>   ..$ gname                       : chr "date_G"
+#>   ..$ xformla                     :Class 'formula'  language ~X
+#>   .. .. ..- attr(*, ".Environment")=<environment: 0x12c7aa998> 
+#>   ..$ data                        :'data.frame':	29520 obs. of  10 variables:
+#>   .. ..$ id           : int [1:29520] 1 1 1 1 1 1 1 1 2 2 ...
+#>   .. ..$ date         : int [1:29520] 1 2 3 4 5 6 7 8 1 2 ...
+#>   .. ..$ Y            : num [1:29520] 0.739 5.093 2.953 2.337 1.793 ...
+#>   .. ..$ X            : num [1:29520] 1.56 1.56 1.56 1.56 1.56 ...
+#>   .. ..$ date_G       : num [1:29520] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. ..$ treated      : num [1:29520] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. ..$ S            : num [1:29520] 1 1 1 1 1 1 1 1 1 1 ...
+#>   .. ..$ control_group: num [1:29520] 1 1 1 1 1 1 1 1 1 1 ...
+#>   .. ..$ .w           : num [1:29520] 1 1 1 1 1 1 1 1 1 1 ...
+#>   .. ..$ .rowid       : int [1:29520] 1 1 1 1 1 1 1 1 2 2 ...
+#>   ..$ control_group               : chr "notyettreated"
+#>   ..$ anticipation                : num 0
+#>   ..$ weightsname                 : chr "S"
+#>   ..$ alp                         : num 0.05
+#>   ..$ bstrap                      : logi TRUE
+#>   ..$ biters                      : num 1000
+#>   ..$ clustervars                 : NULL
+#>   ..$ cband                       : logi TRUE
+#>   ..$ print_details               : logi FALSE
+#>   ..$ pl                          : logi FALSE
+#>   ..$ cores                       : num 1
+#>   ..$ est_method                  : chr "chained"
+#>   ..$ base_period                 : chr "varying"
+#>   ..$ panel                       : logi FALSE
+#>   ..$ true_repeated_cross_sections: logi FALSE
+#>   ..$ n                           : int 3690
+#>   ..$ nG                          : int 6
+#>   ..$ nT                          : int 8
+#>   ..$ tlist                       : int [1:8] 1 2 3 4 5 6 7 8
+#>   ..$ glist                       : num [1:6] 3 4 5 6 7 8
+#>   ..$ call                        : language GMM(yname = "Y", tname = "date", idname = "id", gname = "date_G", xformla = ~X,      propensityformla = c("X"), d| __truncated__ ...
+#>   ..$ delta.att.influ             :List of 4
+#>   .. ..$ :'data.frame':	168 obs. of  6 variables:
+#>   .. .. ..$ attgt_id: int [1:168] 1 2 3 4 5 6 7 8 9 10 ...
+#>   .. .. ..$ nobsG   : num [1:168] 249 249 249 249 249 249 249 249 249 249 ...
+#>   .. .. ..$ nobsC   : num [1:168] 3441 3441 3184 2921 2654 ...
+#>   .. .. ..$ date_G  : num [1:168] 3 3 3 3 3 3 3 3 3 3 ...
+#>   .. .. ..$ date    : int [1:168] 2 3 4 5 6 7 8 3 4 5 ...
+#>   .. .. ..$ Y       : num [1:168, 1] -0.0535 1.6762 1.461 1.1699 0.9715 ...
+#>   .. ..$ : num [1:3690, 1:2, 1:168] 1 2 3 4 5 6 7 8 9 10 ...
+#>   .. ..$ :'data.frame':	3690 obs. of  2 variables:
+#>   .. .. ..$ date_G: num [1:3690] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ id    : int [1:3690] 1 2 3 4 5 6 7 8 9 10 ...
+#>   .. ..$ :'data.frame':	168 obs. of  48 variables:
+#>   .. .. ..$ ATT(3,1): num [1:168] -1 -1 -1 -1 -1 -1 -1 0 0 0 ...
+#>   .. .. ..$ ATT(3,2): num [1:168] 1 0 0 0 0 0 0 -1 -1 -1 ...
+#>   .. .. ..$ ATT(3,3): num [1:168] 0 1 0 0 0 0 0 1 0 0 ...
+#>   .. .. ..$ ATT(3,4): num [1:168] 0 0 1 0 0 0 0 0 1 0 ...
+#>   .. .. ..$ ATT(3,5): num [1:168] 0 0 0 1 0 0 0 0 0 1 ...
+#>   .. .. ..$ ATT(3,6): num [1:168] 0 0 0 0 1 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(3,7): num [1:168] 0 0 0 0 0 1 0 0 0 0 ...
+#>   .. .. ..$ ATT(3,8): num [1:168] 0 0 0 0 0 0 1 0 0 0 ...
+#>   .. .. ..$ ATT(4,1): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(4,2): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(4,3): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(4,4): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(4,5): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(4,6): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(4,7): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(4,8): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(5,1): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(5,2): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(5,3): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(5,4): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(5,5): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(5,6): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(5,7): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(5,8): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(6,1): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(6,2): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(6,3): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(6,4): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(6,5): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(6,6): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(6,7): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(6,8): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(7,1): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(7,2): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(7,3): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(7,4): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(7,5): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(7,6): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(7,7): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(7,8): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(8,1): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(8,2): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(8,3): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(8,4): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(8,5): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(8,6): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(8,7): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. .. ..$ ATT(8,8): num [1:168] 0 0 0 0 0 0 0 0 0 0 ...
+#>   ..$ att.influ                   :List of 2
+#>   .. ..$ :'data.frame':	42 obs. of  3 variables:
+#>   .. .. ..$ Y     : num [1:42] 0.0531 1.7305 1.5166 1.2282 1.0269 ...
+#>   .. .. ..$ date_G: num [1:42] 3 3 3 3 3 3 3 4 4 4 ...
+#>   .. .. ..$ date  : num [1:42] 1 3 4 5 6 7 8 1 2 4 ...
+#>   .. ..$ : num [1:3690, 1, 1:42] 1.216 0.685 -0.214 -0.769 -0.132 ...
+#>   ..- attr(*, "class")= chr "DIDparams"
+#>  $ call        : language GMM(yname = "Y", tname = "date", idname = "id", gname = "date_G", xformla = ~X,      propensityformla = c("X"), d| __truncated__ ...
+#>  - attr(*, "class")= chr "MP"
+#> NULL
 
 # 2. Aggregation
 agg.es.gmm <- aggte(MP = gmm.results, type = 'dynamic')
-#> Error in aggte(MP = gmm.results, type = "dynamic"): could not find function "aggte"
 
 agg.es.gmm
-#> Error: object 'agg.es.gmm' not found
+#> 
+#> Call:
+#> aggte(MP = gmm.results, type = "dynamic")
+#> 
+#> Reference: Callaway, Brantly and Pedro H.C. Sant'Anna.  "Difference-in-Differences with Multiple Time Periods." Journal of Econometrics, Vol. 225, No. 2, pp. 200-230, 2021. <https://doi.org/10.1016/j.jeconom.2020.12.001>, <https://arxiv.org/abs/1803.09015> 
+#> 
+#> 
+#> Overall summary of ATT's based on event-study/dynamic aggregation:  
+#>     ATT    Std. Error     [ 95%  Conf. Int.]  
+#>  1.1312         0.018     1.0959      1.1665 *
+#> 
+#> 
+#> Dynamic Effects:
+#>  Event time Estimate Std. Error [95% Simult.  Conf. Band]  
+#>          -7  -0.0045     0.0034       -0.0144      0.0053  
+#>          -6  -0.0012     0.0023       -0.0078      0.0055  
+#>          -5  -0.0027     0.0024       -0.0097      0.0043  
+#>          -4  -0.0016     0.0022       -0.0079      0.0047  
+#>          -3  -0.0004     0.0023       -0.0069      0.0062  
+#>          -2   0.0107     0.0072       -0.0098      0.0312  
+#>           0   1.7247     0.0155        1.6803      1.7690 *
+#>           1   1.4885     0.0173        1.4389      1.5380 *
+#>           2   1.2658     0.0200        1.2085      1.3232 *
+#>           3   1.0011     0.0254        0.9285      1.0738 *
+#>           4   0.7781     0.0307        0.6903      0.8660 *
+#>           5   0.5290     0.0502        0.3853      0.6727 *
+#> ---
+#> Signif. codes: `*' confidence band does not cover 0
+#> 
+#> Control Group:  Not Yet Treated,  Anticipation Periods:  0
+#> Estimation Method:  chained
 ```
 
 

@@ -194,7 +194,7 @@
     x = inffunc_data$x,
     dimnames = list(NULL, NULL)
     )
-    print(str(results))
+    # print(str(results))
     results$inffunc=sparse_matrix
     # results$inffunc=inffunc
     return(results)

@@ -235,7 +235,7 @@ compute.aggte <- function(MP,
       if(simple.se <= sqrt(.Machine$double.eps)*10) simple.se <- NA
     }
 
-    print(str(inf.function))
+    # print(str(inf.function))
     return(AGGTEobj(overall.att = simple.att,
                     overall.se = simple.se,
                     type = type,
