@@ -1,11 +1,43 @@
 Package: cdid
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Type: Package
+Title: Chained Difference-in-Differences
+Version: 0.1.0
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    c(
+      person("Joel", "Cuerrier", email = "cuerrier.j.clg@gmail.com", role = c("cre", "aut")),
+      person("David", "Benatia", email = "david.benatia@hec.ca", role = c("aut")),
+      person("Christophe", "Bellégo", email = "christophe.bellego@ensae.fr", role = "aut"),
+      person("Vincent", "Dortet-Bernadet", email = "vincent.dortet-bernadet@finances.gouv.fr", role = "aut")
+    )
+URL: https://github.com/joelcuerrier/cdid
+Maintainer: Joel Cuerrier <joel.cuerrier@hec.ca>
+Description: The "chained difference-in-differences" package provides tools for modeling long-term treatment effects in scenarios where balanced panel data is unavailable or only a subset of the available data is present.
+License: GPL-2
 Encoding: UTF-8
+LazyData: true
+Imports: 
+    openxlsx,
+    data.table,
+    BMisc,
+    jsonlite,
+    did,
+    stargazer,
+    Matrix,
+    devtools,
+    tidyr,
+    gridExtra,
+    ggplot2,
+    patchwork,
+    tidyr,
+    here,
+    knitr,
+    did
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+BugReports: https://github.com/joelcuerrier/cdid/issues
+# VignetteBuilder: knitr
+Depends:
+    R (>= 3.5.0)
+Suggests: 
+    knitr,
+    rmarkdown
