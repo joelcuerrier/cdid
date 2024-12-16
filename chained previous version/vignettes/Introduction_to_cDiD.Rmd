@@ -219,7 +219,7 @@ chained.results=chained(
 
 agg.es.chained <- aggte(MP = chained.results, type = 'dynamic')
 agg.es.chained
-str(agg.es.chained)
+<!-- str(agg.es.chained) -->
 ```
 
 ## GMM 
