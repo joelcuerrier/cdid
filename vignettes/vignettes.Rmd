@@ -80,8 +80,12 @@ group. Second, we sample from this population using the specified process.
 ```{r}
 # Load the cdid package
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
+
 library(cdid)
+library(did)
 library(dplyr)
+library(BMisc)
+library(Matrix)
 
 set.seed(123)
 

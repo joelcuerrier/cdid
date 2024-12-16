@@ -76,7 +76,7 @@ remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FAL
 #> Using GitHub PAT from the git credential store.
 #> Downloading GitHub repo joelcuerrier/cdid@main
 #> ── R CMD build ─────────────────────────────────────────────────────────
-#>      checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpOAWaFA/remotes94a97a22d2c/joelcuerrier-cdid-11737e6/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpOAWaFA/remotes94a97a22d2c/joelcuerrier-cdid-11737e6/DESCRIPTION’
+#>      checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpOAWaFA/remotes94a9269c3716/joelcuerrier-cdid-074b419/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpOAWaFA/remotes94a9269c3716/joelcuerrier-cdid-074b419/DESCRIPTION’
 #>   ─  preparing ‘cdid’:
 #>    checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
 #>   ─  checking for LF line-endings in source and make files and shell scripts
