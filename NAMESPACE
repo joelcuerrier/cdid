@@ -13,3 +13,5 @@ export(gmm_convert_delta_to_att)
 export(pre_process_cdid)
 export(process_attgt)
 export(process_attgt_gmm)
+import(did)
+

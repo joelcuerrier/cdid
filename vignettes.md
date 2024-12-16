@@ -76,16 +76,45 @@ remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FAL
 #> Using GitHub PAT from the git credential store.
 #> Downloading GitHub repo joelcuerrier/cdid@main
 #> ── R CMD build ─────────────────────────────────────────────────────────
-#>      checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpbeZJQ6/remotes901a3c6e6767/joelcuerrier-cdid-3952564/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpbeZJQ6/remotes901a3c6e6767/joelcuerrier-cdid-3952564/DESCRIPTION’
-#>   ─  preparing ‘cdid’:
-#>      checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
-#>   ─  checking for LF line-endings in source and make files and shell scripts
-#>   ─  checking for empty or unneeded directories
-#>      Removed empty directory ‘cdid/chained previous version/inst’
-#>   ─  building ‘cdid_0.0.0.9000.tar.gz’
-#>      
+#>   
+   checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpbeZJQ6/remotes901a55711cea/joelcuerrier-cdid-3d2362c/DESCRIPTION’ ...
+  
+✔  checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpbeZJQ6/remotes901a55711cea/joelcuerrier-cdid-3d2362c/DESCRIPTION’
+#> 
+  
+─  preparing ‘cdid’:
+#>    checking DESCRIPTION meta-information
+  
+   checking DESCRIPTION meta-information ...
+  
+✔  checking DESCRIPTION meta-information
+#> 
+  
+─  checking for LF line-endings in source and make files and shell scripts
+#> 
+  
+─  checking for empty or unneeded directories
+#> 
+  
+   Removed empty directory ‘cdid/chained previous version/inst’
+#> 
+  
+─  building ‘cdid_0.0.0.9000.tar.gz’
+#> 
+  
+   
 #> 
 library(cdid)
+library(dplyr)
+library(did)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
 
 set.seed(123)
 
@@ -99,27 +128,21 @@ data0 <- data0 %>%
   group_by(id) %>%
   filter(!(all(P_Y1_chaine == 0 & annee %in% 1:8))) %>%
   ungroup()
-#> Error in data0 %>% group_by(id) %>% filter(!(all(P_Y1_chaine == 0 & annee %in% : could not find function "%>%"
 
 data0 <- data0[,c(1,2,3,6,7,8)]
 data0 <- rename(data0,Y = Y1_chaine)
-#> Error in rename(data0, Y = Y1_chaine): could not find function "rename"
 data0 <- rename(data0,date = annee)
-#> Error in rename(data0, date = annee): could not find function "rename"
 data0 <- rename(data0,date_G = annee_G)
-#> Error in rename(data0, date_G = annee_G): could not find function "rename"
 data0$P_Y1_chaine <- NULL
 
 # Sort data0 by id and date
 data0 <- data0 %>%
   arrange(id, date)
-#> Error in data0 %>% arrange(id, date): could not find function "%>%"
 
 ### Correct id's
 list_id <-as.data.frame(unique(data0[,"id"]))
 list_id$iden_num<-1:dim(list_id)[1] 
 data0 <- merge(data0, list_id, by.x = "id", by.y = "id", all.x = TRUE)
-#> Error in fix.by(by.y, y): 'by' must specify a uniquely valid column
 data0$id <- data0$iden_num
 data0$iden_num <- NULL
 
@@ -132,7 +155,6 @@ data0 <- data0 %>%
   group_by(id) %>%                                # Group data by id
   mutate(S = ifelse(date == min(date), 1, 0)) %>% # S == 1 for lowest year, 0 otherwise
   ungroup()                                       # Ungroup data
-#> Error in data0 %>% group_by(id) %>% mutate(S = ifelse(date == min(date), : could not find function "%>%"
 
 #### CUE: data0 is the typical dataset. The script starts here. The above script is just to make sure we have the expected data form
 # Data must have:
@@ -163,7 +185,7 @@ chained.results =chained(
                     select='select',
                     treated='treated',
                     cband=TRUE)
-#> Error in `[.data.frame`(data, , tname): undefined columns selected
+#> Error in DIDparams(yname = yname, tname = tname, idname = idname, gname = gname, : could not find function "DIDparams"
 
 # 2. Aggregation
 agg.es.chained <- aggte(MP = chained.results, type = 'dynamic')
@@ -199,28 +221,22 @@ data0 <- data0 %>%
   group_by(id) %>%
   filter(!(all(P_Y1_longDID == 0 & annee %in% 1:8))) %>%
   ungroup()
-#> Error in data0 %>% group_by(id) %>% filter(!(all(P_Y1_longDID == 0 & annee %in% : could not find function "%>%"
 
 
 data0 <- data0[,c(1,2,3,6,7,8)]
 data0 <- rename(data0,Y = Y1_chaine)
-#> Error in rename(data0, Y = Y1_chaine): could not find function "rename"
 data0 <- rename(data0,date = annee)
-#> Error in rename(data0, date = annee): could not find function "rename"
 data0 <- rename(data0,date_G = annee_G)
-#> Error in rename(data0, date_G = annee_G): could not find function "rename"
 data0$P_Y1_chaine <- NULL
 
 # Sort data0 by id and date
 data0 <- data0 %>%
   arrange(id, date)
-#> Error in data0 %>% arrange(id, date): could not find function "%>%"
 
 ### Correct id's
 list_id <-as.data.frame(unique(data0[,"id"]))
 list_id$iden_num<-1:dim(list_id)[1] 
 data0 <- merge(data0, list_id, by.x = "id", by.y = "id", all.x = TRUE)
-#> Error in fix.by(by.y, y): 'by' must specify a uniquely valid column
 data0$id <- data0$iden_num
 data0$iden_num <- NULL
 
@@ -233,7 +249,6 @@ data0 <- data0 %>%
   group_by(id) %>%                   # Group data by id
   mutate(S = ifelse(date == min(date), 1, 1)) %>% # S == 1 for lowest year, 0 otherwise
   ungroup()                          # Ungroup data
-#> Error in data0 %>% group_by(id) %>% mutate(S = ifelse(date == min(date), : could not find function "%>%"
   
 #### CUE: data0 is the typical dataset. The script starts here. The above script is just to make sure we have the expected data form
 # Data must have:
@@ -265,7 +280,7 @@ gmm.results = GMM(
                     select='select',
                     treated='treated',
                     cband=TRUE)
-#> Error in `[.data.frame`(data, , tname): undefined columns selected
+#> Error in DIDparams(yname = yname, tname = tname, idname = idname, gname = gname, : could not find function "DIDparams"
 
 # 2. Aggregation
 agg.es.gmm <- aggte(MP = gmm.results, type = 'dynamic')
