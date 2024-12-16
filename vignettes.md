@@ -76,9 +76,9 @@ remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FAL
 #> Using GitHub PAT from the git credential store.
 #> Downloading GitHub repo joelcuerrier/cdid@main
 #> ── R CMD build ─────────────────────────────────────────────────────────
-#>      checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpbeZJQ6/remotes901a5bdab7a9/joelcuerrier-cdid-6a64b83/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpbeZJQ6/remotes901a5bdab7a9/joelcuerrier-cdid-6a64b83/DESCRIPTION’
+#>      checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpOAWaFA/remotes94a9331db15/joelcuerrier-cdid-11737e6/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpOAWaFA/remotes94a9331db15/joelcuerrier-cdid-11737e6/DESCRIPTION’
 #>   ─  preparing ‘cdid’:
-#>    checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
+#>      checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
 #>   ─  checking for LF line-endings in source and make files and shell scripts
 #>   ─  checking for empty or unneeded directories
 #>      Removed empty directory ‘cdid/chained previous version/inst’
@@ -87,6 +87,14 @@ remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FAL
 #> 
 library(cdid)
 library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
 
 set.seed(123)
 
@@ -157,7 +165,7 @@ chained.results =chained(
                     select='select',
                     treated='treated',
                     cband=TRUE)
-#> Error in DIDparams(yname = yname, tname = tname, idname = idname, gname = gname, : could not find function "DIDparams"
+#> Error in rhs.vars(xformla): could not find function "rhs.vars"
 
 # 2. Aggregation
 agg.es.chained <- aggte(MP = chained.results, type = 'dynamic')
@@ -252,7 +260,7 @@ gmm.results = GMM(
                     select='select',
                     treated='treated',
                     cband=TRUE)
-#> Error in DIDparams(yname = yname, tname = tname, idname = idname, gname = gname, : could not find function "DIDparams"
+#> Error in rhs.vars(xformla): could not find function "rhs.vars"
 
 # 2. Aggregation
 agg.es.gmm <- aggte(MP = gmm.results, type = 'dynamic')
