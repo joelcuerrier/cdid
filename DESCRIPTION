@@ -31,7 +31,8 @@ Imports:
     tidyr,
     here,
     knitr,
-    did
+    did,
+    dplyr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 BugReports: https://github.com/joelcuerrier/cdid/issues
