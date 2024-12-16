@@ -2,6 +2,8 @@
 
 S3method(print,MP)
 S3method(summary,MP)
+export(DIDparams)
+export(GMM)
 export(MP)
 export(chained)
 export(compute.aggte)
@@ -14,4 +16,4 @@ export(pre_process_cdid)
 export(process_attgt)
 export(process_attgt_gmm)
 import(did)
-
+import(dplyr)

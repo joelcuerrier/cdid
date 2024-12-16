@@ -1,4 +1,6 @@
 
+#' @export
+
 GMM <- function(    yname,
                     tname,
                     idname=NULL,

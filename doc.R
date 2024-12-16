@@ -4,9 +4,9 @@ devtools::build()
 load_all()
 
 
-library(cdid)
 
-document()
+
+
 
 devtools::check()
 
