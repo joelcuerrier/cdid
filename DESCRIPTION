@@ -39,7 +39,8 @@ BugReports: https://github.com/joelcuerrier/cdid/issues
 # VignetteBuilder: knitr
 Depends:
     R (>= 3.5.0),
-    dplyr
+    dplyr,
+    did
 Suggests: 
     knitr,
     rmarkdown

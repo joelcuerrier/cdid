@@ -84,8 +84,8 @@ remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FAL
 library(cdid)
 library(did)
 library(dplyr)
-library(BMisc)
-library(Matrix)
+
+
 
 set.seed(123)
 
