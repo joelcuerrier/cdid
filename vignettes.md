@@ -1,7 +1,7 @@
 ---
 title: "Introduction to cDiD with Multiple Time Periods"
 author: "Joel Cuerrier"
-date:  "2024-12-15"
+date:  "2024-12-16"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to cDiD with Multiple Time Periods}
@@ -75,29 +75,15 @@ group. Second, we sample from this population using the specified process.
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
 #> Using GitHub PAT from the git credential store.
 #> Downloading GitHub repo joelcuerrier/cdid@main
-#> ── R CMD build ───────────────────────────────────────
-#>   
-   checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/Rtmpnfr0DG/remotes794a7cd03a11/joelcuerrier-cdid-a1ec144/DESCRIPTION’ ...
-  
-✔  checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/Rtmpnfr0DG/remotes794a7cd03a11/joelcuerrier-cdid-a1ec144/DESCRIPTION’
-#> 
-  
-─  preparing ‘cdid’:
-#>    checking DESCRIPTION meta-information ...
-  
-✔  checking DESCRIPTION meta-information
-#> 
-  
-─  checking for LF line-endings in source and make files and shell scripts
-#> 
-  
-─  checking for empty or unneeded directories
-#> 
-  
-─  building ‘cdid_0.0.0.9000.tar.gz’
-#> 
-  
-   
+#> ── R CMD build ─────────────────────────────────────────────────────────
+#>      checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpbeZJQ6/remotes901a3c6e6767/joelcuerrier-cdid-3952564/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/18/86jbd8_d11ngf_w3c553vmyr0000gn/T/RtmpbeZJQ6/remotes901a3c6e6767/joelcuerrier-cdid-3952564/DESCRIPTION’
+#>   ─  preparing ‘cdid’:
+#>      checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
+#>   ─  checking for LF line-endings in source and make files and shell scripts
+#>   ─  checking for empty or unneeded directories
+#>      Removed empty directory ‘cdid/chained previous version/inst’
+#>   ─  building ‘cdid_0.0.0.9000.tar.gz’
+#>      
 #> 
 library(cdid)
 
@@ -113,21 +99,27 @@ data0 <- data0 %>%
   group_by(id) %>%
   filter(!(all(P_Y1_chaine == 0 & annee %in% 1:8))) %>%
   ungroup()
+#> Error in data0 %>% group_by(id) %>% filter(!(all(P_Y1_chaine == 0 & annee %in% : could not find function "%>%"
 
 data0 <- data0[,c(1,2,3,6,7,8)]
 data0 <- rename(data0,Y = Y1_chaine)
+#> Error in rename(data0, Y = Y1_chaine): could not find function "rename"
 data0 <- rename(data0,date = annee)
+#> Error in rename(data0, date = annee): could not find function "rename"
 data0 <- rename(data0,date_G = annee_G)
+#> Error in rename(data0, date_G = annee_G): could not find function "rename"
 data0$P_Y1_chaine <- NULL
 
 # Sort data0 by id and date
 data0 <- data0 %>%
   arrange(id, date)
+#> Error in data0 %>% arrange(id, date): could not find function "%>%"
 
 ### Correct id's
 list_id <-as.data.frame(unique(data0[,"id"]))
 list_id$iden_num<-1:dim(list_id)[1] 
 data0 <- merge(data0, list_id, by.x = "id", by.y = "id", all.x = TRUE)
+#> Error in fix.by(by.y, y): 'by' must specify a uniquely valid column
 data0$id <- data0$iden_num
 data0$iden_num <- NULL
 
@@ -140,6 +132,7 @@ data0 <- data0 %>%
   group_by(id) %>%                                # Group data by id
   mutate(S = ifelse(date == min(date), 1, 0)) %>% # S == 1 for lowest year, 0 otherwise
   ungroup()                                       # Ungroup data
+#> Error in data0 %>% group_by(id) %>% mutate(S = ifelse(date == min(date), : could not find function "%>%"
 
 #### CUE: data0 is the typical dataset. The script starts here. The above script is just to make sure we have the expected data form
 # Data must have:
@@ -170,43 +163,126 @@ chained.results =chained(
                     select='select',
                     treated='treated',
                     cband=TRUE)
+#> Error in `[.data.frame`(data, , tname): undefined columns selected
 
 # 2. Aggregation
 agg.es.chained <- aggte(MP = chained.results, type = 'dynamic')
-#> Warning in compute.aggte(MP = MP, type = type, balance_e = balance_e, min_e =
-#> min_e, : Used bootstrap procedure to compute simultaneous confidence band
+#> Error in aggte(MP = chained.results, type = "dynamic"): could not find function "aggte"
 
 # 3. Print results
 agg.es.chained
-#> 
-#> Call:
-#> aggte(MP = chained.results, type = "dynamic")
-#> 
-#> Reference: Callaway, Brantly and Pedro H.C. Sant'Anna.  "Difference-in-Differences with Multiple Time Periods." Journal of Econometrics, Vol. 225, No. 2, pp. 200-230, 2021. <https://doi.org/10.1016/j.jeconom.2020.12.001>, <https://arxiv.org/abs/1803.09015> 
-#> 
-#> 
-#> Overall summary of ATT's based on event-study/dynamic aggregation:  
-#>    ATT    Std. Error     [ 95%  Conf. Int.]  
-#>  1.605        0.2396     1.1354      2.0746 *
-#> 
-#> 
-#> Dynamic Effects:
-#>  Event time Estimate Std. Error [95% Pointwise  Conf. Band]  
-#>          -6   0.1772     0.4876         -1.1263      1.4807  
-#>          -5   0.0872     0.3613         -0.8787      1.0531  
-#>          -4  -0.1860     0.2767         -0.9257      0.5537  
-#>          -3  -0.2290     0.1999         -0.7632      0.3052  
-#>          -2  -0.1439     0.1419         -0.5232      0.2355  
-#>          -1  -0.2554     0.0892         -0.4937     -0.0171 *
-#>           0   1.7951     0.0884          1.5589      2.0313 *
-#>           1   1.7615     0.1351          1.4002      2.1227 *
-#>           2   1.6541     0.2084          1.0971      2.2110 *
-#>           3   1.4875     0.2813          0.7356      2.2395 *
-#>           4   1.5304     0.4042          0.4499      2.6109 *
-#>           5   1.4014     0.6096         -0.2281      3.0308  
-#> ---
-#> Signif. codes: `*' confidence band does not cover 0
-#> 
-#> Control Group:  Never Treated,  Anticipation Periods:  0
-#> Estimation Method:  chained
+#> Error: object 'agg.es.chained' not found
 ```
+
+
+
+``` r
+
+# 0. We generate data in several steps.
+# Simulate data
+data=fonction_simu_attrition(theta2_alpha_Gg=0, factor = 0.5, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=1)
+#> Error in fonction_simu_attrition(theta2_alpha_Gg = 0, factor = 0.5, lambda1_alpha_St = 0, : unused argument (factor = 0.5)
+
+# data0 <- data %>%
+#   arrange(id, annee) %>% # Sort by `id` and `annee`
+#   group_by(id) %>% # Group by `id`
+#   mutate(previous_P_Y1_chaine = lag(P_Y1_chaine)) %>% # Create a lagged variable
+#   filter((P_Y1_chaine== 0 & previous_P_Y1_chaine == 1)|P_Y1_chaine== 1) %>% # Apply your condition
+#   ungroup() # Ungroup the data
+
+# Generate the dummy variable "P" with a randomized fraction
+data$P_Y1_longDID <- as.numeric(runif(dim(data)[1], min = 0, max = 1)>=0)
+
+# Filter indivs never observed across all years
+data0 <- data[data$P_Y1_longDID == 1,]
+data0 <- data0 %>%
+  group_by(id) %>%
+  filter(!(all(P_Y1_longDID == 0 & annee %in% 1:8))) %>%
+  ungroup()
+#> Error in data0 %>% group_by(id) %>% filter(!(all(P_Y1_longDID == 0 & annee %in% : could not find function "%>%"
+
+
+data0 <- data0[,c(1,2,3,6,7,8)]
+data0 <- rename(data0,Y = Y1_chaine)
+#> Error in rename(data0, Y = Y1_chaine): could not find function "rename"
+data0 <- rename(data0,date = annee)
+#> Error in rename(data0, date = annee): could not find function "rename"
+data0 <- rename(data0,date_G = annee_G)
+#> Error in rename(data0, date_G = annee_G): could not find function "rename"
+data0$P_Y1_chaine <- NULL
+
+# Sort data0 by id and date
+data0 <- data0 %>%
+  arrange(id, date)
+#> Error in data0 %>% arrange(id, date): could not find function "%>%"
+
+### Correct id's
+list_id <-as.data.frame(unique(data0[,"id"]))
+list_id$iden_num<-1:dim(list_id)[1] 
+data0 <- merge(data0, list_id, by.x = "id", by.y = "id", all.x = TRUE)
+#> Error in fix.by(by.y, y): 'by' must specify a uniquely valid column
+data0$id <- data0$iden_num
+data0$iden_num <- NULL
+
+# Add a treatment var
+data0$treated <- 0
+data0$treated[data0$date_G!=0] <- 1
+
+# Add a new variable S
+data0 <- data0 %>%
+  group_by(id) %>%                   # Group data by id
+  mutate(S = ifelse(date == min(date), 1, 1)) %>% # S == 1 for lowest year, 0 otherwise
+  ungroup()                          # Ungroup data
+#> Error in data0 %>% group_by(id) %>% mutate(S = ifelse(date == min(date), : could not find function "%>%"
+  
+#### CUE: data0 is the typical dataset. The script starts here. The above script is just to make sure we have the expected data form
+# Data must have:
+# binary treatment var (treated)
+# sampling indicator for being observed in date t and t+1 (S)
+# outcome variable (Y)
+# predictor variable (X): several predictors should work
+# id for individuals (id)
+# dates (date)
+# treatment dates / cohorts (date_G)
+  
+
+# 1. GMM DiD
+gmm.results = GMM(
+                    yname="Y",
+                    tname="date",
+                    idname="id",
+                    gname="date_G",
+                    xformla=~X, 
+                    propensityformla=c("X"), 
+                    data=data0,      
+                    weightsname="S",  
+                    bstrap=FALSE, 
+                    biters=1000,
+                    debT=3,
+                    finT=8,
+                    deb=1,
+                    fin=8,
+                    select='select',
+                    treated='treated',
+                    cband=TRUE)
+#> Error in `[.data.frame`(data, , tname): undefined columns selected
+
+# 2. Aggregation
+agg.es.gmm <- aggte(MP = gmm.results, type = 'dynamic')
+#> Error in aggte(MP = gmm.results, type = "dynamic"): could not find function "aggte"
+
+agg.es.gmm
+#> Error: object 'agg.es.gmm' not found
+```
+
+
+
+
+
+<!-- source("R/fonction_simu_attrition.R")
+source("R/gg.R")
+source("R/pre_process_cdid.R")
+source("gmm_compute_delta_att.R")
+source("gmm_convert_delta_to_att.R")
+source("gmm_convert_result.R")
+source('process_attgt_gmm.R') -->
