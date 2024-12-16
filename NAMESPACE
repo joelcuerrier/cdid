@@ -9,4 +9,3 @@ export(convert_delta_to_att)
 export(fonction_simu_attrition)
 export(pre_process_cdid)
 export(process_attgt)
-

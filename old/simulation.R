@@ -36,7 +36,7 @@ library(cdid)
 # aggrégés. La fonction chained n'utilise pas les aggrégations. Les codes de la vignettes eux, 
 # utilisent les fonctions d'agrégat de Callaway qui utilise un simple Bootstrap. Il y a possibilité d'intégrer le wild boostrap dans cette fonction.
 
-nsims=100
+nsims=10
 
 beta_hat_chaine  = matrix(NA,nsims,6)
 IC_inf_chaine  = matrix(NA,nsims,6)
