@@ -20,3 +20,4 @@ source("R/pre_process_cdid.R")
 remotes::install_github("joelcuerrier/cdid", ref = "august26", build_vignettes = FALSE, force = TRUE)
 
 
+devtools::build_vignettes()

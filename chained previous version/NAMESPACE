@@ -19,11 +19,22 @@ export(mboot)
 export(pre_process_did)
 export(process_attgt)
 export(process_attgt_gmm)
+
+import(dplyr)
 import(BMisc)
 importFrom(BMisc, rhs.vars)
 import(tidyr)
 importFrom(tidyr, pivot_wider)
 import(Matrix)
+import(openxlsx)
+import(data.table)
+import(jsonlite)
+import(tidyr)
+import(did)
+
+
+
+
 
 
 
