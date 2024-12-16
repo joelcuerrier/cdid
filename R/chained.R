@@ -1,3 +1,5 @@
+#' @export
+
 # # 0. We generate data in several steps.
 # # Simulate data
 # data=fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=1)

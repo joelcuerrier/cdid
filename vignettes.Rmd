@@ -23,11 +23,11 @@ library(did)
 
 library(devtools)
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
+library(cdid)
 
 # 0. We generate data in several steps.
 # Simulate data
 data=fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=1)
-# data <- subset(data, select = -c(Y1_CS, Y1_longDID))  # delte this. and check i think in the actual data process there is observations that are dropped.
 
 # Filter indivs never observed across all years
 data0 <- data[data$P_Y1_longDID == 1,]
