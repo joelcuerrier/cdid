@@ -67,7 +67,8 @@ GMM <- function(    yname,
   # Part 3. Post-estimation aggregation step. Converts delta ATT into aggregated ATT. 
   # (to be cleaned)
   result = gmm_convert_delta_to_att(result) 
-
+  
+    
 
   # # Part 4. Result must be converted to be used in the aggte function.  
   # # (to be cleaned)

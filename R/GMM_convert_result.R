@@ -195,8 +195,14 @@
     dimnames = list(NULL, NULL)
     )
     # print(str(results))
+    
     results$inffunc=sparse_matrix
     # results$inffunc=inffunc
+
+
+    # rencontre david
+    dp$att.results
+
     return(results)
     }  
             

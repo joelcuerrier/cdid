@@ -165,7 +165,7 @@ agg.es.chained
 
 # 0. We generate data in several steps.
 # Simulate data
-data=fonction_simu_attrition(theta2_alpha_Gg=0, factor = 0.5, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=1)
+data=fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=1)
 
 # data0 <- data %>%
 #   arrange(id, annee) %>% # Sort by `id` and `annee`
@@ -246,8 +246,8 @@ gmm.results = GMM(
 # 2. Aggregation
 agg.es.gmm <- aggte(MP = gmm.results, type = 'dynamic')
 
-agg.es.gmm
-
+str( agg.es.gmm)
+gmm
 
 ```
 
