@@ -114,7 +114,7 @@ agg.es.chained
 
 # 0. We generate data in several steps.
 # Simulate data
-data0 = fonction_simu_attrition(4)
+data0 = fonction_simu_attrition()
 
 # 1. GMM DiD
 gmm.results = GMM(

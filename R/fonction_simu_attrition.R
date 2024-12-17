@@ -9,41 +9,9 @@
 #' data=data_sim=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5,alpha_percentile=0.75)
 #' @export
 
-fonction_simu_attrition <- function(dgp=1){
+fonction_simu_attrition <- function(theta2_alpha_Gg, lambda1_alpha_St, sigma_alpha, sigma_epsilon, alpha_percentile){
 # Remarque : pour l'estimateur long DID, on l'estime sur un panel cylindr� qui drop les observations manquantes
 # c-à-d, on utilise pour cet estimateur la pond�ration utilis�e pour l'estimateur en Cross Section !!!
-
-# Parameters
-if (dgp==1){
-theta2_alpha_Gg = 0
-lambda1_alpha_St = 0
-sigma_alpha = 2
-sigma_epsilon = 0.5
-alpha_percentile = 1
-} else if (dgp==2){
-theta2_alpha_Gg = 0.2
-lambda1_alpha_St = 0.2
-sigma_alpha = 2
-sigma_epsilon = 0.5
-alpha_percentile = 1
-} else if (dgp==3){
-theta2_alpha_Gg = 0.2
-lambda1_alpha_St = 0.2
-sigma_alpha = 2
-sigma_epsilon = 0.5
-alpha_percentile = 0.9
-} else if (dgp==4){
-theta2_alpha_Gg = 0.2
-lambda1_alpha_St = 0.2
-sigma_alpha = 2
-sigma_epsilon = 0.5
-alpha_percentile = 0.6}
-
-else {
-stop("dgp must be 1, 2, 3 or 4")
-}
-
-# theta2_alpha_Gg = 0.2, lambda1_alpha_St = 0.2, sigma_alpha = 2, sigma_epsilon = 0.5, alpha_percentile = 0.75
 
 
 
@@ -237,6 +205,7 @@ for (simu_i in 1:nsims){
   
 
   # Added on December 17th.
+  
   # Filter indivs never observed across all years
   data0 <- data_sim[data_sim$P_Y1_longDID == 1,]
   data0 <- data0 %>%
@@ -269,7 +238,6 @@ for (simu_i in 1:nsims){
   data0 <- data0 %>%
     group_by(id) %>%                                # Group data by id
     mutate(S = ifelse(date == min(date), 1, 0)) %>% # S == 1 for lowest year, 0 otherwise
-    # mutate(S = ifelse(date == min(date), 1, 1)) %>% # S == 1 for lowest year, 0 otherwise
     ungroup()                                       # Ungroup data
 
   #### CUE: data0 is the typical dataset. The script starts here. The above script is just to make sure we have the expected data form
@@ -282,8 +250,8 @@ for (simu_i in 1:nsims){
   # dates (date)
   # treatment dates / cohorts (date_G)
 
-  # return(data_sim)
-  return(data0)
+  return(data_sim)
+  # return(data0)
     } 
   }
   

@@ -53,8 +53,8 @@ GMM <- function(    yname,
                      print_details=FALSE,
                      pl=FALSE,
                      cores=1,
-                     call=match.call()
-                     ,treated="treated")
+                     call=match.call(),
+                     treated="treated")
   
 
   #gmm.R calls GMM_estimPeriod_Boot dans fonctions_estimation_Boot.R
