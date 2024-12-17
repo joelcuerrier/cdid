@@ -117,9 +117,10 @@ library(cdid)
 
 # 0. We generate data in several steps.
 # Simulate data
-source("R/fonction_simu_attrition.R")
-source("R/gg.R")
-data0 = fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=1)
+
+
+
+data0 = fonction_simu_attrition(1)
 
 
   # Generate the dummy variable "P" with a randomized fraction

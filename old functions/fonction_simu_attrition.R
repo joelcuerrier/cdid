@@ -9,41 +9,9 @@
 #' data=data_sim=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5,alpha_percentile=0.75)
 #' @export
 
-fonction_simu_attrition <- function(dgp=1){
+fonction_simu_attrition <- function(theta2_alpha_Gg, lambda1_alpha_St, sigma_alpha, sigma_epsilon, alpha_percentile){
 # Remarque : pour l'estimateur long DID, on l'estime sur un panel cylindr� qui drop les observations manquantes
 # c-à-d, on utilise pour cet estimateur la pond�ration utilis�e pour l'estimateur en Cross Section !!!
-
-# Parameters
-if (dgp==1){
-theta2_alpha_Gg = 0
-lambda1_alpha_St = 0
-sigma_alpha = 2
-sigma_epsilon = 0.5
-alpha_percentile = 1
-} else if (dgp==2){
-theta2_alpha_Gg = 0.2
-lambda1_alpha_St = 0.2
-sigma_alpha = 2
-sigma_epsilon = 0.5
-alpha_percentile = 1
-} else if (dgp==3){
-theta2_alpha_Gg = 0.2
-lambda1_alpha_St = 0.2
-sigma_alpha = 2
-sigma_epsilon = 0.5
-alpha_percentile = 0.9
-} else if (dgp==4){
-theta2_alpha_Gg = 0.2
-lambda1_alpha_St = 0.2
-sigma_alpha = 2
-sigma_epsilon = 0.5
-alpha_percentile = 0.6}
-
-else {
-stop("dgp must be 1, 2, 3 or 4")
-}
-
-# theta2_alpha_Gg = 0.2, lambda1_alpha_St = 0.2, sigma_alpha = 2, sigma_epsilon = 0.5, alpha_percentile = 0.75
 
 
 
@@ -235,42 +203,7 @@ for (simu_i in 1:nsims){
   data_sim <- subset(data_sim, select = -P_Y2_CS)
   data_sim <- subset(data_sim, select = -P_Y2_longDID)
   
-
-  # Added on December 17th.
-  # Filter indivs never observed across all years
-  data0 <- data_sim[data_sim$P_Y1_longDID == 1,]
-  data0 <- data0 %>%
-    group_by(id) %>%
-    filter(!(all(P_Y1_chaine == 0 & annee %in% 1:8))) %>%
-    ungroup()
-
-  data0 <- data0[,c(1,2,3,6,7,8)]
-  data0 <- rename(data0,Y = Y1_chaine)
-  data0 <- rename(data0,date = annee)
-  data0 <- rename(data0,date_G = annee_G)
-  data0$P_Y1_chaine <- NULL
-
-  # Sort data0 by id and date
-  data0 <- data0 %>%
-    arrange(id, date)
-
-  ### Correct id's
-  list_id <-as.data.frame(unique(data0[,"id"]))
-  list_id$iden_num<-1:dim(list_id)[1] 
-  data0 <- merge(data0, list_id, by.x = "id", by.y = "id", all.x = TRUE)
-  data0$id <- data0$iden_num
-  data0$iden_num <- NULL
-
-  # Add a treatment var
-  data0$treated <- 0
-  data0$treated[data0$date_G!=0] <- 1
-
-  # Add a new variable S
-  data0 <- data0 %>%
-    group_by(id) %>%                                # Group data by id
-    mutate(S = ifelse(date == min(date), 1, 0)) %>% # S == 1 for lowest year, 0 otherwise
-    # mutate(S = ifelse(date == min(date), 1, 1)) %>% # S == 1 for lowest year, 0 otherwise
-    ungroup()                                       # Ungroup data
+                                     # Ungroup data
 
   #### CUE: data0 is the typical dataset. The script starts here. The above script is just to make sure we have the expected data form
   # Data must have:
@@ -282,8 +215,8 @@ for (simu_i in 1:nsims){
   # dates (date)
   # treatment dates / cohorts (date_G)
 
-  # return(data_sim)
-  return(data0)
+  return(data_sim)
+  
     } 
   }
   
