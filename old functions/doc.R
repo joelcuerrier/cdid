@@ -15,9 +15,9 @@ devtools::document()
 rm(list = ls())  # Clear the environment
 
 
-source("R/pre_process_cdid.R")
 
-remotes::install_github("joelcuerrier/cdid", ref = "august26", build_vignettes = FALSE, force = TRUE)
+
+# remotes::install_github("joelcuerrier/cdid", ref = "august26", build_vignettes = FALSE, force = TRUE)
 
 
 devtools::build_vignettes()
