@@ -81,9 +81,9 @@ group. Second, we sample from this population using the specified process.
 # Load the cdid package
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
 library(cdid)
-# source("R/build_sim_dataset.R")
-data0 = fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=1)
-# build_sim_dataset(dgp=1)
+
+# 0. We generate data.
+data0 = fonction_simu_attrition()
 
 # 1. Chained DiD
 chained.results =chained(
@@ -93,6 +93,7 @@ chained.results =chained(
                     gname="date_G",
                     xformla=~X, 
                     propensityformla=c("X"), 
+                    control_group=c("notyettreated"), #either "nevertreated" or "notyettreated"
                     data=data0,      
                     weightsname="S",  
                     bstrap=FALSE, 

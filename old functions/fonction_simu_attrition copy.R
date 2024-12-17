@@ -9,37 +9,9 @@
 #' data=data_sim=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5,alpha_percentile=0.75)
 #' @export
 
-fonction_simu_attrition <- function(dgp=1){
+fonction_simu_attrition <- function(theta2_alpha_Gg, lambda1_alpha_St, sigma_alpha, sigma_epsilon, alpha_percentile){
 # Remarque : pour l'estimateur long DID, on l'estime sur un panel cylindr� qui drop les observations manquantes
 # c-à-d, on utilise pour cet estimateur la pond�ration utilis�e pour l'estimateur en Cross Section !!!
-
-# Parameters
-if (dgp==1){
-theta2_alpha_Gg = 0
-lambda1_alpha_St = 0
-sigma_alpha = 2
-sigma_epsilon = 0.5
-alpha_percentile = 1
-} else if (dgp==2){
-theta2_alpha_Gg = 0.2
-lambda1_alpha_St = 0.2
-sigma_alpha = 2
-sigma_epsilon = 0.5
-alpha_percentile = 1
-} else if (dgp==3){
-theta2_alpha_Gg = 0.2
-lambda1_alpha_St = 0.2
-sigma_alpha = 2
-sigma_epsilon = 0.5
-alpha_percentile = 0.9
-} else if (dgp==4){
-theta2_alpha_Gg = 0.2
-lambda1_alpha_St = 0.2
-sigma_alpha = 2
-sigma_epsilon = 0.5
-alpha_percentile = 0.6}
-
-# theta2_alpha_Gg = 0.2, lambda1_alpha_St = 0.2, sigma_alpha = 2, sigma_epsilon = 0.5, alpha_percentile = 0.75
 
 
 

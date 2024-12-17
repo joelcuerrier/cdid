@@ -55,7 +55,7 @@ chained <- function(yname,
                     idname=NULL,
                     gname,
                     xformla=NULL,
-                    propensityformla,
+                    # propensityformla,
                     data,
                     panel=TRUE, 
                     allow_unbalanced_panel=TRUE, 
@@ -73,15 +73,15 @@ chained <- function(yname,
                     print_details=FALSE, 
                     pl=FALSE, 
                     cores=1, 
-                    debT,
-                    finT,
-                    deb,
-                    fin,
-                    select,
+                    # debT,
+                    # finT,
+                    # deb,
+                    # fin,
+                    # select,
                     treated){
 
   # Part 1. Pre-process step can be useful to carry over the parameters of the functions
-  dp=pre_process_cdid(yname=yname,
+  dp=pre_process(yname=yname,
                     tname=tname,
                     idname=idname,
                     gname=gname,
@@ -102,8 +102,9 @@ chained <- function(yname,
                     print_details=print_details,
                     pl=pl,
                     cores=cores,
-                    call=match.call(),
-                    treated=treated)
+                    call=match.call()
+                    # treated=treated
+                    )
 
   ## Part 2. Compute Delta ATT (previously done with chained.compute.mp.spatt.Boot)
   result = compute_delta_att(dp) 
