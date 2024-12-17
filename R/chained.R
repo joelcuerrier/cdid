@@ -102,19 +102,17 @@ chained <- function(yname,
                     print_details=print_details,
                     pl=pl,
                     cores=cores,
-                    call=match.call()
-                    # treated=treated
+                    call=match.call(),
+                    treated=treated
                     )
 
   ## Part 2. Compute Delta ATT (previously done with chained.compute.mp.spatt.Boot)
   result = compute_delta_att(dp) 
   
   # Part 3. Post-estimation aggregation step. Converts delta ATT into aggregated ATT. 
-  # (to be cleaned)
   result = convert_delta_to_att(result) 
 
   # Part 4. Result must be converted to be used in the aggte function.  
-  # (to be cleaned)
   result = convert_result(result)
   
   return(result)

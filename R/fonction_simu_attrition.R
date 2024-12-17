@@ -233,7 +233,6 @@ for (simu_i in 1:nsims){
   
 
   # Added on December 17th.
-  
   # Filter indivs never observed across all years
   data0 <- data_sim[data_sim$P_Y1_longDID == 1,]
   data0 <- data0 %>%
@@ -266,6 +265,7 @@ for (simu_i in 1:nsims){
   data0 <- data0 %>%
     group_by(id) %>%                                # Group data by id
     mutate(S = ifelse(date == min(date), 1, 0)) %>% # S == 1 for lowest year, 0 otherwise
+    # mutate(S = ifelse(date == min(date), 1, 1)) %>% # S == 1 for lowest year, 0 otherwise
     ungroup()                                       # Ungroup data
 
   #### CUE: data0 is the typical dataset. The script starts here. The above script is just to make sure we have the expected data form

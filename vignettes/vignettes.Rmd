@@ -83,27 +83,21 @@ remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FAL
 library(cdid)
 
 # 0. We generate data.
-data0 = fonction_simu_attrition()
+data = fonction_simu_attrition()
 
 # 1. Chained DiD
-chained.results =chained(
+chained.results = chained(
+                    data=data,      
                     yname="Y",
                     tname="date",
                     idname="id",
                     gname="date_G",
-                    xformla=~X, 
-                    propensityformla=c("X"), 
                     control_group=c("notyettreated"), #either "nevertreated" or "notyettreated"
-                    data=data0,      
+                    treated='treated',
+                    xformla=~X, 
                     weightsname="S",  
                     bstrap=FALSE, 
                     biters=1000,
-                    debT=3,
-                    finT=8,
-                    deb=1,
-                    fin=8,
-                    select='select',
-                    treated='treated',
                     cband=TRUE)
 
 # 2. Aggregation
@@ -118,82 +112,21 @@ agg.es.chained
 
 # 0. We generate data in several steps.
 # Simulate data
-data=fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=1)
-
-# data0 <- data %>%
-#   arrange(id, annee) %>% # Sort by `id` and `annee`
-#   group_by(id) %>% # Group by `id`
-#   mutate(previous_P_Y1_chaine = lag(P_Y1_chaine)) %>% # Create a lagged variable
-#   filter((P_Y1_chaine== 0 & previous_P_Y1_chaine == 1)|P_Y1_chaine== 1) %>% # Apply your condition
-#   ungroup() # Ungroup the data
-
-# Generate the dummy variable "P" with a randomized fraction
-# data$P_Y1_longDID <- as.numeric(runif(dim(data)[1], min = 0, max = 1)>=0)
-
-# Filter indivs never observed across all years
-data0 <- data[data$P_Y1_longDID == 1,]
-data0 <- data0 %>%
-  group_by(id) %>%
-  filter(!(all(P_Y1_longDID == 0 & annee %in% 1:8))) %>%
-  ungroup()
-
-
-data0 <- data0[,c(1,2,3,6,7,8)]
-data0 <- rename(data0,Y = Y1_chaine)
-data0 <- rename(data0,date = annee)
-data0 <- rename(data0,date_G = annee_G)
-data0$P_Y1_chaine <- NULL
-
-# Sort data0 by id and date
-data0 <- data0 %>%
-  arrange(id, date)
-
-### Correct id's
-list_id <-as.data.frame(unique(data0[,"id"]))
-list_id$iden_num<-1:dim(list_id)[1] 
-data0 <- merge(data0, list_id, by.x = "id", by.y = "id", all.x = TRUE)
-data0$id <- data0$iden_num
-data0$iden_num <- NULL
-
-# Add a treatment var
-data0$treated <- 0
-data0$treated[data0$date_G!=0] <- 1
-
-# Add a new variable S
-data0 <- data0 %>%
-  group_by(id) %>%                   # Group data by id
-  mutate(S = ifelse(date == min(date), 1, 1)) %>% # S == 1 for lowest year, 0 otherwise
-  ungroup()                          # Ungroup data
-  
-#### CUE: data0 is the typical dataset. The script starts here. The above script is just to make sure we have the expected data form
-# Data must have:
-# binary treatment var (treated)
-# sampling indicator for being observed in date t and t+1 (S)
-# outcome variable (Y)
-# predictor variable (X): several predictors should work
-# id for individuals (id)
-# dates (date)
-# treatment dates / cohorts (date_G)
-  
+data=fonction_simu_attrition()
 
 # 1. GMM DiD
 gmm.results = GMM(
+                    data=data,      
                     yname="Y",
                     tname="date",
                     idname="id",
                     gname="date_G",
+                    control_group=c("notyettreated"), #either "nevertreated" or "notyettreated"
+                    treated='treated',
                     xformla=~X, 
-                    propensityformla=c("X"), 
-                    data=data0,      
                     weightsname="S",  
                     bstrap=FALSE, 
                     biters=1000,
-                    debT=3,
-                    finT=8,
-                    deb=1,
-                    fin=8,
-                    select='select',
-                    treated='treated',
                     cband=TRUE)
 
 # 2. Aggregation

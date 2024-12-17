@@ -6,7 +6,7 @@ GMM <- function(    yname,
                     idname=NULL,
                     gname,
                     xformla=NULL,
-                    propensityformla,
+                    # propensityformla,
                     data,
                     panel=TRUE, 
                     allow_unbalanced_panel=TRUE, 
@@ -24,11 +24,11 @@ GMM <- function(    yname,
                     print_details=FALSE, 
                     pl=FALSE, 
                     cores=1, 
-                    debT,
-                    finT,
-                    deb,
-                    fin,
-                    select,
+                    # debT,
+                    # finT,
+                    # deb,
+                    # fin,
+                    # select,
                     treated){
 
   #Part1. Pre-process step can be useful to carry over the parameters of the functions
@@ -65,13 +65,11 @@ GMM <- function(    yname,
   result = gmm_compute_delta_att(dp)
 
   # Part 3. Post-estimation aggregation step. Converts delta ATT into aggregated ATT. 
-  # (to be cleaned)
   result = gmm_convert_delta_to_att(result) 
   
     
 
   # # Part 4. Result must be converted to be used in the aggte function.  
-  # # (to be cleaned)
   result = gmm_convert_result(result)
   
   return(result)
