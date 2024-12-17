@@ -83,11 +83,11 @@ remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FAL
 library(cdid)
 
 # 0. We generate data.
-data = fonction_simu_attrition()
+data0 = fonction_simu_attrition()
 
 # 1. Chained DiD
 chained.results = chained(
-                    data=data,      
+                    data=data0,      
                     yname="Y",
                     tname="date",
                     idname="id",
@@ -99,6 +99,8 @@ chained.results = chained(
                     bstrap=FALSE, 
                     biters=1000,
                     cband=TRUE)
+# See the ATT g,t
+chained.results
 
 # 2. Aggregation
 agg.es.chained <- aggte(MP = chained.results, type = 'dynamic')
@@ -112,11 +114,11 @@ agg.es.chained
 
 # 0. We generate data in several steps.
 # Simulate data
-data=fonction_simu_attrition()
+data0 = fonction_simu_attrition(4)
 
 # 1. GMM DiD
 gmm.results = GMM(
-                    data=data,      
+                    data=data0,      
                     yname="Y",
                     tname="date",
                     idname="id",

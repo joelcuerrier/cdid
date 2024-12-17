@@ -39,6 +39,10 @@ sigma_alpha = 2
 sigma_epsilon = 0.5
 alpha_percentile = 0.6}
 
+else {
+stop("dgp must be 1, 2, 3 or 4")
+}
+
 # theta2_alpha_Gg = 0.2, lambda1_alpha_St = 0.2, sigma_alpha = 2, sigma_epsilon = 0.5, alpha_percentile = 0.75
 
 

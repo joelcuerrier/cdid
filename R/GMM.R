@@ -37,7 +37,7 @@ GMM <- function(    yname,
                      idname="id",
                      gname="date_G",
                      xformla=~X,
-                     data=data0,
+                     data=data,
                      panel=TRUE,
                      allow_unbalanced_panel=TRUE,
                      control_group=c("notyettreated"), #either "nevertreated" or "notyettreated"
