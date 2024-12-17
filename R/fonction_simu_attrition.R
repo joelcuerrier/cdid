@@ -259,11 +259,6 @@ for (simu_i in 1:nsims){
 
 
 
-library(cdid)
-library(dplyr)
-library(writexl)
-set.seed(123)
-
 
 
 
