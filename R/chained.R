@@ -81,7 +81,7 @@ chained <- function(yname,
                     treated){
 
   # Part 1. Pre-process step can be useful to carry over the parameters of the functions
-  dp=pre_process(yname=yname,
+  dp=pre_process_cdid(yname=yname,
                     tname=tname,
                     idname=idname,
                     gname=gname,
