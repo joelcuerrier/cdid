@@ -80,7 +80,7 @@ group. Second, we sample from this population using the specified process.
 ```{r}
 # Load the cdid package
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
-
+library(cdid)
 # source("R/build_sim_dataset.R")
 data0 = fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=1)
 # build_sim_dataset(dgp=1)
