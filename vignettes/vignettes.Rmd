@@ -157,7 +157,7 @@ data0 = fonction_simu_attrition(theta2_alpha_Gg=0, lambda1_alpha_St=0, sigma_alp
   # Add a new variable S
   data0 <- data0 %>%
     group_by(id) %>%                   # Group data by id
-    mutate(S = ifelse(date == min(date), 1, 0)) %>% # S == 1 for lowest year, 0 otherwise
+    mutate(S = ifelse(date == min(date), 1, 1)) %>% # S == 1 for lowest year, 0 otherwise
     ungroup()       
 
  
