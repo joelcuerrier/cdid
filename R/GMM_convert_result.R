@@ -200,8 +200,8 @@
     # results$inffunc=inffunc
 
 
-    # rencontre david
-    dp$att.results
+    # # # rencontre david
+    # dp$att.results
 
     return(results)
     }  

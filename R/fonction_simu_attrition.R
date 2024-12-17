@@ -201,7 +201,69 @@ for (simu_i in 1:nsims){
   data_sim <- subset(data_sim, select = -P_Y2_CS)
   data_sim <- subset(data_sim, select = -P_Y2_longDID)
   
-  return(data_sim)
+
+  # Added on December 17th.
+  
+  # Filter indivs never observed across all years
+  data0 <- data_sim[data_sim$P_Y1_longDID == 1,]
+  data0 <- data0 %>%
+    group_by(id) %>%
+    filter(!(all(P_Y1_chaine == 0 & annee %in% 1:8))) %>%
+    ungroup()
+
+  data0 <- data0[,c(1,2,3,6,7,8)]
+  data0 <- rename(data0,Y = Y1_chaine)
+  data0 <- rename(data0,date = annee)
+  data0 <- rename(data0,date_G = annee_G)
+  data0$P_Y1_chaine <- NULL
+
+  # Sort data0 by id and date
+  data0 <- data0 %>%
+    arrange(id, date)
+
+  ### Correct id's
+  list_id <-as.data.frame(unique(data0[,"id"]))
+  list_id$iden_num<-1:dim(list_id)[1] 
+  data0 <- merge(data0, list_id, by.x = "id", by.y = "id", all.x = TRUE)
+  data0$id <- data0$iden_num
+  data0$iden_num <- NULL
+
+  # Add a treatment var
+  data0$treated <- 0
+  data0$treated[data0$date_G!=0] <- 1
+
+  # Add a new variable S
+  data0 <- data0 %>%
+    group_by(id) %>%                                # Group data by id
+    mutate(S = ifelse(date == min(date), 1, 0)) %>% # S == 1 for lowest year, 0 otherwise
+    ungroup()                                       # Ungroup data
+
+  #### CUE: data0 is the typical dataset. The script starts here. The above script is just to make sure we have the expected data form
+  # Data must have:
+  # binary treatment var (treated)
+  # sampling indicator for being observed in date t and t+1 (S)
+  # outcome variable (Y)
+  # predictor variable (X): several predictors should work
+  # id for individuals (id)
+  # dates (date)
+  # treatment dates / cohorts (date_G)
+
+  # return(data_sim)
+  return(data0)
     } 
   }
   
+
+
+
+
+
+
+library(cdid)
+library(dplyr)
+library(writexl)
+set.seed(123)
+
+
+
+
