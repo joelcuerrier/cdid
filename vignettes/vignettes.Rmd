@@ -85,32 +85,9 @@ library(BMisc)
 # Package Overview and Available Functions
 ls("package:cdid")
 
-?cdid
-?cdid::chained
-?cdid::compute_delta_att
-?cdid::compute.aggte
-?cdid::convert_delta_to_att
-?cdid::convert_result 
-?cdid::DIDparams
-?cdid::fonction_simu_attrition
-?cdid::get_agg_inf_func
-?cdid::getSE
-?cdid::GMM
-?cdid::gmm_compute_delta_att
-?cdid::gmm_convert_delta_to_att
-?cdid::gmm_convert_result 
-?cdid::MP
-?cdid::pre_process_cdid
-?cdid::print.MP
-?cdid::process_attgt
-?cdid::process_attgt_gmm
-?cdid::summary.MP
-
-
-
-
-
-
+# ?cdid
+# ?cdid::chained
+# ?cdid::GMM
 
 # Importing the data
 data0 = fonction_simu_attrition()
@@ -149,39 +126,6 @@ agg.es.did = aggte(MP = did.results, type = 'dynamic')
 agg.es.did
 ```
 
-
-```{r}
-# # Load the cdid package
-
-
-# # 0. We generate data.
-
-# source("R/fonction_simu_attrition.R")
-# # 1. Chained DiD
-# chained.results = chained(
-#                     data=data0,      
-#                     yname="Y",
-#                     tname="date",
-#                     idname="id",
-#                     gname="date_G",
-#                     control_group=c("notyettreated"), #either "nevertreated" or "notyettreated"
-#                     treated='treated',
-#                     xformla=~X, 
-#                     weightsname="S",  
-#                     bstrap=FALSE, 
-#                     biters=1000,
-#                     cband=TRUE)
-# # See the ATT g,t
-# chained.results
-
-# # 2. Aggregation
-# agg.es.chained <- aggte(MP = chained.results, type = 'dynamic')
-
-# # 3. Print results
-# agg.es.chained
-```
-
-
 ```{r}
 
 # 1. GMM DiD
@@ -209,38 +153,6 @@ agg.es.gmm <- aggte(MP = gmm.results, type = 'dynamic')
 agg.es.gmm
 ```
 
-
-```{r}
-# # Combine group and time results
-# did.attgt <- data.frame(group = did.results$group, t = did.results$t, did.att = did.results$att)
-# gmm.attgt <- data.frame(group = gmm.results$group, t = gmm.results$t, gmm.att = gmm.results$att)
-# did.se <- data.frame(group = did.results$group, t = did.results$t, did.se = did.results$se)
-# gmm.se <- data.frame(group = gmm.results$group, t = gmm.results$t, gmm.se = gmm.results$se)
-
-# # Merge all results
-# results.attgt <- Reduce(function(x, y) merge(x, y, by = c("group", "t"), all = FALSE),
-#                         list(did.attgt, gmm.attgt, did.se, gmm.se))
-
-
-# # Aggregate results
-# agg.es.did <- aggte(MP = did.results, type = 'dynamic')
-# agg.es.gmm <- aggte(MP = gmm.results, type = 'dynamic')
-
-# did.agg.attgt <- data.frame(egt = agg.es.did$egt, did.att = agg.es.did$att, did.se = agg.es.did$se)
-# gmm.agg.attgt <- data.frame(egt = agg.es.gmm$egt, gmm.att = agg.es.gmm$att, gmm.se = agg.es.gmm$se)
-
-# # Merge aggregated results
-# results.agg.attgt <- merge(did.agg.attgt, gmm.agg.attgt, by = "egt", all = FALSE)
-
-# # Reorder columns in results.agg.attgt to match results.attgt
-# results.agg.attgt <- results.agg.attgt[, c("egt", "did.att", "gmm.att", "did.se", "gmm.se")]
-
-# # Display results
-# results.attgt
-# results.agg.attgt
-```
-
-
 ```{r}
 # Combine group and time results
 did.attgt <- data.frame(group = did.results$group, t = did.results$t, did.att = did.results$att)
@@ -251,58 +163,6 @@ gmm.se <- data.frame(group = gmm.results$group, t = gmm.results$t, gmm.se = gmm.
 
 did.agg.attgt <- data.frame(egt = agg.es.did$egt, did.att = agg.es.did$att, did.se = agg.es.did$se)
 gmm.agg.attgt <- data.frame(egt = agg.es.gmm$egt, gmm.att = agg.es.gmm$att, gmm.se = agg.es.gmm$se)
-
-
-
-
-
-```
-
-```{r}
-
-# compare.results <- function(...){
-#   # List of data frames passed as arguments
-#   results_list <- list(...)
-  
-#   # Check if each result has the required columns: "group" and "t"
-#   for (df in results_list) {
-#     if (!all(c("group", "t") %in% colnames(df))) {
-#       stop("Each result data frame must contain 'group' and 't' columns")
-#     }
-#   }
-  
-#   # Merge all results by 'group' and 't'
-#   combined_results <- Reduce(function(x, y) merge(x, y, by = c("group", "t"), all = FALSE), results_list)
-  
-#   return(combined_results)
-# }
-
-# compare.results(did.attgt, gmm.attgt, did.se, gmm.se)
-
-```
-
-```{r}
-
-# compare.agg.results <- function (...){
-# results_list <- list(...)
-  
-#   # Check if each result has the required columns: "group" and "t"
-#   for (df in results_list) {
-#     if (!all(c("egt") %in% colnames(df))) {
-#       stop("Each result data frame must contain 'group' and 't' columns")
-#     }
-#   }
-# # Merge all results by 'group' and 't'
-#   combined_results <- Reduce(function(x, y) merge(x, y, by = c("egt"), all = FALSE), results_list)
-  
-#   return(combined_results)
-# }
-
-# compare.agg.results(did.agg.attgt, gmm.agg.attgt)
-
-```
-
-```{r}
 
 compare.results <- function(..., agg = FALSE) {
   # List of data frames passed as arguments
@@ -343,9 +203,6 @@ print(results_agg)
 # Example usage for non-aggregated data
 results_non_agg <- compare.results(did.attgt, gmm.attgt, agg = FALSE)
 print(results_non_agg)
-
-
-
 ```
 
 
