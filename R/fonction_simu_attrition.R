@@ -221,6 +221,7 @@ for (simu_i in 1:nsims){
   }
 
   # Added 5th od December
+  #---------------------------
   # We are fixing the missing observations.
   # We remove Y2.
   
@@ -237,6 +238,7 @@ for (simu_i in 1:nsims){
   
 
   # Added on December 17th.
+  #---------------------------
   # Filter indivs never observed across all years
   data0 <- data_sim[data_sim$P_Y1_longDID == 1,]
   data0 <- data0 %>%
@@ -268,9 +270,9 @@ for (simu_i in 1:nsims){
   # Add a new variable S
   data0 <- data0 %>%
     group_by(id) %>%                                # Group data by id
-    # For Chained use this line:
+   
     # mutate(S = ifelse(date == min(date), 1, 0)) %>% # S == 1 for lowest year, 0 otherwise
-    # For GMM use this line:
+   
     mutate(S = ifelse(date == min(date), 1, 1)) %>% # S == 1 for lowest year, 0 otherwise
     ungroup()                                       # Ungroup data
 
