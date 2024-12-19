@@ -81,6 +81,9 @@ group. Second, we sample from this population using the specified process.
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
 library(cdid)
 
+?cdid::chained
+?cdid::GMM
+
 # Importing the data
 data0 = fonction_simu_attrition()
 
