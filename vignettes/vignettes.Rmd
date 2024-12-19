@@ -76,92 +76,57 @@ group. Second, we sample from this population using the specified process.
 (c) Compute the different estimators.
 (d) Repeat steps 1(b)-2(c) 1,000 times and report the mean and standard deviation of the estimators.
 
-
 ```{r}
 # Load the cdid package
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
 library(cdid)
+library(BMisc)
 
-# 0. We generate data.
+# Package Overview and Available Functions
+ls("package:cdid")
+
+# ?cdid
+# ?cdid::chained
+# ?cdid::GMM
+
+# Importing the data
 data0 = fonction_simu_attrition()
 
-# 1. Chained DiD
-chained.results = chained(
-                    data=data0,      
-                    yname="Y",
-                    tname="date",
-                    idname="id",
-                    gname="date_G",
-                    control_group=c("notyettreated"), #either "nevertreated" or "notyettreated"
-                    treated='treated',
-                    xformla=~X, 
-                    weightsname="S",  
-                    bstrap=FALSE, 
-                    biters=1000,
-                    cband=TRUE)
-# See the ATT g,t
-chained.results
-
-# 2. Aggregation
-agg.es.chained <- aggte(MP = chained.results, type = 'dynamic')
-
-# 3. Print results
-agg.es.chained
+# Display the data
+head(data0)
 ```
 
+```{r}
+library(did)
+did.results = did:: att_gt(
+  yname="Y", 
+  tname="date",
+  idname = "id",
+  gname = "date_G",
+  xformla = ~X,
+  data = data0,
+  weightsname = NULL,
+  allow_unbalanced_panel = TRUE,
+  alp = 0.05,
+  bstrap = TRUE,
+  cband = TRUE,
+  biters = 1000,
+  clustervars = NULL,
+  est_method = "dr",
+  base_period = "varying",
+  print_details = FALSE,
+  pl = FALSE,
+  cores = 1
+)
+
+#Dynamic Effect of the treatment
+agg.es.did = aggte(MP = did.results, type = 'dynamic')
+
+# 3. Print results
+agg.es.did
+```
 
 ```{r}
-remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
-library(cdid)
-
-
-# 0. We generate data in several steps.
-# Simulate data
-
-
-
-data0 = fonction_simu_attrition(1)
-
-
-  # # Generate the dummy variable "P" with a randomized fraction
-  # data$P_Y1_longDID <- as.numeric(runif(dim(data)[1], min = 0, max = 1)>=0)
-  
-  # # Filter indivs never observed across all years
-  # data0 <- data[data$P_Y1_longDID == 1,]
-  # data0 <- data0 %>%
-  #   group_by(id) %>%
-  #   filter(!(all(P_Y1_longDID == 0 & annee %in% 1:8))) %>%
-  #   ungroup()
-  
-  
-  # data0 <- data0[,c(1,2,3,6,7,8)]
-  # data0 <- rename(data0,Y = Y1_chaine)
-  # data0 <- rename(data0,date = annee)
-  # data0 <- rename(data0,date_G = annee_G)
-  # data0$P_Y1_chaine <- NULL
-  
-  # # Sort data0 by id and date
-  # data0 <- data0 %>%
-  #   arrange(id, date)
-  
-  # ### Correct id's
-  # list_id <-as.data.frame(unique(data0[,"id"]))
-  # list_id$iden_num<-1:dim(list_id)[1] 
-  # data0 <- merge(data0, list_id, by.x = "id", by.y = "id", all.x = TRUE)
-  # data0$id <- data0$iden_num
-  # data0$iden_num <- NULL
-  
-  # # Add a treatment var
-  # data0$treated <- 0
-  # data0$treated[data0$date_G!=0] <- 1
-  
-  # # Add a new variable S
-  # data0 <- data0 %>%
-  #   group_by(id) %>%                   # Group data by id
-  #   mutate(S = ifelse(date == min(date), 1, 1)) %>% # S == 1 for lowest year, 0 otherwise
-  #   ungroup()       
-
- 
 
 # 1. GMM DiD
 gmm.results = GMM(
@@ -178,22 +143,78 @@ gmm.results = GMM(
                     biters=1000,
                     cband=TRUE)
 
+# See the ATT g,t
+gmm.results
+
 # 2. Aggregation
 agg.es.gmm <- aggte(MP = gmm.results, type = 'dynamic')
 
+# 3. Print results
 agg.es.gmm
+```
 
+```{r}
+# Combine group and time results
+did.attgt <- data.frame(group = did.results$group, t = did.results$t, did.att = did.results$att)
+gmm.attgt <- data.frame(group = gmm.results$group, t = gmm.results$t, gmm.att = gmm.results$att)
 
+did.se <- data.frame(group = did.results$group, t = did.results$t, did.se = did.results$se)
+gmm.se <- data.frame(group = gmm.results$group, t = gmm.results$t, gmm.se = gmm.results$se)
+
+did.agg.attgt <- data.frame(egt = agg.es.did$egt, did.att = agg.es.did$att, did.se = agg.es.did$se)
+gmm.agg.attgt <- data.frame(egt = agg.es.gmm$egt, gmm.att = agg.es.gmm$att, gmm.se = agg.es.gmm$se)
+
+compare.results <- function(..., agg = FALSE) {
+  # List of data frames passed as arguments
+  results_list <- list(...)
+  
+  # Check if each result has the required columns
+  for (df in results_list) {
+    if (agg) {
+      # If agg is TRUE, check only for the "egt" column
+      if (!"egt" %in% colnames(df)) {
+        stop("Each result data frame must contain 'egt' column when agg = TRUE")
+      }
+    } else {
+      # If agg is FALSE, check for both "group" and "t" columns
+      if (!all(c("group", "t") %in% colnames(df))) {
+        stop("Each result data frame must contain 'group' and 't' columns when agg = FALSE")
+      }
+    }
+  }
+  
+  # Merge all results by 'egt' (for aggregated data) or 'group' and 't' (for regular data)
+  if (agg) {
+    # Merge based on "egt"
+    combined_results <- Reduce(function(x, y) merge(x, y, by = "egt", all = FALSE), results_list)
+  } else {
+    # Merge based on "group" and "t"
+    combined_results <- Reduce(function(x, y) merge(x, y, by = c("group", "t"), all = FALSE), results_list)
+  }
+  
+  # Return the merged results
+  return(combined_results)
+}
+
+# Example usage for aggregated data
+results_agg <- compare.results(did.agg.attgt, gmm.agg.attgt, agg = TRUE)
+print(results_agg)
+
+# Example usage for non-aggregated data
+results_non_agg <- compare.results(did.attgt, gmm.attgt, agg = FALSE)
+print(results_non_agg)
 ```
 
 
-
-
-
-<!-- source("R/fonction_simu_attrition.R")
-source("R/gg.R")
-source("R/pre_process_cdid.R")
-source("gmm_compute_delta_att.R")
-source("gmm_convert_delta_to_att.R")
-source("gmm_convert_result.R")
-source('process_attgt_gmm.R') -->
+<!-- import(dplyr)
+import(BMisc)
+importFrom(BMisc, rhs.vars)
+import(tidyr)
+importFrom(tidyr, pivot_wider)
+import(Matrix)
+importFrom(Matrix, sparseMatrix)
+import(openxlsx)
+import(data.table)
+import(jsonlite)
+import(tidyr)
+import(did) -->
