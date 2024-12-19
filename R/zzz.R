@@ -1,16 +1,11 @@
-utils::globalVariables(c("year","att","att.se","post","group","x"))
-
-#' @title citation
+#' cdid: An Overview of the cdid Package
 #'
-#' @description print the citation for the relevant paper
+#' The cdid package contains functions for performing causal inference using Difference-in-Differences (DiD) methods with several advanced options for analysis.
 #'
-#' @keywords internal
-citation <- function() {
-  cat("Reference: Christophe Bellégo, David Benatia, Vincent Dortet-Bernadet. \"The Chained Difference-in-Differences\" Journal of Econometrics. <https://arxiv.org/abs/2301.01085> \n")
-}
-
-
-
+#' @docType package
+#' @name cdid
+#' @importFrom stats lm
+NULL
 
 
 
