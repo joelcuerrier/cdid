@@ -80,6 +80,7 @@ group. Second, we sample from this population using the specified process.
 # Load the cdid package
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
 library(cdid)
+library(BMisc)
 
 # Package Overview and Available Functions
 ls("package:cdid")
@@ -109,7 +110,7 @@ ls("package:cdid")
 
 
 
-?cdid::GMM
+
 
 # Importing the data
 data0 = fonction_simu_attrition()
