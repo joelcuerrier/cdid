@@ -16,7 +16,6 @@ export(pre_process_cdid)
 export(process_attgt)
 export(process_attgt_gmm)
 
-import(dplyr)
 import(BMisc)
 importFrom(BMisc, rhs.vars)
 import(tidyr)
