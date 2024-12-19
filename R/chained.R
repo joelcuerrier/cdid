@@ -1,4 +1,5 @@
 
+#' Chained Function:
 #' @description `att_gt` computes average treatment effects in DID
 #'  setups where there are more than two periods of data and allowing for
 #'  treatment to occur at different points in time and allowing for
