@@ -71,7 +71,7 @@ for (simu_i in 1:nsims){
                     cband=TRUE)
       
       agg.es.chained <- aggte(MP = chained.results, type = 'dynamic')
-      # agg.es.chained # erreur ici, la fonction de callaway ne retourne pas les bons ICS.
+
 
       betas = tail(agg.es.chained$att.egt, 6)
       beta_hat_chaine[simu_i,1:length(betas)] = betas

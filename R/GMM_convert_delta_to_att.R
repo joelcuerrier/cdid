@@ -26,8 +26,8 @@ glist <- dp$glist
 weightsname <- dp$weightsname
 xformla <- dp$xformla
 chained <- dp$chained #TRUE for chained, FALSE for GMM.
-print(chained)
-print("@@@@@@@@@@@@@@@@@")
+
+
 result <- dp$delta.att.influ #delta att and influence matrix from compute_delta_att.
 tlen <- length(tlist) #how many dates
 glen <- length(glist) #how many treatment cohorts

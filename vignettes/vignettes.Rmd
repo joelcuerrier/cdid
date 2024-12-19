@@ -128,6 +128,7 @@ agg.es.did
 
 ```{r}
 # 1. GMM DiD
+source("R/GMM_convert_delta_to_att.R")
 gmm.results = GMM(
                     data=data0,      
                     yname="Y",

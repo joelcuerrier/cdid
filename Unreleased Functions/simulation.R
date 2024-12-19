@@ -30,11 +30,6 @@ library(cdid)
 # ===============================
 #  Chained
 # ===============================
-# Nouveauté dans la simulation et notes importantes:
-# Les influ obtenu avec WildBoostrap sont utilisés pour calculer les ICs. Pour cette raison
-# j'utilise la fonction chained_estimPeriod_Boot, pour accéder aux résultats att et influence 
-# aggrégés. La fonction chained n'utilise pas les aggrégations. Les codes de la vignettes eux, 
-# utilisent les fonctions d'agrégat de Callaway qui utilise un simple Bootstrap. Il y a possibilité d'intégrer le wild boostrap dans cette fonction.
 
 nsims=10
 
