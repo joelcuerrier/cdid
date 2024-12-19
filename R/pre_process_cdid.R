@@ -10,6 +10,7 @@
 #'
 #' @return a [`DIDparams`] object
 #'
+#' @references Callaway, Brantly and Pedro H.C. Sant'Anna.  \"Difference-in-Differences with Multiple Time Periods.\" Journal of Econometrics, Vol. 225, No. 2, pp. 200-230, 2021. \doi{10.1016/j.jeconom.2020.12.001}, <https://arxiv.org/abs/1803.09015>
 #' @export
 pre_process_cdid <- function(yname,
                             tname,

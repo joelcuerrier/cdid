@@ -1,5 +1,8 @@
 
-
+source("R/fonction_simu_attrition_params.R")
+library(BMisc)
+library(dplyr)
+library(Matrix)
 #########################################
 # Code pour la Simulation
 nsims=1
@@ -11,7 +14,7 @@ set.seed(123)
 for (simu_i in 1:nsims){
     print(simu_i)
     
-    data=fonction_simu_attrition(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.6)
+    data=fonction_simu_attrition_params(theta2_alpha_Gg=0.2, lambda1_alpha_St=0.2, sigma_alpha=2, sigma_epsilon=0.5, alpha_percentile=0.6)
     
     # Filter indivs never observed across all years
     data0 <- data[data$P_Y1_longDID==1,]
@@ -44,25 +47,26 @@ for (simu_i in 1:nsims){
     # Add a new variable S
     data0 <- data0 %>%
       group_by(id) %>%                                # Group data by id
-      mutate(S = ifelse(date == min(date), 1, 0)) %>% # S == 1 for lowest year, 0 otherwise
+      # mutate(S = ifelse(date == min(date), 1, 0)) %>% # S == 1 for lowest year, 0 otherwise
+      mutate(S = ifelse(date == min(date), 1, 1)) %>% # S == 1 for lowest year, 0 otherwise
       ungroup()   
     
-    chained.results = chained(
+    chained.results = GMM(
                     yname="Y",
                     tname="date",
                     idname="id",
                     gname="date_G",
                     xformla=~X, 
-                    propensityformla=c("X"), 
+                    # propensityformla=c("X"), 
                     data=data0,      
                     weightsname="S",  
                     bstrap=FALSE, 
                     biters=1000,
-                    debT=3,
-                    finT=8,
-                    deb=1,
-                    fin=8,
-                    select='select',
+                    # debT=3,
+                    # finT=8,
+                    # deb=1,
+                    # fin=8,
+                    # select='select',
                     treated='treated',
                     cband=TRUE)
       

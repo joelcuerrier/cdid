@@ -80,8 +80,35 @@ group. Second, we sample from this population using the specified process.
 # Load the cdid package
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
 library(cdid)
+
+# Package Overview and Available Functions
+ls("package:cdid")
+
 ?cdid
 ?cdid::chained
+?cdid::compute_delta_att
+?cdid::compute.aggte
+?cdid::convert_delta_to_att
+?cdid::convert_result 
+?cdid::DIDparams
+?cdid::fonction_simu_attrition
+?cdid::get_agg_inf_func
+?cdid::getSE
+?cdid::GMM
+?cdid::gmm_compute_delta_att
+?cdid::gmm_convert_delta_to_att
+?cdid::gmm_convert_result 
+?cdid::MP
+?cdid::pre_process_cdid
+?cdid::print.MP
+?cdid::process_attgt
+?cdid::process_attgt_gmm
+?cdid::summary.MP
+
+
+
+
+
 ?cdid::GMM
 
 # Importing the data

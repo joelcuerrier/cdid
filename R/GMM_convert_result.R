@@ -1,4 +1,10 @@
-
+#' @title convert_result
+#'
+#' @description Result must be converted to be used in the aggte function.  . 
+#'
+#' @return a [`DIDparams`] object
+#'
+#' @export
     
     gmm_convert_result <- function(dp){
 
