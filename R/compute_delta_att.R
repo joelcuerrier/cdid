@@ -8,7 +8,7 @@
 #'
 #' @return a [`DIDparams`] object
 #'
-#' @export
+
 
 
 compute_delta_att <-function(dp) {

@@ -4,7 +4,7 @@
 \alias{summary.MP}
 \title{summary.MP}
 \usage{
-\method{summary}{MP}(object, ...)
+summary.MP(object, ...)
 }
 \arguments{
 \item{object}{an \code{MP} object}

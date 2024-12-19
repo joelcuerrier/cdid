@@ -11,6 +11,7 @@ GMM(
   gname,
   xformla = NULL,
   data,
+  chained = FALSE,
   panel = TRUE,
   allow_unbalanced_panel = TRUE,
   control_group = c("nevertreated"),

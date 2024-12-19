@@ -122,7 +122,7 @@
 #'
 #' @return an [`MP`] object containing all the results for group-time average
 #'  treatment effects
-#' @export
+
 
 chained <- function(yname,
                     tname,

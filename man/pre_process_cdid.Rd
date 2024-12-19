@@ -38,3 +38,6 @@ Function to process arguments passed to the main methods in the
 \code{did} package as well as conducting some tests to make sure
 data is in proper format / try to throw helpful error messages.
 }
+\references{
+Callaway, Brantly and Pedro H.C. Sant'Anna.  \"Difference-in-Differences with Multiple Time Periods.\" Journal of Econometrics, Vol. 225, No. 2, pp. 200-230, 2021. \doi{10.1016/j.jeconom.2020.12.001}, \url{https://arxiv.org/abs/1803.09015}
+}

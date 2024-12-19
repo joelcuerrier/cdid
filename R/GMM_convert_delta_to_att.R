@@ -95,6 +95,7 @@ glen <- length(glist) #how many treatment cohorts
   # ATT: contains all ATT(g,t)'s, sorted as desired
   # agreg_influence: influence matrix is dim (nbindiv x 2 x nb of ATT(g,t)), influence values are in agreg_influence[,2,]
   dp$att.influ <-list(ATT,agreg_influence)
+  
 
   dp
 }

@@ -5,7 +5,7 @@
 #' 
 #' @return a [`DIDparams`] object
 #'
-#' @export
+
 
 convert_delta_to_att <- function(dp){
 
