@@ -131,6 +131,7 @@ GMM <- function(    yname,
                     xformla=NULL,
                     # propensityformla,
                     data,
+                    chained = FALSE, #True to use chained.
                     panel=TRUE, 
                     allow_unbalanced_panel=TRUE, 
                     control_group=c("nevertreated"), 
@@ -179,7 +180,9 @@ GMM <- function(    yname,
                      call=match.call(),
                      treated="treated")
   
-
+  #We add the argument chained to the dp object. It is used in the function gmm_compute_delta_att to know if we use chained or GMM estimator.
+  dp$chained=chained
+  
   #gmm.R calls GMM_estimPeriod_Boot dans fonctions_estimation_Boot.R
   ########################################
   ## Part 2. Prelim checks (previously done with mp.spatt.GMM)

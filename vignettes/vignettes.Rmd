@@ -127,6 +127,7 @@ agg.es.did
 ```
 
 ```{r}
+source("R/GMM.R")
 
 # 1. GMM DiD
 gmm.results = GMM(

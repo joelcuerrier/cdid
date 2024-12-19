@@ -25,6 +25,7 @@ tlist <- dp$tlist
 glist <- dp$glist
 weightsname <- dp$weightsname
 xformla <- dp$xformla
+chained <- dp$chained #TRUE for chained, FALSE for GMM.
 
 result <- dp$delta.att.influ #delta att and influence matrix from compute_delta_att.
 tlen <- length(tlist) #how many dates
@@ -59,8 +60,15 @@ glen <- length(glist) #how many treatment cohorts
   ATT <- matrix(NA,ncol(mat_W),length(yname))
   colnames(ATT) <- yname
   rownames(ATT) <- colnames(mat_W)
-  ATT[,1] <- MASS::ginv(t(mat_W)%*%MASS::ginv(omega_deltaATT[1,,])%*%mat_W)%*%t(mat_W)%*%MASS::ginv(omega_deltaATT[1,,])%*%delta_ATT[,1]
   
+
+  if (chained==FALSE){
+  ATT[,1] <- MASS::ginv(t(mat_W)%*%MASS::ginv(omega_deltaATT[1,,])%*%mat_W)%*%t(mat_W)%*%MASS::ginv(omega_deltaATT[1,,])%*%delta_ATT[,1]
+  }else{
+  ATT[,1] <- MASS::ginv(t(mat_W)%*%diag(dim(omega_deltaATT[1,,])[1])%*%mat_W)%*%t(mat_W)%*%diag(dim(omega_deltaATT[1,,])[1])%*%delta_ATT[,1] #chained
+  }
+
+
   # Improve formatting
   ATT<-as.data.frame(ATT)
   ncol_ATT<-ncol(ATT)
@@ -76,8 +84,13 @@ glen <- length(glist) #how many treatment cohorts
   
   # Influence function of ATT : PHI
   agreg_influence=array(0,dim=c(dim(result[[2]])[1],length(yname),dim(ATT)[1])) 
-  agreg_influence[,1,] <- t(MASS::ginv(t(mat_W)%*%MASS::ginv(omega_deltaATT[1,,])%*%mat_W)%*%t(mat_W)%*%MASS::ginv(omega_deltaATT[1,,])%*%t(result[[2]][,2,]))
   
+  if (chained==FALSE){
+  agreg_influence[,1,] <- t(MASS::ginv(t(mat_W)%*%MASS::ginv(omega_deltaATT[1,,])%*%mat_W)%*%t(mat_W)%*%MASS::ginv(omega_deltaATT[1,,])%*%t(result[[2]][,2,]))
+  }else{
+  agreg_influence[,1,] <- t(MASS::ginv(t(mat_W)%*%diag(dim(omega_deltaATT[1,,])[1])%*%mat_W)%*%t(mat_W)%*%diag(dim(omega_deltaATT[1,,])[1])%*%t(result[[2]][,2,])) #chained
+  }
+
   # We add the result to dp.
   # ATT: contains all ATT(g,t)'s, sorted as desired
   # agreg_influence: influence matrix is dim (nbindiv x 2 x nb of ATT(g,t)), influence values are in agreg_influence[,2,]
