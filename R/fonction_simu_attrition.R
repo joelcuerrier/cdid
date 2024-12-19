@@ -18,7 +18,7 @@
 #' lambda1_alpha_St = 0.5, sigma_alpha = 2, sigma_epsilon = 0.5, tprob)
 #' @export
 
-fonction_simu_unbalanced <- function(N,T,theta2_alpha_Gg, lambda1_alpha_St, sigma_alpha, sigma_epsilon, tprob){
+fonction_simu_attrition <- function(N,T,theta2_alpha_Gg, lambda1_alpha_St, sigma_alpha, sigma_epsilon, tprob){
 
 # Settings
 T = T+1           # periods 
