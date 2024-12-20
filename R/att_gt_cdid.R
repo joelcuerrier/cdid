@@ -124,7 +124,7 @@
 #'  treatment effects
 #' @export
 
-GMM <- function(    yname,
+att_gt_cdid <- function(yname,
                     tname,
                     idname=NULL,
                     gname,
@@ -134,7 +134,7 @@ GMM <- function(    yname,
                     chained = FALSE, #True to use chained.
                     panel=TRUE, 
                     allow_unbalanced_panel=TRUE, 
-                    control_group=c("nevertreated"), 
+                    control_group=c("nevertreated","notyettreated"), 
                     anticipation=0, 
                     weightsname,
                     weight_assumption=NULL,
@@ -143,42 +143,35 @@ GMM <- function(    yname,
                     cband=TRUE, 
                     biters=1000,
                     clustervars=NULL, 
-                    est_method="chained", 
+                    est_method=c("2-step","Identity"), 
                     base_period="varying",
                     print_details=FALSE, 
                     pl=FALSE, 
-                    cores=1, 
-                    # debT,
-                    # finT,
-                    # deb,
-                    # fin,
-                    # select,
-                    treated){
+                    cores=1){
 
   #Part1. Pre-process step can be useful to carry over the parameters of the functions
-  dp=pre_process_cdid(yname="Y",
-                     tname="date",
-                     idname="id",
-                     gname="date_G",
-                     xformla=~X,
-                     data=data,
-                     panel=TRUE,
-                     allow_unbalanced_panel=TRUE,
-                     control_group=c("notyettreated"), #either "nevertreated" or "notyettreated"
-                     anticipation=0,
-                     weightsname="S",
-                     alp=0.05,
-                     bstrap=TRUE,
-                     biters=1000,
-                     clustervars=NULL,
-                     cband=TRUE,
-                     est_method="chained",
-                     base_period="varying",
-                     print_details=FALSE,
-                     pl=FALSE,
-                     cores=1,
-                     call=match.call(),
-                     treated="treated")
+  dp=pre_process_cdid(yname,
+                      tname,
+                      idname,
+                      gname,
+                      xformla,
+                      data,
+                      panel=TRUE,
+                      allow_unbalanced_panel=TRUE,
+                      control_group,
+                      anticipation=0,
+                      weightsname,
+                      alp=0.05,
+                      bstrap=TRUE,
+                      biters=1000,
+                      clustervars=NULL,
+                      cband=TRUE,
+                      est_method=c("2-step","Identity"), 
+                      base_period="varying",
+                      print_details=FALSE,
+                      pl=FALSE,
+                      cores=1,
+                      call=match.call())
   
   #We add the argument chained to the dp object. It is used in the function gmm_compute_delta_att to know if we use chained or GMM estimator.
   dp$chained=chained
@@ -193,10 +186,11 @@ GMM <- function(    yname,
   # Part 3. Post-estimation aggregation step. Converts delta ATT into aggregated ATT. 
   result = gmm_convert_delta_to_att(result) 
   
-    
-
-  # # Part 4. Result must be converted to be used in the aggte function.  
-  result = gmm_convert_result(result)
+  # # Part 4. Result must be converted to be used in the aggte function.
+  if   est_method == "2-step" {
+  result = gmm_convert_result(result,1)}
+  else { #if not 2-step, then identity
+  result = gmm_convert_result(result,2)}
   
   return(result)
 }

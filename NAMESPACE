@@ -2,7 +2,7 @@
 
 S3method(compute,aggte)
 export(DIDparams)
-export(GMM)
+export(att_gt_cdid)
 export(MP)
 export(convert_result)
 export(fonction_simu_attrition)
