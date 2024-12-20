@@ -28,7 +28,6 @@ gmm_compute_delta_att <-function(dp) {
   weightsname <- dp$weightsname
   xformla <- dp$xformla
   control_group <- dp$control_group
-  chained <- dp$chained 
 
 
   #gmm.R calls GMM_estimPeriod_Boot dans fonctions_estimation_Boot.R
@@ -47,7 +46,7 @@ gmm_compute_delta_att <-function(dp) {
   
   #Condition on sample size
   gsize <- aggregate(data[, gname], by = list(data[,gname]), function(x) length(x)/length(tlist))
-  gsize <- subset(gsize, x < (length(rhs.vars(xformla)) + 5)) #check groups not satisfying condition
+  gsize <- subset(gsize, x < (length(BMisc::rhs.vars(xformla)) + 5)) #check groups not satisfying condition
   if (nrow(gsize) > 0) {
     gpaste <- paste(gsize[, 1], collapse = ",")
     warning(paste0("Some groups are probably too small: \n", gpaste))
@@ -172,7 +171,7 @@ gmm_compute_delta_att <-function(dp) {
         # 2.2.2 Prep data for estimation !! Dec 14: it comes from this part.
         # Make balanced panel for (tlist[t],tlist[t+k]). https://bcallaway11.github.io/BMisc/reference/makeBalancedPanel.html
         disdat <- data[(data[, tname] == tlist[t + k] | data[, tname] == tlist[t]), ]
-        disdat <- makeBalancedPanel(disdat, idname, tname) #This function drops observations from data.frame that are not part of balanced panel data set.
+        disdat <- BMisc::makeBalancedPanel(disdat, idname, tname) #This function drops observations from data.frame that are not part of balanced panel data set.
         
         if (dim(disdat)[1]>=1) { #if at least one indiv observed twice
           if (control_group == "nevertreated") {
@@ -335,7 +334,6 @@ gmm_compute_delta_att <-function(dp) {
   result <- list(fatt,mat_influence,indiv,mat_W)  
   # We add the result to dp.
 dp$delta.att.influ <- result
-dp$chained <-chained
 dp
 }
 #   colnames(mat_W[1,colSums(abs(mat_W),na.rm=TRUE)>0])

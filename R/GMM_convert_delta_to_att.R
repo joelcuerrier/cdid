@@ -25,7 +25,6 @@ tlist <- dp$tlist
 glist <- dp$glist
 weightsname <- dp$weightsname
 xformla <- dp$xformla
-chained <- dp$chained #TRUE for chained, FALSE for GMM.
 
 
 result <- dp$delta.att.influ #delta att and influence matrix from compute_delta_att.
@@ -58,16 +57,15 @@ glen <- length(glist) #how many treatment cohorts
   
   # Optimal estimator of ATTgt
   delta_ATT <- as.matrix(result[[1]][,yname])
-  ATT <- matrix(NA,ncol(mat_W),length(yname))
-  colnames(ATT) <- yname
+  ATT <- matrix(NA,ncol(mat_W),2)
+  colnames(ATT) <- c("2-step","Identity")
   rownames(ATT) <- colnames(mat_W)
   
 
-  if (chained==FALSE){
+  #2-step
   ATT[,1] <- MASS::ginv(t(mat_W)%*%MASS::ginv(omega_deltaATT[1,,])%*%mat_W)%*%t(mat_W)%*%MASS::ginv(omega_deltaATT[1,,])%*%delta_ATT[,1]
-  }else{
-  ATT[,1] <- MASS::ginv(t(mat_W)%*%diag(dim(omega_deltaATT[1,,])[1])%*%mat_W)%*%t(mat_W)%*%diag(dim(omega_deltaATT[1,,])[1])%*%delta_ATT[,1] #chained
-  }
+  #Identity
+  ATT[,2] <- MASS::ginv(t(mat_W)%*%mat_W)%*%t(mat_W)%*%delta_ATT[,1] 
 
 
   # Improve formatting
@@ -84,13 +82,12 @@ glen <- length(glist) #how many treatment cohorts
   colnames(ATT)[ncol_ATT+2]<-tname
   
   # Influence function of ATT : PHI
-  agreg_influence=array(0,dim=c(dim(result[[2]])[1],length(yname),dim(ATT)[1])) 
+  agreg_influence=array(0,dim=c(dim(result[[2]])[1],2,dim(ATT)[1])) 
   
-  if (chained==FALSE){
+  #2-step
   agreg_influence[,1,] <- t(MASS::ginv(t(mat_W)%*%MASS::ginv(omega_deltaATT[1,,])%*%mat_W)%*%t(mat_W)%*%MASS::ginv(omega_deltaATT[1,,])%*%t(result[[2]][,2,]))
-  }else{
-  agreg_influence[,1,] <- t(MASS::ginv(t(mat_W)%*%diag(dim(omega_deltaATT[1,,])[1])%*%mat_W)%*%t(mat_W)%*%diag(dim(omega_deltaATT[1,,])[1])%*%t(result[[2]][,2,])) #chained
-  }
+  #Identity
+  agreg_influence[,2,] <- t(MASS::ginv(t(mat_W)%*%mat_W)%*%t(mat_W)%*%t(result[[2]][,2,])) 
 
   # We add the result to dp.
   # ATT: contains all ATT(g,t)'s, sorted as desired

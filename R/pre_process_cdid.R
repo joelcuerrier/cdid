@@ -34,8 +34,7 @@ pre_process_cdid <- function(yname,
                             print_details = FALSE,
                             pl = FALSE,
                             cores = 1,
-                            call = NULL,
-                            treated) {
+                            call = NULL) {
   #-----------------------------------------------------------------------------
   # Data pre-processing and error checking
   #-----------------------------------------------------------------------------
@@ -44,7 +43,7 @@ pre_process_cdid <- function(yname,
   #First the column nevertreated is created in the data set
   
   control_group <- control_group[1]
-  data$control_group <- ifelse(data[[treated]] == 1, 0, 1)
+  data$control_group <- ifelse(data[[gname]] > 0, 0, 1)
   if(!(control_group %in% c("nevertreated","notyettreated"))){
     stop("control_group must be either 'nevertreated' or 'notyettreated'")
   }

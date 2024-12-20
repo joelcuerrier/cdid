@@ -5,11 +5,8 @@ date:  "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to cDiD with Multiple Time Periods}
-  %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  markdown: 
-    wrap: 72
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
@@ -21,133 +18,63 @@ knitr::opts_chunk$set(
 install.packages("pandoc")
 library(pandoc)
 ```
-
 <!-- rmarkdown::pandoc_version() -->
 
+
 # Attribution of Vignettes to Original Author
+The vignettes included in this library are based on those authored by [Brantly Callaway and Pedro H.C. Sant'Anna] for the 'did' package. We have adapted the content for use in this library to provide users with accessible and informative documentation. The original vignettes authored by [Brantly Callaway and Pedro H.C. Sant'Anna] can be found in the 'did' package documentation [https://bcallaway11.github.io/did/articles/did-basics.html].
 
-The vignettes included in this library are based on those authored by
-[Brantly Callaway and Pedro H.C. Sant'Anna] for the 'did' package. We
-have adapted the content for use in this library to provide users with
-accessible and informative documentation. The original vignettes
-authored by [Brantly Callaway and Pedro H.C. Sant'Anna] can be found in
-the 'did' package documentation
-[<https://bcallaway11.github.io/did/articles/did-basics.html>].
+# Introduction 
+****
+* This vignette provides an introductory overview of utilizing Chained-Difference-in-Differences (cDiD) designs to identify and estimate the average impact of engaging in a treatment, with a specific emphasis on leveraging functionalities from the cdid package. 
 
-# Introduction
+* The cdid package allows for multiple periods, variation in treatment timing, treatment effect heterogeneity, general missing data patterns, and sample selection on observables.
 
-------------------------------------------------------------------------
+* The chained DiD rests on a parallel trends assumption, conditioned on being sampled. 
 
--   This vignette provides an introductory overview of utilizing
-    Chained-Difference-in-Differences (cDiD) designs to identify and
-    estimate the average impact of engaging in a treatment, with a
-    specific emphasis on leveraging functionalities from the cdid
-    package.
+* The chained DiD is robust to some forms of attrition caused by unobservable heterogeneity.
 
--   The cdid package allows for multiple periods, variation in treatment
-    timing, treatment effect heterogeneity, general missing data
-    patterns, and sample selection on observables.
+* We identify three main advantages of our approach: (1) it does not require having a balanced panel subsample as it is the case with a standard DiD; (2) identifying assumption allows for sample selection on time-persistent unobservable (or latent) factors, unlike the cross-section DiD which treats the sample as repeated cross-sectional data; and (3) it may also deliver efficiency gains compared to existing methods, notably when the outcome variable is highly time-persistent.
 
--   The chained DiD rests on a parallel trends assumption, conditioned
-    on being sampled.
-
--   The chained DiD is robust to some forms of attrition caused by
-    unobservable heterogeneity.
-
--   We identify three main advantages of our approach: (1) it does not
-    require having a balanced panel subsample as it is the case with a
-    standard DiD; (2) identifying assumption allows for sample selection
-    on time-persistent unobservable (or latent) factors, unlike the
-    cross-section DiD which treats the sample as repeated
-    cross-sectional data; and (3) it may also deliver efficiency gains
-    compared to existing methods, notably when the outcome variable is
-    highly time-persistent.
-
--   The cdid package is designed to provide group-time average treatment
-    effects. Future updates to the package will expand its capabilities
-    to include event-study type estimates, which encompass treatment
-    effect parameters corresponding to various durations of exposure to
-    the treatment, as well as overall treatment effect estimates.
+* The cdid package is designed to provide group-time average treatment effects. Future updates to the package will expand its capabilities to include event-study type estimates, which encompass treatment effect parameters corresponding to various durations of exposure to the treatment, as well as overall treatment effect estimates.
 
 # Examples with numerical simulations
-
-------------------------------------------------------------------------
-
-We propose a simulation design adapted from the first section. Let us
-specify the potential outcome as a components of variance:
+****
+We propose a simulation design adapted from the first section. Let us specify the
+potential outcome as a components of variance:
 
 $$
 Y_{it}(D_i) = \alpha_i + \delta_t + \sum_{\tau=2}^{t} \beta_{\tau} D_{i\tau} + \varepsilon_{it}
 $$
 
-Where $D_{i\tau} ∈ {0, 1}$ denotes whether individual i has been treated
-in $\tau$ or earlier. Let us assume that $\tau ∈ {0, ..., T + 1}$ and
-treatments can only occur in t ≥ 2 so that G ∈ {2, ..., T + 1}. The data
-generating process is characterized by the following assumptions:
+Where $D_{i\tau} ∈ {0, 1}$ denotes whether individual i has been treated in $\tau$ or earlier. Let us assume that $\tau ∈ {0, ..., T + 1}$ and treatments can only occur in t ≥ 2 so that G ∈ {2, ..., T + 1}. The data generating process is characterized by the following assumptions:
 
--   The individual-specific unobservable heterogeneity is iid gaussian:
-    $\alpha_i ∼ N(1, \alpha^2_{\alpha})$, where $\alpha^2 = 2;$
--   The time-specific unobservable heterogeneity is iid gaussian:
-    $\delta_t ∼ N(1, 1)$;
--   The treatment effect is constant over time: $\beta_{\tau} = 1$;
--   The error term is iid gaussian:
-    $\varepsilon_{it} ∼ N(0, \alpha^2_{\varepsilon})$;
--   The probability to receive the treatment at time g, conditional on
-    being treated at g or in the control group, is defined as:
-    $$Pr(G_{ig} = 1|X_i, \alpha_i, G_{ig} + C_i = 1) = \frac{1}{1 + \exp(\theta_0 + \theta_1 X_i + \theta_2 \alpha_i \times g)}$$.
-    Where $X_i ∼ N(1, 1)$ is observable for every i, unlike $\alpha_i$,
-    and $\theta_0 = −1, \theta_1 = 0.4$ and $\theta_2 = 0$ or
-    $\theta_2 = 0.2$. In the latter case, the treatment probability
-    varies with treatment timing and the unobserved individual
-    heterogeneity;
--   The sampling probability in the consecutive periods t, t + 1
-    conditional on $\alpha_i$ is given by:
-    $$Pr((S_{it} + 1 = 1|\alpha_i)) = \frac{1}{1 + \exp(\lambda_0 + \lambda_1 \alpha_i \times t)}$$
-    With $\lambda_0 = −1$, and $\lambda_1 = 0$ or $\lambda_1 = 0.2$, so
-    that the sampling process can also vary with time and the unobserved
-    individual heterogeneity.
+* The individual-specific unobservable heterogeneity is iid gaussian: $\alpha_i ∼ N(1, \alpha^2_{\alpha})$, where $\alpha^2 = 2;$
+* The time-specific unobservable heterogeneity is iid gaussian: $\delta_t ∼ N(1, 1)$;
+* The treatment effect is constant over time: $\beta_{\tau} = 1$;
+* The error term is iid gaussian: $\varepsilon_{it} ∼ N(0, \alpha^2_{\varepsilon})$;
+* The probability to receive the treatment at time g, conditional on being treated at g or in the control group, is defined as: 
+$$Pr(G_{ig} = 1|X_i, \alpha_i, G_{ig} + C_i = 1) = \frac{1}{1 + \exp(\theta_0 + \theta_1 X_i + \theta_2 \alpha_i \times g)}$$.
+Where $X_i ∼ N(1, 1)$ is observable for every i, unlike $\alpha_i$, and $\theta_0 = −1, \theta_1 = 0.4$ and $\theta_2 = 0$ or $\theta_2 = 0.2$. In the latter case, the treatment probability varies with treatment timing and the unobserved individual heterogeneity;
+* The sampling probability in the consecutive periods t, t + 1 conditional on $\alpha_i$ is given by:
+$$Pr((S_{it} + 1 = 1|\alpha_i)) = \frac{1}{1 + \exp(\lambda_0 + \lambda_1 \alpha_i \times t)}$$
+With $\lambda_0 = −1$, and $\lambda_1 = 0$ or $\lambda_1 = 0.2$, so that the sampling process can also vary with time and the unobserved individual heterogeneity.
 
-We simulate the sampled data in two steps. First, we generate a
-population sample for each period t to represent individuals that are
-either treated at t or in the control group. Second, we sample from this
-population using the specified process.
+We simulate the sampled data in two steps. First, we generate a population sample
+for each period t to represent individuals that are either treated at t or in the control
+group. Second, we sample from this population using the specified process. 
 
-1.  Generate a population of individuals
+1. Generate a population of individuals
+(a) Draw $N = 2 x max $\frac{n}{E_{\alpha}[Pr(S_{itt+1})]}$ individuals per period in order to have $T + 2$ population samples of N individuals, where each individual is characterized by a vector $(\alpha_i, \delta_t, X_i, \epsilon_{it})$.
+(b) Separately for each population sample g, draw a uniform random number $(\xi_i \in [0, 1])$ per individual. If $\xi_i \leq Pr(G_{it} = 1|X_i, \alpha_i, G_{it} + C_i = 1)$, then set $(G_{ig} = 1, C_i = 0)$, otherwise set $(G_{ig} = 0, C_i = 1)$.
+(c) Compute $Y_{it}$ from $(\alpha_{i}, \delta_{t}, X_{i}, ε_{it}, G_{i0}, ..., _{iT+1}, C_{i})$;
 
-```{=html}
-<!-- -->
-```
-(a) Draw \$N = 2 x max $\frac{n}{E_{\alpha}[Pr(S_{itt+1})]}$ individuals
-    per period in order to have $T + 2$ population samples of N
-    individuals, where each individual is characterized by a vector
-    $(\alpha_i, \delta_t, X_i, \epsilon_{it})$.
-(b) Separately for each population sample g, draw a uniform random
-    number $(\xi_i \in [0, 1])$ per individual. If
-    $\xi_i \leq Pr(G_{it} = 1|X_i, \alpha_i, G_{it} + C_i = 1)$, then
-    set $(G_{ig} = 1, C_i = 0)$, otherwise set $(G_{ig} = 0, C_i = 1)$.
-(c) Compute $Y_{it}$ from
-    $(\alpha_{i}, \delta_{t}, X_{i}, ε_{it}, G_{i0}, ..., _{iT+1}, C_{i})$;
+2. Sample from this population
+(a) Draw a uniform random number $η_{it} ∈ [0, 1]$ per individual i and period t. If $η_{it} ≤ Pr(S_{itt+1} = 1|\alpha_{i}), then set S_{itt+1} = 1$ and $S_{iττ+1} = 0$ for $τ /neq t$;
 
-```{=html}
-<!-- -->
-```
-2.  Sample from this population
-
-```{=html}
-<!-- -->
-```
-(a) Draw a uniform random number $η_{it} ∈ [0, 1]$ per individual i and
-    period t. If
-    $η_{it} ≤ Pr(S_{itt+1} = 1|\alpha_{i}), then set S_{itt+1} = 1$ and
-    $S_{iττ+1} = 0$ for $τ /neq t$;
-
-(b) Draw (without replacement) n individuals per period t from the
-    population for which $S_{itt+1} = 1$;
-
+(b) Draw (without replacement) n individuals per period t from the population for which $S_{itt+1} = 1$;
 (c) Compute the different estimators.
-
-(d) Repeat steps 1(b)-2(c) 1,000 times and report the mean and standard
-    deviation of the estimators.
+(d) Repeat steps 1(b)-2(c) 1,000 times and report the mean and standard deviation of the estimators.
 
 ```{r}
 # Load the cdid package
@@ -279,7 +206,7 @@ results_non_agg <- compare.results(did.attgt, gmm.attgt, agg = FALSE)
 print(results_non_agg)
 ```
 
-```{=html}
+
 <!-- import(dplyr)
 import(BMisc)
 importFrom(BMisc, rhs.vars)
@@ -292,4 +219,3 @@ import(data.table)
 import(jsonlite)
 import(tidyr)
 import(did) -->
-```
