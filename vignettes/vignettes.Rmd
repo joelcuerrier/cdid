@@ -200,12 +200,13 @@ agg.es.did
 ```
 
 ```{r}
-
 # 1. GMM DiD
+
 gmm.results = GMM(
                     data=data0,      
                     yname="Y",
                     tname="date",
+                    chained=TRUE,
                     idname="id",
                     gname="date_G",
                     control_group=c("notyettreated"), #either "nevertreated" or "notyettreated"

@@ -11,6 +11,7 @@ GMM(
   gname,
   xformla = NULL,
   data,
+  chained = FALSE,
   panel = TRUE,
   allow_unbalanced_panel = TRUE,
   control_group = c("nevertreated"),
@@ -176,5 +177,5 @@ and (4) general missing data patterns
 Bellego, Benatia,Dortet-Bernardet (2022) for a detailed description.
 }
 \references{
-Callaway, Brantly and Pedro H.C. Sant'Anna.  \"Difference-in-Differences with Multiple Time Periods.\" Journal of Econometrics, Vol. 225, No. 2, pp. 200-230, 2021. \doi{10.1016/j.jeconom.2020.12.001}, \url{https://arxiv.org/abs/1803.09015}
+Bellego, Benatia,Dortet-Bernardet (2022)  \"The Chained Difference-in-Differences\" , \url{https://www.davidbenatia.com/publication/chaineddid/}
 }

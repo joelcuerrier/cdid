@@ -118,7 +118,7 @@
 #'  the user allows for anticipation) to be equal to 0, but one
 #'  extra estimate in an earlier period.
 #'
-#' @references Callaway, Brantly and Pedro H.C. Sant'Anna.  \"Difference-in-Differences with Multiple Time Periods.\" Journal of Econometrics, Vol. 225, No. 2, pp. 200-230, 2021. \doi{10.1016/j.jeconom.2020.12.001}, <https://arxiv.org/abs/1803.09015>
+#' @references Bellego, Benatia,Dortet-Bernardet (2022)  \"The Chained Difference-in-Differences\" , \url{https://www.davidbenatia.com/publication/chaineddid/}
 #'
 #' @return an [`MP`] object containing all the results for group-time average
 #'  treatment effects
@@ -131,6 +131,7 @@ GMM <- function(    yname,
                     xformla=NULL,
                     # propensityformla,
                     data,
+                    chained = FALSE, #True to use chained.
                     panel=TRUE, 
                     allow_unbalanced_panel=TRUE, 
                     control_group=c("nevertreated"), 
@@ -179,7 +180,9 @@ GMM <- function(    yname,
                      call=match.call(),
                      treated="treated")
   
-
+  #We add the argument chained to the dp object. It is used in the function gmm_compute_delta_att to know if we use chained or GMM estimator.
+  dp$chained=chained
+  
   #gmm.R calls GMM_estimPeriod_Boot dans fonctions_estimation_Boot.R
   ########################################
   ## Part 2. Prelim checks (previously done with mp.spatt.GMM)
