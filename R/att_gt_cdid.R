@@ -134,7 +134,7 @@ att_gt_cdid <- function(yname,
                     chained = FALSE, #True to use chained.
                     panel=TRUE, 
                     allow_unbalanced_panel=TRUE, 
-                    control_group=c("nevertreated","notyettreated"), 
+                    control_group, 
                     anticipation=0, 
                     weightsname,
                     weight_assumption=NULL,
@@ -143,7 +143,7 @@ att_gt_cdid <- function(yname,
                     cband=TRUE, 
                     biters=1000,
                     clustervars=NULL, 
-                    est_method=c("2-step","Identity"), 
+                    est_method, 
                     base_period="varying",
                     print_details=FALSE, 
                     pl=FALSE, 
@@ -166,15 +166,12 @@ att_gt_cdid <- function(yname,
                       biters=1000,
                       clustervars=NULL,
                       cband=TRUE,
-                      est_method=c("2-step","Identity"), 
+                      est_method, 
                       base_period="varying",
                       print_details=FALSE,
                       pl=FALSE,
                       cores=1,
                       call=match.call())
-  
-  #We add the argument chained to the dp object. It is used in the function gmm_compute_delta_att to know if we use chained or GMM estimator.
-  dp$chained=chained
   
   #gmm.R calls GMM_estimPeriod_Boot dans fonctions_estimation_Boot.R
   ########################################
@@ -185,13 +182,13 @@ att_gt_cdid <- function(yname,
 
   # Part 3. Post-estimation aggregation step. Converts delta ATT into aggregated ATT. 
   result = gmm_convert_delta_to_att(result) 
-  
+
   # # Part 4. Result must be converted to be used in the aggte function.
-  if   est_method == "2-step" {
+  if   (est_method == "2-step") {
   result = gmm_convert_result(result,1)}
-  else { #if not 2-step, then identity
+  if (est_method == "Identity")  { #if not 2-step, then identity
   result = gmm_convert_result(result,2)}
-  
+
   return(result)
 }
 
