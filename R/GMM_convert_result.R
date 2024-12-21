@@ -8,7 +8,6 @@
     
     gmm_convert_result <- function(dp,type){
 
-
       data <- dp$data
       yname = dp$yname
       tname = dp$tname
@@ -31,7 +30,8 @@
       cores <- dp$cores
       
       ##
-      results <- result$att.influ
+      results <- dp$att.influ
+     
       attgt_list=results[[1]]
       attgt_list=as.data.frame(attgt_list)
       
@@ -47,7 +47,7 @@
       inffunc=as.matrix(inffunc)
       
       attgt.results=process_attgt_gmm(attgt.list)
-      print(attgt.results)
+      #print(attgt.results)
       group=attgt.results$group
       att=attgt.results$att
       tt=attgt.results$tt
@@ -95,15 +95,15 @@
       #-----------------------------------------------------------------------------
       
       # select which periods are pre-treatment
-      pre <- which(group > tt)
       
-      #En utilisant process_attgt_gmm il y a 168 ATT. Il y a 42 groupes et 4 périodes. J'ajoute une patch pour retirer les valeurs supérieures à 42.
-      pre <- pre[pre<= length(unique(group))*length(unique(tt))]
+      pre <- which(group > tt)
       
       # Drop group-periods that have variance equal to zero (singularity problems)
       if(length(zero_na_sd_entry)>0){
         pre <- pre[!(pre %in% zero_na_sd_entry)]
       }
+      
+      
       # pseudo-atts in pre-treatment periods
       preatt <- as.matrix(att[pre])
       

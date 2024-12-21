@@ -177,17 +177,18 @@ att_gt_cdid <- function(yname,
   ########################################
   ## Part 2. Prelim checks (previously done with mp.spatt.GMM)
   ## And Compute Delta ATT (previously done with compute.mp.spatt.GMM)
-  
-  result = gmm_compute_delta_att(dp)
+  result <- gmm_compute_delta_att(dp)
 
   # Part 3. Post-estimation aggregation step. Converts delta ATT into aggregated ATT. 
-  result = gmm_convert_delta_to_att(result) 
-
+  result <- gmm_convert_delta_to_att(result) 
+  
   # # Part 4. Result must be converted to be used in the aggte function.
-  if   (est_method == "2-step") {
-  result = gmm_convert_result(result,1)}
-  if (est_method == "Identity")  { #if not 2-step, then identity
-  result = gmm_convert_result(result,2)}
+  if   (dp$est_method == "2-step") {
+  if (!exists("result") || is.null(result)) stop("Error: 'result' is NULL or does not exist before gmm_convert_result for 2-step.")
+  result <- gmm_convert_result(result,1)}
+  if (!exists("result") || is.null(result)) stop("Error: 'result' is NULL or does not exist before gmm_convert_result for identity.")
+  if (dp$est_method == "Identity")  { #if not 2-step, then identity
+  result <- gmm_convert_result(result,2)}
 
   return(result)
 }
