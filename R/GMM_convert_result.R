@@ -187,7 +187,7 @@
       
       results$inffunc=sparse_matrix
       # results$inffunc=inffunc
-      results$t[results$group>results$t] <- results$t[results$group>results$t]+1
+      #results$t[results$group>results$t] <- results$t[results$group>results$t]+1
       print(results)
 
 
