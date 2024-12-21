@@ -47,7 +47,7 @@
       inffunc=as.matrix(inffunc)
       
       attgt.results=process_attgt_gmm(attgt.list)
-      
+      print(attgt.results)
       group=attgt.results$group
       att=attgt.results$att
       tt=attgt.results$tt
@@ -167,7 +167,7 @@
       
       #
       
-      unique_id <- unique(results$DIDparams$data$id)
+      unique_id <- (1:length(unique(data[,idname]))) #unique(results$DIDparams$data$id)
       unique_gt <- paste0("(",results$group,",",results$t,")")
       
       inffunc_data <- expand.grid(id = unique_id,
