@@ -4,7 +4,7 @@
 \alias{gmm_convert_result}
 \title{convert_result}
 \usage{
-gmm_convert_result(dp)
+gmm_convert_result(dp, type)
 }
 \value{
 a \code{\link{DIDparams}} object

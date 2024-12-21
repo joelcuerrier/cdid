@@ -5,7 +5,7 @@ Version: 0.1.0
 Authors@R: 
     c(
       person("Joel", "Cuerrier", email = "cuerrier.j.clg@gmail.com", role = c("cre", "aut")),
-      person("David", "Benatia", email = "david.benatia@hec.ca", role = c("aut")),
+      person("David", "Benatia", email = "david.benatia@hec.ca", role = c("cre", "aut")),
       person("Christophe", "Bellégo", email = "christophe.bellego@ensae.fr", role = "aut"),
       person("Vincent", "Dortet-Bernadet", email = "vincent.dortet-bernadet@finances.gouv.fr", role = "aut")
     )

@@ -26,8 +26,7 @@ pre_process_cdid(
   print_details = FALSE,
   pl = FALSE,
   cores = 1,
-  call = NULL,
-  treated
+  call = NULL
 )
 }
 \value{
@@ -39,5 +38,5 @@ Function to process arguments passed to the main methods in the
 data is in proper format / try to throw helpful error messages.
 }
 \references{
-Callaway, Brantly and Pedro H.C. Sant'Anna.  \"Difference-in-Differences with Multiple Time Periods.\" Journal of Econometrics, Vol. 225, No. 2, pp. 200-230, 2021. \doi{10.1016/j.jeconom.2020.12.001}, \url{https://arxiv.org/abs/1803.09015}
+Bellego, Benatia,Dortet-Bernardet (2022)  \"The Chained Difference-in-Differences\" , \url{https://www.davidbenatia.com/publication/chaineddid/}
 }

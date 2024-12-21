@@ -1,11 +1,11 @@
 
 
-#' GMM Function:
+#' att_gt_cdid Function:
 #' @description `att_gt` computes average treatment effects.
 #' Our estimator accommodates (1) multiple time
 #' periods, (2) variation in treatment timing, (3) treatment effect heterogeneity,
 #' and (4) general missing data patterns
-#' Bellego, Benatia,Dortet-Bernardet (2022) for a detailed description.
+#' Bellego, Benatia,Dortet-Bernardet (2024) for a detailed description.
 #' @param yname The name of the outcome variable
 #' @param data The name of the data.frame that contains the data
 #' @param tname The name of the column containing the time periods

@@ -4,7 +4,7 @@
 \alias{print.MP}
 \title{print.MP}
 \usage{
-print.MP(x, ...)
+\method{print}{MP}(x, ...)
 }
 \arguments{
 \item{x}{a \code{MP} object}
