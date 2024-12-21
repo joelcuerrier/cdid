@@ -64,21 +64,18 @@ We simulate the sampled data in two steps. First, we generate a population sampl
 
 1.  Generate a population of individuals
 
-```{=html}
 <!-- -->
-```
+
 (a) Draw \$N = 2 x max $\frac{n}{E_{\alpha}[Pr(S_{itt+1})]}$ individuals per period in order to have $T + 2$ population samples of N individuals, where each individual is characterized by a vector $(\alpha_i, \delta_t, X_i, \epsilon_{it})$.
 (b) Separately for each population sample g, draw a uniform random number $(\xi_i \in [0, 1])$ per individual. If $\xi_i \leq Pr(G_{it} = 1|X_i, \alpha_i, G_{it} + C_i = 1)$, then set $(G_{ig} = 1, C_i = 0)$, otherwise set $(G_{ig} = 0, C_i = 1)$.
 (c) Compute $Y_{it}$ from $(\alpha_{i}, \delta_{t}, X_{i}, ε_{it}, G_{i0}, ..., _{iT+1}, C_{i})$;
 
-```{=html}
 <!-- -->
-```
+
 2.  Sample from this population
 
-```{=html}
 <!-- -->
-```
+
 (a) Draw a uniform random number $η_{it} ∈ [0, 1]$ per individual i and period t. If $η_{it} ≤ Pr(S_{itt+1} = 1|\alpha_{i}), then set S_{itt+1} = 1$ and $S_{iττ+1} = 0$ for $τ /neq t$;
 
 (b) Draw (without replacement) n individuals per period t from the population for which $S_{itt+1} = 1$;
