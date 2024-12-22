@@ -96,7 +96,7 @@ editor_options:
 Installing the library requires using remotes at the moment because we
 haven't submitted the package on CRAN yet. The command is
 
-``` R
+``` r
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = TRUE, force = TRUE)
 ```
 
@@ -105,8 +105,11 @@ remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = TRU
 library(did) #Callaway and Sant'Anna (2021) 
 library(cdid) #Bellego, Benatia, and Dortet-Bernadet (2024)
 
+set.seed(123)
 #Generate a dataset: 500 units, 8 time periods, with unit fixed-effects (alpha)
 data0=fonction_simu_attrition(N = 500,T = 8,theta2_alpha_Gg = 0.5, lambda1_alpha_St = 0, sigma_alpha = 2, sigma_epsilon = 0.1, tprob = 0.5)
+
+# The true values of the coefficients are based on time-to-treatment. The treatment effect is zero before the treatment, 1.75 one period after, 1.5 two period after, 1.25 three period after, 1 four period after, 0.75 five period after, 0.5 six period after, etc.
 
 #We keep all observations, so we have a balanced dataset
 data0$S <- 1
@@ -180,12 +183,20 @@ aggregate parameters using the following commands
 ``` r
 # Aggregation
 agg.es.did <- aggte(MP = did.results, type = 'dynamic')
-agg.es.gmm <- aggte(MP = result_gmm, type = 'dynamic')
+agg.es.2step <- aggte(MP = result_2step, type = 'dynamic')
 agg.es.id <- aggte(MP = result_id, type = 'dynamic')
+```
 
+```{r}
 # Print results
 agg.es.did
-agg.es.gmm
+```
+
+```{r}
+agg.es.2step
+```
+
+```{r}
 agg.es.id
 ```
 
@@ -265,12 +276,20 @@ result_id = att_gt_cdid(yname="Y", tname="date",
 ```{r}
 # Aggregation
 agg.es.did <- aggte(MP = did.results, type = 'dynamic')
-agg.es.gmm <- aggte(MP = result_gmm, type = 'dynamic')
+agg.es.2step <- aggte(MP = result_2step, type = 'dynamic')
 agg.es.id <- aggte(MP = result_id, type = 'dynamic')
+```
 
+```{r}
 # Print results
 agg.es.did
-agg.es.gmm
+```
+
+```{r}
+agg.es.2step
+```
+
+```{r}
 agg.es.id
 ```
 

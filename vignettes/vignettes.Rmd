@@ -1,230 +1,304 @@
 ---
-title: "Introduction to cDiD with Multiple Time Periods"
-author: "Joel Cuerrier"
-date:  "`r Sys.Date()`"
+title: "Introduction to the Chained Diff-in-Diff (cdid)"
+author: "David Benatia"
+date:  "2024-12-25"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction to cDiD with Multiple Time Periods}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Introduction to the Chained Diff-in-Diff (cdid)}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
-```{r setup, include = FALSE}
-options(repos = c(CRAN = "https://cran.rstudio.com"))
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-install.packages("pandoc")
-library(pandoc)
-```
-
 <!-- rmarkdown::pandoc_version() -->
-
-# Attribution of Vignettes to Original Author
-
-The vignettes included in this library are based on those authored by [Brantly Callaway and Pedro H.C. Sant'Anna] for the 'did' package. We have adapted the content for use in this library to provide users with accessible and informative documentation. The original vignettes authored by [Brantly Callaway and Pedro H.C. Sant'Anna] can be found in the 'did' package documentation [<https://bcallaway11.github.io/did/articles/did-basics.html>].
 
 # Introduction
 
 ------------------------------------------------------------------------
 
--   This vignette provides an introductory overview of utilizing Chained-Difference-in-Differences (cDiD) designs to identify and estimate the average impact of engaging in a treatment, with a specific emphasis on leveraging functionalities from the cdid package.
+-   Recent advances in econometrics have focused on the identification,
+    estimation, and inference of treatment effects in staggered designs,
+    i.e. where treatment timing varies across units. Despite the variety
+    of available approaches, none stand out as universally superior, and
+    many overlook key challenges such as estimator efficiency or the
+    frequent occurrence of unbalanced panel data.
 
--   The cdid package allows for multiple periods, variation in treatment timing, treatment effect heterogeneity, general missing data patterns, and sample selection on observables.
+    In our recent paper [(Bellégo, Benatia, Dortet-Bernadet, Journal of
+    Econometrics,
+    2024)](https://www.sciencedirect.com/science/article/pii/S0304407624001295),
+    we address these gaps by extending the well-established method
+    developed by [Callaway and Sant'Anna (Journal of Econometrics,
+    2021)](https://www.sciencedirect.com/science/article/abs/pii/S0304407620303948)
+    The cdid library is therefore intended to be used in connection with
+    the **did** library by [Brantly Callaway and Pedro H.C. Sant'Anna]:
+    [<https://bcallaway11.github.io/did/articles/did-basics.html>]. Our
+    approach improves efficiency and adapts seamlessly to unbalanced
+    panels, making it particularly valuable for researchers facing data
+    with missing observations.
 
--   The chained DiD rests on a parallel trends assumption, conditioned on being sampled.
+    This page introduces the **cdid** R library that implements the
+    methods from our paper, showcasing their relevance for empirical
+    research. **For those short on time, here are the key takeaways:**
 
--   The chained DiD is robust to some forms of attrition caused by unobservable heterogeneity.
+    -   **cdid** offers greater precision than **did** in balanced panel
+        data.
 
--   We identify three main advantages of our approach: (1) it does not require having a balanced panel subsample as it is the case with a standard DiD; (2) identifying assumption allows for sample selection on time-persistent unobservable (or latent) factors, unlike the cross-section DiD which treats the sample as repeated cross-sectional data; and (3) it may also deliver efficiency gains compared to existing methods, notably when the outcome variable is highly time-persistent.
+    -   **cdid** outperforms **did** with unbalanced panels, provided
+        errors are serially correlated (e.g., in presence of unit-level
+        fixed effects). For time-independent errors, **did** may be
+        preferred (see the paper for more details).
 
--   The cdid package is designed to provide group-time average treatment effects. Future updates to the package will expand its capabilities to include event-study type estimates, which encompass treatment effect parameters corresponding to various durations of exposure to the treatment, as well as overall treatment effect estimates.
+    -   **cdid** is less prone to bias in cases of attrition, notably if
+        missingness is related to unobservable heterogeneity for example
+        due to correlations between individual fixed effects, treatment
+        assignment, and attrition/sampling. For cases where missingness
+        is related to observables, additional results from our paper
+        have yet to be implemented in the library (see the paper).
 
-# Examples with numerical simulations
+### Features of the cdid library
 
-------------------------------------------------------------------------
+**What it supports:**
 
-We propose a simulation design adapted from the first section. Let us specify the potential outcome as a components of variance:
+-   Handles any form of missing data.
 
-$$
-Y_{it}(D_i) = \alpha_i + \delta_t + \sum_{\tau=2}^{t} \beta_{\tau} D_{i\tau} + \varepsilon_{it}
-$$
+-   Allows for control units comprising only "never treated" or also
+    "not-yet-treated."
 
-Where $D_{i\tau} ∈ {0, 1}$ denotes whether individual i has been treated in $\tau$ or earlier. Let us assume that $\tau ∈ {0, ..., T + 1}$ and treatments can only occur in t ≥ 2 so that G ∈ {2, ..., T + 1}. The data generating process is characterized by the following assumptions:
+-   Provides two weighting matrix options for GMM-based aggregation of
+    $\Delta ATT(g,t)$ into $ATT(g,t)$: identity or 2-step. Small-sample
+    simulations show that:
 
--   The individual-specific unobservable heterogeneity is iid gaussian: $\alpha_i ∼ N(1, \alpha^2_{\alpha})$, where $\alpha^2 = 2;$
--   The time-specific unobservable heterogeneity is iid gaussian: $\delta_t ∼ N(1, 1)$;
--   The treatment effect is constant over time: $\beta_{\tau} = 1$;
--   The error term is iid gaussian: $\varepsilon_{it} ∼ N(0, \alpha^2_{\varepsilon})$;
--   The probability to receive the treatment at time g, conditional on being treated at g or in the control group, is defined as: $$Pr(G_{ig} = 1|X_i, \alpha_i, G_{ig} + C_i = 1) = \frac{1}{1 + \exp(\theta_0 + \theta_1 X_i + \theta_2 \alpha_i \times g)}$$. Where $X_i ∼ N(1, 1)$ is observable for every i, unlike $\alpha_i$, and $\theta_0 = −1, \theta_1 = 0.4$ and $\theta_2 = 0$ or $\theta_2 = 0.2$. In the latter case, the treatment probability varies with treatment timing and the unobserved individual heterogeneity;
--   The sampling probability in the consecutive periods t, t + 1 conditional on $\alpha_i$ is given by: $$Pr((S_{it} + 1 = 1|\alpha_i)) = \frac{1}{1 + \exp(\lambda_0 + \lambda_1 \alpha_i \times t)}$$ With $\lambda_0 = −1$, and $\lambda_1 = 0$ or $\lambda_1 = 0.2$, so that the sampling process can also vary with time and the unobserved individual heterogeneity.
+    -   **Identity**: Best for smaller datasets with more missing data,
+        and less overidentifying restrictions.
 
-We simulate the sampled data in two steps. First, we generate a population sample for each period t to represent individuals that are either treated at t or in the control group. Second, we sample from this population using the specified process.
+    -   **2-step**: Best for larger, balanced datasets with many
+        overidentifying restrictions.
 
-1.  Generate a population of individuals
+-   Implements simple propensity scores for treatment assignment where
+    predictor columns X are treated as constant across time periods. For
+    time-varying covariates, users can include additional columns
+    (Xt,Xt+1,etc.) in the dataset.
 
-<!-- -->
+**Current limitations:**
 
-(a) Draw \$N = 2 x max $\frac{n}{E_{\alpha}[Pr(S_{itt+1})]}$ individuals per period in order to have $T + 2$ population samples of N individuals, where each individual is characterized by a vector $(\alpha_i, \delta_t, X_i, \epsilon_{it})$.
-(b) Separately for each population sample g, draw a uniform random number $(\xi_i \in [0, 1])$ per individual. If $\xi_i \leq Pr(G_{it} = 1|X_i, \alpha_i, G_{it} + C_i = 1)$, then set $(G_{ig} = 1, C_i = 0)$, otherwise set $(G_{ig} = 0, C_i = 1)$.
-(c) Compute $Y_{it}$ from $(\alpha_{i}, \delta_{t}, X_{i}, ε_{it}, G_{i0}, ..., _{iT+1}, C_{i})$;
+-   The generalized attrition model from our paper, which allows for
+    dynamic attrition processes (e.g., past outcomes influencing
+    observation status), is not yet implemented.
 
-<!-- -->
+-   The library currently supports only the IPW estimator, though
+    extensions to doubly-robust estimators like in the **did** library
+    are planned for the future.
 
-2.  Sample from this population
+# Getting started
 
-<!-- -->
+Installing the library requires using remotes at the moment because we
+haven't submitted the package on CRAN yet. The command is
 
-(a) Draw a uniform random number $η_{it} ∈ [0, 1]$ per individual i and period t. If $η_{it} ≤ Pr(S_{itt+1} = 1|\alpha_{i}), then set S_{itt+1} = 1$ and $S_{iττ+1} = 0$ for $τ /neq t$;
-
-(b) Draw (without replacement) n individuals per period t from the population for which $S_{itt+1} = 1$;
-
-(c) Compute the different estimators.
-
-(d) Repeat steps 1(b)-2(c) 1,000 times and report the mean and standard deviation of the estimators.
-
-```{r}
-# Load the cdid package
-remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = FALSE, force = TRUE)
-library(cdid)
-library(BMisc)
-
-# Package Overview and Available Functions
-ls("package:cdid")
-
-# ?cdid
-# ?cdid::chained
-# ?cdid::GMM
-
-# Importing the data
-data0 = fonction_simu_attrition()
-
-# Display the data
-head(data0)
+``` r
+remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = TRUE, force = TRUE)
 ```
 
-```{r}
-library(did)
+``` r
+#Load the relevant packages
+library(did) #Callaway and Sant'Anna (2021) 
+library(cdid) #Bellego, Benatia, and Dortet-Bernadet (2024)
+
+set.seed(123)
+#Generate a dataset: 500 units, 8 time periods, with unit fixed-effects (alpha)
+data0=fonction_simu_attrition(N = 500,T = 8,theta2_alpha_Gg = 0.5, lambda1_alpha_St = 0, sigma_alpha = 2, sigma_epsilon = 0.1, tprob = 0.5)
+
+# The true values of the coefficients are based on time-to-treatment. The treatment effect is zero before the treatment, 1.75 one period after, 1.5 two period after, 1.25 three period after, 1 four period after, 0.75 five period after, 0.5 six period after, etc.
+
+#We keep all observations, so we have a balanced dataset
+data0$S <- 1
+
+#run did
 did.results = did:: att_gt(
-  yname="Y", 
+  yname="Y",
   tname="date",
   idname = "id",
   gname = "date_G",
   xformla = ~X,
   data = data0,
   weightsname = NULL,
-  allow_unbalanced_panel = TRUE,
+  allow_unbalanced_panel = FALSE,
+  panel = TRUE,
+  control_group = "notyettreated",
   alp = 0.05,
   bstrap = TRUE,
   cband = TRUE,
   biters = 1000,
   clustervars = NULL,
-  est_method = "dr",
+  est_method = "ipw",
   base_period = "varying",
   print_details = FALSE,
   pl = FALSE,
   cores = 1
 )
 
-#Dynamic Effect of the treatment
-agg.es.did = aggte(MP = did.results, type = 'dynamic')
+#run cdid with 2step weighting matrix
+result_2step = att_gt_cdid(yname="Y", tname="date",
+                         idname="id",
+                         gname="date_G",
+                         xformla=~X,
+                         data=data0,
+                         control_group="notyettreated",
+                         weightsname="S",
+                         alp=0.05,
+                         bstrap=TRUE,
+                         biters=1000,
+                         clustervars=NULL,
+                         cband=TRUE,
+                         est_method="2-step",
+                         base_period="varying",
+                         print_details=FALSE,
+                         pl=FALSE,
+                         cores=1)
 
-# 3. Print results
+#run cdid with identity weighting matrix
+result_id = att_gt_cdid(yname="Y", tname="date",
+                        idname="id",
+                        gname="date_G",
+                        xformla=~X,
+                        data=data0,
+                        control_group="notyettreated",
+                        weightsname="S",
+                        alp=0.05,
+                        bstrap=TRUE,
+                        biters=1000,
+                        clustervars=NULL,
+                        cband=TRUE,
+                        est_method="Identity",
+                        base_period="varying",
+                        print_details=FALSE,
+                        pl=FALSE,
+                        cores=1)
+```
+
+Now that we have the ATT(g,t) for all three methods, we can compare
+aggregate parameters using the following commands
+
+``` r
+# Aggregation
+agg.es.did <- aggte(MP = did.results, type = 'dynamic')
+agg.es.2step <- aggte(MP = result_2step, type = 'dynamic')
+agg.es.id <- aggte(MP = result_id, type = 'dynamic')
+```
+
+```{r}
+# Print results
 agg.es.did
 ```
 
 ```{r}
-# 1. GMM DiD
-
-gmm.results = GMM(
-                    data=data0,      
-                    yname="Y",
-                    tname="date",
-                    chained=TRUE,
-                    idname="id",
-                    gname="date_G",
-                    control_group=c("notyettreated"), #either "nevertreated" or "notyettreated"
-                    treated='treated',
-                    xformla=~X, 
-                    weightsname="S",  
-                    bstrap=FALSE, 
-                    biters=1000,
-                    cband=TRUE)
-
-# See the ATT g,t
-gmm.results
-
-# 2. Aggregation
-agg.es.gmm <- aggte(MP = gmm.results, type = 'dynamic')
-
-# 3. Print results
-agg.es.gmm
+agg.es.2step
 ```
 
 ```{r}
-# Combine group and time results
-did.attgt <- data.frame(group = did.results$group, t = did.results$t, did.att = did.results$att)
-gmm.attgt <- data.frame(group = gmm.results$group, t = gmm.results$t, gmm.att = gmm.results$att)
+agg.es.id
+```
 
-did.se <- data.frame(group = did.results$group, t = did.results$t, did.se = did.results$se)
-gmm.se <- data.frame(group = gmm.results$group, t = gmm.results$t, gmm.se = gmm.results$se)
+Let us now do the same but with an unbalanced panel dataset
 
-did.agg.attgt <- data.frame(egt = agg.es.did$egt, did.att = agg.es.did$att, did.se = agg.es.did$se)
-gmm.agg.attgt <- data.frame(egt = agg.es.gmm$egt, gmm.att = agg.es.gmm$att, gmm.se = agg.es.gmm$se)
+```{r}
+#Generate a dataset: 500 units, 8 time periods, with unit fixed-effects (alpha)
+set.seed(123)
+data0=fonction_simu_attrition(N = 500,T = 8,theta2_alpha_Gg = 0.5, lambda1_alpha_St = 0, sigma_alpha = 2, sigma_epsilon = 0.1, tprob = 0.5)
 
-compare.results <- function(..., agg = FALSE) {
-  # List of data frames passed as arguments
-  results_list <- list(...)
-  
-  # Check if each result has the required columns
-  for (df in results_list) {
-    if (agg) {
-      # If agg is TRUE, check only for the "egt" column
-      if (!"egt" %in% colnames(df)) {
-        stop("Each result data frame must contain 'egt' column when agg = TRUE")
-      }
-    } else {
-      # If agg is FALSE, check for both "group" and "t" columns
-      if (!all(c("group", "t") %in% colnames(df))) {
-        stop("Each result data frame must contain 'group' and 't' columns when agg = FALSE")
-      }
-    }
-  }
-  
-  # Merge all results by 'egt' (for aggregated data) or 'group' and 't' (for regular data)
-  if (agg) {
-    # Merge based on "egt"
-    combined_results <- Reduce(function(x, y) merge(x, y, by = "egt", all = FALSE), results_list)
-  } else {
-    # Merge based on "group" and "t"
-    combined_results <- Reduce(function(x, y) merge(x, y, by = c("group", "t"), all = FALSE), results_list)
-  }
-  
-  # Return the merged results
-  return(combined_results)
-}
+#We discard observations based on sampling indicator S
+data0 <- data0[data0$S==1,]
 
-# Example usage for aggregated data
-results_agg <- compare.results(did.agg.attgt, gmm.agg.attgt, agg = TRUE)
-print(results_agg)
+#run did
+did.results = did:: att_gt(
+  yname="Y",
+  tname="date",
+  idname = "id",
+  gname = "date_G",
+  xformla = ~X,
+  data = data0,
+  weightsname = NULL,
+  allow_unbalanced_panel = FALSE,
+  panel = FALSE,
+  control_group = "notyettreated",
+  alp = 0.05,
+  bstrap = TRUE,
+  cband = TRUE,
+  biters = 1000,
+  clustervars = NULL,
+  est_method = "ipw",
+  base_period = "varying",
+  print_details = FALSE,
+  pl = FALSE,
+  cores = 1
+)
 
-# Example usage for non-aggregated data
-results_non_agg <- compare.results(did.attgt, gmm.attgt, agg = FALSE)
-print(results_non_agg)
+#run cdid with 2step weighting matrix
+result_2step = att_gt_cdid(yname="Y", tname="date",
+                         idname="id",
+                         gname="date_G",
+                         xformla=~X,
+                         data=data0,
+                         control_group="notyettreated",
+                         weightsname="S",
+                         alp=0.05,
+                         bstrap=TRUE,
+                         biters=1000,
+                         clustervars=NULL,
+                         cband=TRUE,
+                         est_method="2-step",
+                         base_period="varying",
+                         print_details=FALSE,
+                         pl=FALSE,
+                         cores=1)
+
+#run cdid with identity weighting matrix
+result_id = att_gt_cdid(yname="Y", tname="date",
+                        idname="id",
+                        gname="date_G",
+                        xformla=~X,
+                        data=data0,
+                        control_group="notyettreated",
+                        weightsname="S",
+                        alp=0.05,
+                        bstrap=TRUE,
+                        biters=1000,
+                        clustervars=NULL,
+                        cband=TRUE,
+                        est_method="Identity",
+                        base_period="varying",
+                        print_details=FALSE,
+                        pl=FALSE,
+                        cores=1)
+```
+
+```{r}
+# Aggregation
+agg.es.did <- aggte(MP = did.results, type = 'dynamic')
+agg.es.2step <- aggte(MP = result_2step, type = 'dynamic')
+agg.es.id <- aggte(MP = result_id, type = 'dynamic')
+```
+
+```{r}
+# Print results
+agg.es.did
+```
+
+```{r}
+agg.es.2step
+```
+
+```{r}
+agg.es.id
 ```
 
 ```{=html}
-<!-- import(dplyr)
-import(BMisc)
-importFrom(BMisc, rhs.vars)
-import(tidyr)
-importFrom(tidyr, pivot_wider)
-import(Matrix)
-importFrom(Matrix, sparseMatrix)
-import(openxlsx)
-import(data.table)
-import(jsonlite)
-import(tidyr)
-import(did) -->
+<!-- source("R/fonction_simu_attrition.R")
+source("R/gg.R")
+source("R/pre_process_cdid.R")
+source("gmm_compute_delta_att.R")
+source("gmm_convert_delta_to_att.R")
+source("gmm_convert_result.R")
+source('process_attgt_gmm.R') -->
 ```
