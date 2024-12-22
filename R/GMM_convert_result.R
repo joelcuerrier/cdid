@@ -164,7 +164,7 @@
       }
 
 
-      #THIS IS GIVING MY ATT(g,t) with CI.
+      #ATT(g,t) with CI.
       results=MP(group=group, t=tt, att=att, V_analytical=V, se=se, c=cval, inffunc=inffunc, n=n, W=W, Wpval=Wpval, alp = alp, DIDparams=dp,debT=debT)
 
       #
