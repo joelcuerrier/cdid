@@ -1,8 +1,10 @@
 #' Simulate Unbalanced Panel Data
 #'
-#' @description This function generates a simulated dataset with treatment assignment, 
-#' individual-level heterogeneity, and time-varying effects. It incorporates attrition 
-#' by generating scores based on individual characteristics and time periods.
+#' @description This function generates a simulated dataset with treatment assignment,
+#' individual-level heterogeneity, and time-varying effects. It incorporates attrition
+#' based on individual characteristics and time periods. For more details on the methodology, see:
+#' Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences",
+#' Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
 #'
 #' @param N Number of units
 #' @param T Number of periods
@@ -11,17 +13,17 @@
 #' @param lambda1_alpha_St Coefficient for individual heterogeneity in the propensity score.
 #' @param sigma_alpha Standard deviation of individual heterogeneity (alpha).
 #' @param sigma_epsilon Standard deviation of the error term (epsilon).
-#' @param tprob Probability target used to enforce the sampled unbalanced data is N*T*tprob
+#' @param tprob Probability target to get approximately N*T*tprob observations
 #' @return A data frame containing simulated data.
 #' @examples
-#' data_sim <- fonction_simu_attrition(N=150,T=9,theta2_alpha_Gg = 0.01, 
-#' lambda1_alpha_St = 0.5, sigma_alpha = 2, sigma_epsilon = 0.5, tprob)
+#' data_sim <- fonction_simu_attrition(N=150,T=9,theta2_alpha_Gg = 0.01,
+#' lambda1_alpha_St = 0.5, sigma_alpha = 2, sigma_epsilon = 0.5, tprob=0.5)
 #' @export
 
 fonction_simu_attrition <- function(N,T,theta2_alpha_Gg, lambda1_alpha_St, sigma_alpha, sigma_epsilon, tprob){
 
 # Settings
-T = T+1           # periods 
+T = T+1           # periods
 N = floor(N/T)        # unique individuals
 k = 1
 tprob = tprob
@@ -41,7 +43,7 @@ theta2 <- 0.2 #theta2_alpha_Gg # Interaction coefficient for alpha_i * t
 
 # Sampling parameters
 lambda0 = -1   # Constante
-lambda1 = 0.1 #lambda1_alpha_St # Parameter assigned to alpha_i*t 
+lambda1 = 0.1 #lambda1_alpha_St # Parameter assigned to alpha_i*t
 
 # Generate individual heterogeneity (alpha)
 ALPHA <- mu_a + sig_a * matrix(rnorm(N * T), ncol = T)  # Individual heterogeneity for N individuals over T periods
@@ -53,24 +55,24 @@ X <- mu_x + sig_x * matrix(rnorm(N * T), ncol = T)      # Covariates for propens
 # Create a time matrix for propensity score calculation
   mat_t = matrix(1,nrow=N,ncol=T)
   for (t in 1:T){
-    mat_t[,t]=mat_t[,t]*t 
+    mat_t[,t]=mat_t[,t]*t
   }
 
   Score = 1/(1+exp((theta0 + theta1*X + theta2*ALPHA*mat_t))) # propensity score qui d�pend de alpha * t
   G = 1*(Score>matrix(runif(N*T),ncol=T))
-  
+
   # Enforce no treatment before period 2 (t = 2)
-  G[,(1:3)] = 0 
+  G[,(1:3)] = 0
   colMeans(G)
-  
+
   # Create a matrix indicating past treatment (D)
-  D = data.frame() 
+  D = data.frame()
   for (d in 0:(T-1)){
     D1 = cbind( matrix(0,nrow=N,ncol=d) , matrix(G[,(1+d)],nrow=N,ncol=(T-d)) )
     D = rbind(D,D1)
   }
   D = data.matrix(D)
-  
+
   # Generate errors
   EPSI = sig_e*matrix(rnorm(N*T*T), ncol=T)
 
@@ -82,26 +84,26 @@ X <- mu_x + sig_x * matrix(rnorm(N * T), ncol = T)      # Covariates for propens
   mat_beta = data.frame()
   for (d in 1:T){
     beta_ok = beta[1:(length(beta)-(d-1))]  #Retrait de la derniere valeur de beta
-    beta_ok=c(rep(0,(d-1)),beta_ok) 
-    
+    beta_ok=c(rep(0,(d-1)),beta_ok)
+
     beta_temp = t(matrix(beta_ok,nrow=T,ncol=N))
     mat_beta = rbind(mat_beta,beta_temp)
   }
-  
+
   effet = t(t(D * mat_beta))
   Y = effet + alpha + delta + EPSI
-  
+
   # Create time and ID variables
   ID = matrix(seq.int(nrow(Y)),nrow=(N*T), ncol=T)
   time_var = as.vector(0:8)
   time_var = t(matrix(time_var,nrow=T,ncol=(N*T)))
-  
+
   XX = as.vector(X)
-  XX = matrix(XX,nrow=(N*T),ncol=T) 
-  
+  XX = matrix(XX,nrow=(N*T),ncol=T)
+
   GG = as.vector(G*kronecker(t(c(0:(T-1))),rep(1,dim(G)[1])))
-  GG = matrix(GG,nrow=(N*T),ncol=T) 
-  
+  GG = matrix(GG,nrow=(N*T),ncol=T)
+
   # Assemble the balanced panel dataset
   data_sim = data.frame(id = as.vector(ID) )
   data_sim$date = as.vector(time_var)
@@ -109,7 +111,7 @@ X <- mu_x + sig_x * matrix(rnorm(N * T), ncol = T)      # Covariates for propens
   data_sim$X = as.vector(XX)
   data_sim$date_G = as.vector(GG)
   data_sim$S = 1
-  
+
   # Sampling process
   prob = matrix(0,dim(alpha)[1],dim(alpha)[2]) #fill with zeros
   for (t in 1:dim(prob)[2]){
@@ -118,10 +120,9 @@ X <- mu_x + sig_x * matrix(rnorm(N * T), ncol = T)      # Covariates for propens
   prob <- tprob*prob/mean(colMeans(prob))
   St = 1*(prob>matrix(runif(N*T*T),ncol=T)) # observed at t and t+1
   data_sim$S <- as.vector(St)
-  
+
   data_sim <- data_sim[data_sim$date!=0,]
-  
+
   return(data_sim)
-     
+
   }
-  

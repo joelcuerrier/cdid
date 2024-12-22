@@ -1,11 +1,11 @@
+#' @title att_gt_cdid
 
-
-#' att_gt_cdid Function:
-#' @description `att_gt` computes average treatment effects.
+#' @description `att_gt_cdid` computes average treatment effects.
 #' Our estimator accommodates (1) multiple time
 #' periods, (2) variation in treatment timing, (3) treatment effect heterogeneity,
-#' and (4) general missing data patterns
-#' Bellego, Benatia,Dortet-Bernardet (2024) for a detailed description.
+#' and (4) general missing data patterns. For more details on the methodology, see:
+#' Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences",
+#' Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
 #' @param yname The name of the outcome variable
 #' @param data The name of the data.frame that contains the data
 #' @param tname The name of the column containing the time periods
@@ -39,42 +39,19 @@
 #'   Default is `FALSE`.
 #' @param pl Whether or not to use parallel processing
 #' @param cores The number of cores to use for parallel processing
-#' @param est_method the method to compute group-time average treatment effects.  The default is "dr" which uses the doubly robust
-#' approach in the `DRDID` package.  Other built-in methods
+#' @param est_method the method to compute group-time average treatment effects.  At the moment, one can only use the IPW estimator
+#' with either "2-step" or "Identity" weighting matrix to aggregate Delta ATT into ATT.
 #' include "ipw" for inverse probability weighting and "reg" for
-#' first step regression estimators.  The user can also pass their
-#' own function for estimating group time average treatment
-#' effects.  This should be a function
-#' `f(Y1,Y0,treat,covariates)` where `Y1` is an
-#' `n` x `1` vector of outcomes in the post-treatment
-#' outcomes, `Y0` is an `n` x `1` vector of
-#' pre-treatment outcomes, `treat` is a vector indicating
-#' whether or not an individual participates in the treatment,
-#' and `covariates` is an `n` x `k` matrix of
-#' covariates.  The function should return a list that includes
-#' `ATT` (an estimated average treatment effect), and
-#' `inf.func` (an `n` x `1` influence function).
-#' The function can return other things as well, but these are
-#' the only two that are required. `est_method` is only used
-#' if covariates are included.
+#' first step regression estimators.
 #' @param xformla A formula for the covariates to include in the
 #'  model.  It should be of the form `~ X1 + X2`.  Default
 #'  is NULL which is equivalent to `xformla=~1`.  This is
 #'  used to create a matrix of covariates which is then passed
 #'  to the 2x2 DID estimator chosen in `est_method`.
-#' @param panel Whether or not the data is a panel dataset.
-#'  The panel dataset should be provided in long format -- that
-#'  is, where each row corresponds to a unit observed at a
-#'  particular point in time.  The default is TRUE.  When
-#'  is using a panel dataset, the variable `idname` must
-#'  be set.  When `panel=FALSE`, the data is treated
-#'  as repeated cross sections.
-#' @param allow_unbalanced_panel Whether or not function should
-#'  "balance" the panel with respect to time and id.  The default
-#'  values if `FALSE` which means that [att_gt()] will drop
-#'  all units where data is not observed in all periods.
-#'  The advantage of this is that the computations are faster
-#'  (sometimes substantially).
+#'  X's are assumed fixed across the time dimension in this version.
+#'  Use different columns Xt, Xt+1 if time-varying covariates are needed.
+#' @param panel (Not used) This is not used as balanced and unbalanced panel data is treated similarly.
+#' @param allow_unbalanced_panel (Not used) This is not used as balanced and unbalanced panel data is treated similarly.
 #' @param control_group Which units to use the control group.
 #'  The default is "nevertreated" which sets the control group
 #'  to be the group of units that never participate in the
@@ -86,14 +63,14 @@
 #'  never treated units, but it includes additional units that
 #'  eventually participate in the treatment, but have not
 #'  participated yet.
-#' @param anticipation The number of time periods before participating
+#' @param anticipation (Not used) The number of time periods before participating
 #'  in the treatment where units can anticipate participating in the
 #'  treatment and therefore it can affect their untreated potential outcomes
-#' @param faster_mode This option enables a faster version of `did`, optimizing
+#' @param faster_mode (Not used) This option enables a faster version of `did`, optimizing
 #' computation time for large datasets by improving data management within the package.
 #' The default is set to `FALSE`. While the difference is minimal for small datasets,
 #' it is recommended for use with large datasets.
-#' @param base_period Whether to use a "varying" base period or a
+#' @param base_period (Not used) The cdid package only uses the g-1 base period for the moment. Whether to use a "varying" base period or a
 #'  "universal" base period.  Either choice results in the same
 #'  post-treatment estimates of ATT(g,t)'s.  In pre-treatment
 #'  periods, using a varying base period amounts to computing a
@@ -118,7 +95,8 @@
 #'  the user allows for anticipation) to be equal to 0, but one
 #'  extra estimate in an earlier period.
 #'
-#' @references Bellego, Benatia,Dortet-Bernardet (2022)  \"The Chained Difference-in-Differences\" , \url{https://www.davidbenatia.com/publication/chaineddid/}
+#' @references Bellego, Benatia, and Dortet-Bernadet (2024) \"The Chained Difference-in-Differences",
+#' Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
 #'
 #' @return an [`MP`] object containing all the results for group-time average
 #'  treatment effects
@@ -132,21 +110,21 @@ att_gt_cdid <- function(yname,
                     # propensityformla,
                     data,
                     chained = FALSE, #True to use chained.
-                    panel=TRUE, 
-                    allow_unbalanced_panel=TRUE, 
-                    control_group, 
-                    anticipation=0, 
+                    panel=TRUE,
+                    allow_unbalanced_panel=TRUE,
+                    control_group,
+                    anticipation=0,
                     weightsname,
                     weight_assumption=NULL,
                     alp=0.05,
                     bstrap=TRUE,
-                    cband=TRUE, 
+                    cband=TRUE,
                     biters=1000,
-                    clustervars=NULL, 
-                    est_method, 
+                    clustervars=NULL,
+                    est_method,
                     base_period="varying",
-                    print_details=FALSE, 
-                    pl=FALSE, 
+                    print_details=FALSE,
+                    pl=FALSE,
                     cores=1){
 
   #Part1. Pre-process step can be useful to carry over the parameters of the functions
@@ -166,22 +144,19 @@ att_gt_cdid <- function(yname,
                       biters=1000,
                       clustervars=NULL,
                       cband=TRUE,
-                      est_method, 
+                      est_method,
                       base_period="varying",
                       print_details=FALSE,
                       pl=FALSE,
                       cores=1,
                       call=match.call())
-  
-  #gmm.R calls GMM_estimPeriod_Boot dans fonctions_estimation_Boot.R
-  ########################################
-  ## Part 2. Prelim checks (previously done with mp.spatt.GMM)
-  ## And Compute Delta ATT (previously done with compute.mp.spatt.GMM)
+
+  ## Part 2. Prelim checks and compute Delta ATT
   result <- gmm_compute_delta_att(dp)
 
-  # Part 3. Post-estimation aggregation step. Converts delta ATT into aggregated ATT. 
-  result <- gmm_convert_delta_to_att(result) 
-  
+  # Part 3. Post-estimation aggregation step. Converts delta ATT into aggregated ATT.
+  result <- gmm_convert_delta_to_att(result)
+
   # # Part 4. Result must be converted to be used in the aggte function.
   if   (dp$est_method == "2-step") {
   if (!exists("result") || is.null(result)) stop("Error: 'result' is NULL or does not exist before gmm_convert_result for 2-step.")
@@ -194,4 +169,3 @@ att_gt_cdid <- function(yname,
 }
 
 
- 

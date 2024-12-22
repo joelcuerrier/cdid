@@ -1,6 +1,6 @@
 Package: cdid
 Type: Package
-Title: Chained Difference-in-Differences
+Title: The Chained Difference-in-Differences
 Version: 0.1.0
 Authors@R: 
     c(
@@ -11,7 +11,7 @@ Authors@R:
     )
 URL: https://github.com/joelcuerrier/cdid
 Maintainer: David Benatia <david.benatia@hec.ca>
-Description: The "chained difference-in-differences" package provides tools for modeling long-term treatment effects in scenarios where balanced panel data is unavailable or only a subset of the available data is present.
+Description: The cdid package provides an extension of the did package that improves efficiency and allows better handling of unbalanced panel data. Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences", Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
 License: GPL-2
 Encoding: UTF-8
 LazyData: true

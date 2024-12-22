@@ -1,16 +1,17 @@
-# Callaway, B. (2024). The did Library. Department of Economics, University of Georgia. Available at: https://github.com/bcallaway11/did
+# Modified function of pre_process_did.R by Callaway, B. (2024). The did Library. Department of Economics, University of Georgia. Available at: https://github.com/bcallaway11/did
 
-#' @title Process `did` Function Arguments
+#' @title Process `cdid` Function Arguments
 #'
 #' @description Function to process arguments passed to the main methods in the
-#'  `did` package as well as conducting some tests to make sure
+#'  `cdid` package as well as conducting some tests to make sure
 #'  data is in proper format / try to throw helpful error messages.
 #'
 
 #'
 #' @return a [`DIDparams`] object
 #'
-#' @references Bellego, Benatia,Dortet-Bernardet (2022)  \"The Chained Difference-in-Differences\" , \url{https://www.davidbenatia.com/publication/chaineddid/}
+#' @references Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences",
+#' Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
 
 #' @export
 pre_process_cdid <- function(yname,
@@ -38,10 +39,10 @@ pre_process_cdid <- function(yname,
   #-----------------------------------------------------------------------------
   # Data pre-processing and error checking
   #-----------------------------------------------------------------------------
-  
+
   # set control group
   #First the column nevertreated is created in the data set
-  
+
   control_group <- control_group[1]
   data$control_group <- ifelse(data[[gname]] > 0, 0, 1)
   if(!(control_group %in% c("nevertreated","notyettreated"))){
@@ -100,7 +101,7 @@ pre_process_cdid <- function(yname,
   # Check if there is a never treated group
   if ( length(glist[glist==0]) == 0) {
     if(control_group=="nevertreated"){
-      
+
       stop("There is no available never-treated group")
     } else {
       # Drop all time periods with time periods >= latest treated
@@ -114,7 +115,7 @@ pre_process_cdid <- function(yname,
 
       # don't comput ATT(g,t) for groups that are only treated at end
       # and only play a role as a comparison group
-      glist <- glist[ glist < max(glist)] 
+      glist <- glist[ glist < max(glist)]
     }
   }
 
@@ -234,11 +235,11 @@ pre_process_cdid <- function(yname,
   #-----------------------------------------------------------------------------
   # code for setting up repeated cross sections (and unbalanced panel)
   #-----------------------------------------------------------------------------
- 
+
   if (!panel) {
     # check for complete cases
 
-    
+
     keepers <- complete.cases(data)
     # keepers <- na.omit(data)
     if (nrow(data[keepers,]) < nrow(data)) {
@@ -321,7 +322,7 @@ pre_process_cdid <- function(yname,
 
   # order dataset wrt idname and tname
   data <- data[order(data[,idname], data[,tname]),]
-  
+
   # store parameters for passing around later
   dp <- DIDparams(yname=yname,
                   tname=tname,
