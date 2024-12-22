@@ -2,7 +2,7 @@
 % Please edit documentation in R/pre_process_cdid.R
 \name{pre_process_cdid}
 \alias{pre_process_cdid}
-\title{Process \code{did} Function Arguments}
+\title{Process \code{cdid} Function Arguments}
 \usage{
 pre_process_cdid(
   yname,
@@ -34,9 +34,10 @@ a \code{\link{DIDparams}} object
 }
 \description{
 Function to process arguments passed to the main methods in the
-\code{did} package as well as conducting some tests to make sure
+\code{cdid} package as well as conducting some tests to make sure
 data is in proper format / try to throw helpful error messages.
 }
 \references{
-Bellego, Benatia,Dortet-Bernardet (2022)  \"The Chained Difference-in-Differences\" , \url{https://www.davidbenatia.com/publication/chaineddid/}
+Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences",
+Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
 }

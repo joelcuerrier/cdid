@@ -6,14 +6,11 @@
 \usage{
 gmm_compute_delta_att(dp)
 }
-\arguments{
-\item{call}{Function call to gg}
-}
 \value{
 a \code{\link{DIDparams}} object
 }
 \description{
-Function to process arguments passed to the main methods in the
-\code{cdid} package to compute Delta ATT as well as conducting some tests to make sure
-data is in proper format.
+Function to compute the delta ATT. For more details on the methodology, see:
+Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences",
+Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
 }

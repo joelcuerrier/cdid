@@ -2,7 +2,7 @@
 % Please edit documentation in R/att_gt_cdid.R
 \name{att_gt_cdid}
 \alias{att_gt_cdid}
-\title{att_gt_cdid Function:}
+\title{att_gt_cdid}
 \usage{
 att_gt_cdid(
   yname,
@@ -47,24 +47,15 @@ in the untreated group.}
 model.  It should be of the form \code{~ X1 + X2}.  Default
 is NULL which is equivalent to \code{xformla=~1}.  This is
 used to create a matrix of covariates which is then passed
-to the 2x2 DID estimator chosen in \code{est_method}.}
+to the 2x2 DID estimator chosen in \code{est_method}.
+X's are assumed fixed across the time dimension in this version.
+Use different columns Xt, Xt+1 if time-varying covariates are needed.}
 
 \item{data}{The name of the data.frame that contains the data}
 
-\item{panel}{Whether or not the data is a panel dataset.
-The panel dataset should be provided in long format -- that
-is, where each row corresponds to a unit observed at a
-particular point in time.  The default is TRUE.  When
-is using a panel dataset, the variable \code{idname} must
-be set.  When \code{panel=FALSE}, the data is treated
-as repeated cross sections.}
+\item{panel}{(Not used) This is not used as balanced and unbalanced panel data is treated similarly.}
 
-\item{allow_unbalanced_panel}{Whether or not function should
-"balance" the panel with respect to time and id.  The default
-values if \code{FALSE} which means that \code{\link[=att_gt]{att_gt()}} will drop
-all units where data is not observed in all periods.
-The advantage of this is that the computations are faster
-(sometimes substantially).}
+\item{allow_unbalanced_panel}{(Not used) This is not used as balanced and unbalanced panel data is treated similarly.}
 
 \item{control_group}{Which units to use the control group.
 The default is "nevertreated" which sets the control group
@@ -78,7 +69,7 @@ never treated units, but it includes additional units that
 eventually participate in the treatment, but have not
 participated yet.}
 
-\item{anticipation}{The number of time periods before participating
+\item{anticipation}{(Not used) The number of time periods before participating
 in the treatment where units can anticipate participating in the
 treatment and therefore it can affect their untreated potential outcomes}
 
@@ -108,26 +99,12 @@ can be two variables (otherwise will throw an error) and one of these
 must be the same as idname which allows for clustering at the individual
 level. By default, we cluster at individual level (when \code{bstrap=TRUE}).}
 
-\item{est_method}{the method to compute group-time average treatment effects.  The default is "dr" which uses the doubly robust
-approach in the \code{DRDID} package.  Other built-in methods
+\item{est_method}{the method to compute group-time average treatment effects.  At the moment, one can only use the IPW estimator
+with either "2-step" or "Identity" weighting matrix to aggregate Delta ATT into ATT.
 include "ipw" for inverse probability weighting and "reg" for
-first step regression estimators.  The user can also pass their
-own function for estimating group time average treatment
-effects.  This should be a function
-\code{f(Y1,Y0,treat,covariates)} where \code{Y1} is an
-\code{n} x \code{1} vector of outcomes in the post-treatment
-outcomes, \code{Y0} is an \code{n} x \code{1} vector of
-pre-treatment outcomes, \code{treat} is a vector indicating
-whether or not an individual participates in the treatment,
-and \code{covariates} is an \code{n} x \code{k} matrix of
-covariates.  The function should return a list that includes
-\code{ATT} (an estimated average treatment effect), and
-\code{inf.func} (an \code{n} x \code{1} influence function).
-The function can return other things as well, but these are
-the only two that are required. \code{est_method} is only used
-if covariates are included.}
+first step regression estimators.}
 
-\item{base_period}{Whether to use a "varying" base period or a
+\item{base_period}{(Not used) The cdid package only uses the g-1 base period for the moment. Whether to use a "varying" base period or a
 "universal" base period.  Either choice results in the same
 post-treatment estimates of ATT(g,t)'s.  In pre-treatment
 periods, using a varying base period amounts to computing a
@@ -159,7 +136,7 @@ Default is \code{FALSE}.}
 
 \item{cores}{The number of cores to use for parallel processing}
 
-\item{faster_mode}{This option enables a faster version of \code{did}, optimizing
+\item{faster_mode}{(Not used) This option enables a faster version of \code{did}, optimizing
 computation time for large datasets by improving data management within the package.
 The default is set to \code{FALSE}. While the difference is minimal for small datasets,
 it is recommended for use with large datasets.}
@@ -169,12 +146,14 @@ an \code{\link{MP}} object containing all the results for group-time average
 treatment effects
 }
 \description{
-\code{att_gt} computes average treatment effects.
+\code{att_gt_cdid} computes average treatment effects.
 Our estimator accommodates (1) multiple time
 periods, (2) variation in treatment timing, (3) treatment effect heterogeneity,
-and (4) general missing data patterns
-Bellego, Benatia,Dortet-Bernardet (2024) for a detailed description.
+and (4) general missing data patterns. For more details on the methodology, see:
+Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences",
+Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
 }
 \references{
-Bellego, Benatia,Dortet-Bernardet (2022)  \"The Chained Difference-in-Differences\" , \url{https://www.davidbenatia.com/publication/chaineddid/}
+Bellego, Benatia, and Dortet-Bernadet (2024) \"The Chained Difference-in-Differences",
+Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
 }

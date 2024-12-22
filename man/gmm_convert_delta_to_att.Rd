@@ -2,7 +2,7 @@
 % Please edit documentation in R/GMM_convert_delta_to_att.R
 \name{gmm_convert_delta_to_att}
 \alias{gmm_convert_delta_to_att}
-\title{convert_delta_to_att}
+\title{GMM_convert_delta_to_att}
 \usage{
 gmm_convert_delta_to_att(dp)
 }
@@ -11,5 +11,7 @@ a \code{\link{DIDparams}} object
 }
 \description{
 Function to process arguments passed to the main methods in the
-\code{cdid} package to compute ATT.
+\code{cdid} package to compute ATT from deltaATT. For more details on the methodology, see:
+Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences",
+Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
 }

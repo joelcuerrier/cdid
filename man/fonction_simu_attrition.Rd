@@ -27,7 +27,7 @@ fonction_simu_attrition(
 
 \item{sigma_epsilon}{Standard deviation of the error term (epsilon).}
 
-\item{tprob}{Probability target used to enforce the sampled unbalanced data is N\emph{T}tprob}
+\item{tprob}{Probability target to get approximately N\emph{T}tprob observations}
 
 \item{factor}{Adjustment factor for propensity score probabilities.}
 }
@@ -37,9 +37,11 @@ A data frame containing simulated data.
 \description{
 This function generates a simulated dataset with treatment assignment,
 individual-level heterogeneity, and time-varying effects. It incorporates attrition
-by generating scores based on individual characteristics and time periods.
+based on individual characteristics and time periods. For more details on the methodology, see:
+Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences",
+Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
 }
 \examples{
-data_sim <- fonction_simu_attrition(N=150,T=9,theta2_alpha_Gg = 0.01, 
-lambda1_alpha_St = 0.5, sigma_alpha = 2, sigma_epsilon = 0.5, tprob)
+data_sim <- fonction_simu_attrition(N=150,T=9,theta2_alpha_Gg = 0.01,
+lambda1_alpha_St = 0.5, sigma_alpha = 2, sigma_epsilon = 0.5, tprob=0.5)
 }
