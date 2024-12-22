@@ -100,7 +100,7 @@ haven't submitted the package on CRAN yet. The command is
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = TRUE, force = TRUE)
 ```
 
-``` r
+```{r}
 #Load the relevant packages
 library(did) #Callaway and Sant'Anna (2021) 
 library(cdid) #Bellego, Benatia, and Dortet-Bernadet (2024)
@@ -177,10 +177,16 @@ result_id = att_gt_cdid(yname="Y", tname="date",
                         cores=1)
 ```
 
+```{r}
+print(did.results)
+print(result_2step)
+print(result_id)
+```
+
 Now that we have the ATT(g,t) for all three methods, we can compare
 aggregate parameters using the following commands
 
-``` r
+```{r}
 # Aggregation
 agg.es.did <- aggte(MP = did.results, type = 'dynamic')
 agg.es.2step <- aggte(MP = result_2step, type = 'dynamic')
@@ -274,6 +280,12 @@ result_id = att_gt_cdid(yname="Y", tname="date",
 ```
 
 ```{r}
+print(did.results)
+print(result_2step)
+print(result_id)
+```
+
+```{r}
 # Aggregation
 agg.es.did <- aggte(MP = did.results, type = 'dynamic')
 agg.es.2step <- aggte(MP = result_2step, type = 'dynamic')
@@ -293,12 +305,347 @@ agg.es.2step
 agg.es.id
 ```
 
-```{=html}
-<!-- source("R/fonction_simu_attrition.R")
-source("R/gg.R")
-source("R/pre_process_cdid.R")
-source("gmm_compute_delta_att.R")
-source("gmm_convert_delta_to_att.R")
-source("gmm_convert_result.R")
-source('process_attgt_gmm.R') -->
+# Simulation 1: Balanced Panel
+
+```{r}
+set.seed(123)
+
+nsims <- 100
+simgmm  = matrix(NA,nsims,42)
+simgmm2  = matrix(NA,nsims,42)
+simdid  = matrix(NA,nsims,42)
+
+simgmm_dyn  = matrix(NA,nsims,12)
+simgmm2_dyn  = matrix(NA,nsims,12)
+simdid_dyn  = matrix(NA,nsims,12)
+
+simgmm_overall  = matrix(NA,nsims,1)
+simgmm2_overall  = matrix(NA,nsims,1)
+simdid_overall  = matrix(NA,nsims,1)
+
+for (simi in (1:nsims)) {
+  print(simi)
+#load data0 replace S by 1, no missing.
+data0=fonction_simu_attrition(N = 500,T = 8,theta2_alpha_Gg = 0.5, lambda1_alpha_St = 0, sigma_alpha = 2, sigma_epsilon = 0.1, tprob = 0.5)
+
+data0$S <- 1
+
+#run did
+did.results = did:: att_gt(
+  yname="Y",
+  tname="date",
+  idname = "id",
+  gname = "date_G",
+  xformla = ~X,
+  data = data0,
+  weightsname = NULL,
+  allow_unbalanced_panel = TRUE,
+  panel = FALSE,
+  control_group = "notyettreated",
+  alp = 0.05,
+  bstrap = TRUE,
+  cband = TRUE,
+  biters = 1000,
+  clustervars = NULL,
+  est_method = "ipw",
+  base_period = "varying",
+  print_details = FALSE,
+  pl = FALSE,
+  cores = 1
+)
+
+result_gmm = att_gt_cdid(yname="Y", tname="date",
+                         idname="id",
+                         gname="date_G",
+                         xformla=~X,
+                         data=data0,
+                         panel=TRUE,
+                         allow_unbalanced_panel=TRUE,
+                         control_group="notyettreated",
+                         anticipation=0,
+                         weightsname="S",
+                         alp=0.05,
+                         bstrap=TRUE,
+                         biters=1000,
+                         clustervars=NULL,
+                         cband=TRUE,
+                         est_method="2-step",
+                         base_period="varying",
+                         print_details=FALSE,
+                         pl=FALSE,
+                         cores=1)
+
+result_id = att_gt_cdid(yname="Y", tname="date",
+                        idname="id",
+                        gname="date_G",
+                        xformla=~X,
+                        data=data0,
+                        panel=TRUE,
+                        allow_unbalanced_panel=TRUE,
+                        control_group="notyettreated",
+                        anticipation=0,
+                        weightsname="S",
+                        alp=0.05,
+                        bstrap=TRUE,
+                        biters=1000,
+                        clustervars=NULL,
+                        cband=TRUE,
+                        est_method="Identity",
+                        base_period="varying",
+                        print_details=FALSE,
+                        pl=FALSE,
+                        cores=1)
+
+# 2. Aggregation
+agg.es.did <- aggte(MP = did.results, type = 'dynamic')
+agg.es.gmm <- aggte(MP = result_gmm, type = 'dynamic')
+agg.es.id <- aggte(MP = result_id, type = 'dynamic')
+
+# 3. Print results
+#agg.es.did
+#agg.es.gmm
+#agg.es.id
+
+#ATT(g,t)
+#result_id$att
+
+simgmm[simi,] <- result_gmm$att
+simgmm2[simi,] <- result_id$att
+simdid[simi,] <- did.results$att
+
+if (simi > 2) {
+  # Compute column means and standard deviations
+  res <- data.frame(
+    gmm_mean = colMeans(simgmm[1:simi,]),   # GMM means
+    gmm2_mean = colMeans(simgmm2[1:simi,]),   # GMM means
+    did_mean = colMeans(simdid[1:simi,]),   # DID means
+    gmm_sd = apply(simgmm[1:simi,], 2, sd), # GMM standard deviations
+    gmm2_sd = apply(simgmm2[1:simi,], 2, sd), # GMM standard deviations
+    did_sd = apply(simdid[1:simi,], 2, sd) # DID standard deviations
+  )
+
+
+  # Print the results as a table
+  rownames(res) <- paste0("ATT(",did.results$group,",",did.results$t,")")
+  print(res)
+}
+  #ATT dynamic
+  agg.es.id$att.egt
+
+  simgmm_dyn[simi,] <- agg.es.gmm$att.egt
+  simgmm2_dyn[simi,] <- agg.es.id$att.egt
+  simdid_dyn[simi,] <- agg.es.did$att.egt
+
+  if (simi > 2) {
+    # Compute column means and standard deviations
+    res_dyn <- data.frame(
+      gmm_mean = colMeans(simgmm_dyn[1:simi,]),   # GMM means
+      gmm2_mean = colMeans(simgmm2_dyn[1:simi,]),   # GMM means
+      did_mean = colMeans(simdid_dyn[1:simi,]),   # DID means
+      gmm_sd = apply(simgmm_dyn[1:simi,], 2, sd), # GMM standard deviations
+      gmm2_sd = apply(simgmm2_dyn[1:simi,], 2, sd), # GMM standard deviations
+      did_sd = apply(simdid_dyn[1:simi,], 2, sd) # DID standard deviations
+    )
+
+
+    # Print the results as a table
+    rownames(res_dyn) <- agg.es.did$egt
+    print(res_dyn)
+  }
+
+  #Overall ATT
+  agg.es.id$overall.att
+
+  simgmm_overall[simi,] <- agg.es.gmm$overall.att
+  simgmm2_overall[simi,] <- agg.es.id$overall.att
+  simdid_overall[simi,] <- agg.es.did$overall.att
+
+  if (simi > 2) {
+    # Compute column means and standard deviations
+    res_overall <- data.frame(
+      gmm_mean = mean(simgmm_overall[1:simi, ]),   # GMM means
+      gmm2_mean = mean(simgmm2_overall[1:simi, ]),   # GMM means
+      did_mean = mean(simdid_overall[1:simi, ]),   # DID means
+      gmm_sd = sd(simgmm_overall[1:simi, ]), # GMM standard deviations
+      gmm2_sd = sd(simgmm2_overall[1:simi, ]), # GMM standard deviations
+      did_sd = sd(simdid_overall[1:simi, ]) # DID standard deviations
+    )
+
+
+    # Print the results as a table
+    rownames(res_overall) <- paste0("ATT")
+    print(res_overall)
+  }
+
+
+}
+
+```
+
+# Simulation 2: Unbalanced Panel
+
+```{r}
+set.seed(123)
+
+nsims <- 100
+simgmm  = matrix(NA,nsims,42)
+simgmm2  = matrix(NA,nsims,42)
+simdid  = matrix(NA,nsims,42)
+
+simgmm_dyn  = matrix(NA,nsims,12)
+simgmm2_dyn  = matrix(NA,nsims,12)
+simdid_dyn  = matrix(NA,nsims,12)
+
+simgmm_overall  = matrix(NA,nsims,1)
+simgmm2_overall  = matrix(NA,nsims,1)
+simdid_overall  = matrix(NA,nsims,1)
+
+for (simi in (1:nsims)) {
+  print(simi)
+#load data0 replace S by 1, no missing.
+data0=fonction_simu_attrition(N = 500,T = 8,theta2_alpha_Gg = 0.5, lambda1_alpha_St = 0, sigma_alpha = 2, sigma_epsilon = 0.1, tprob = 0.5)
+data0 <- data0[data0$S==1,]
+
+#run did
+did.results = did:: att_gt(
+  yname="Y",
+  tname="date",
+  idname = "id",
+  gname = "date_G",
+  xformla = ~X,
+  data = data0,
+  weightsname = NULL,
+  allow_unbalanced_panel = TRUE,
+  panel = FALSE,
+  control_group = "notyettreated",
+  alp = 0.05,
+  bstrap = TRUE,
+  cband = TRUE,
+  biters = 1000,
+  clustervars = NULL,
+  est_method = "ipw",
+  base_period = "varying",
+  print_details = FALSE,
+  pl = FALSE,
+  cores = 1
+)
+
+result_gmm = att_gt_cdid(yname="Y", tname="date",
+                         idname="id",
+                         gname="date_G",
+                         xformla=~X,
+                         data=data0,
+                         panel=TRUE,
+                         allow_unbalanced_panel=TRUE,
+                         control_group="notyettreated",
+                         anticipation=0,
+                         weightsname="S",
+                         alp=0.05,
+                         bstrap=TRUE,
+                         biters=1000,
+                         clustervars=NULL,
+                         cband=TRUE,
+                         est_method="2-step",
+                         base_period="varying",
+                         print_details=FALSE,
+                         pl=FALSE,
+                         cores=1)
+
+result_id = att_gt_cdid(yname="Y", tname="date",
+                        idname="id",
+                        gname="date_G",
+                        xformla=~X,
+                        data=data0,
+                        panel=TRUE,
+                        allow_unbalanced_panel=TRUE,
+                        control_group="notyettreated",
+                        anticipation=0,
+                        weightsname="S",
+                        alp=0.05,
+                        bstrap=TRUE,
+                        biters=1000,
+                        clustervars=NULL,
+                        cband=TRUE,
+                        est_method="Identity",
+                        base_period="varying",
+                        print_details=FALSE,
+                        pl=FALSE,
+                        cores=1)
+
+# Aggregation
+agg.es.did <- aggte(MP = did.results, type = 'dynamic')
+agg.es.gmm <- aggte(MP = result_gmm, type = 'dynamic')
+agg.es.id <- aggte(MP = result_id, type = 'dynamic')
+
+# Store
+simgmm[simi,] <- result_gmm$att
+simgmm2[simi,] <- result_id$att
+simdid[simi,] <- did.results$att
+
+if (simi > 2) {
+  # Compute column means and standard deviations
+  res <- data.frame(
+    gmm_mean = colMeans(simgmm[1:simi,]),   # GMM means
+    gmm2_mean = colMeans(simgmm2[1:simi,]),   # GMM means
+    did_mean = colMeans(simdid[1:simi,]),   # DID means
+    gmm_sd = apply(simgmm[1:simi,], 2, sd), # GMM standard deviations
+    gmm2_sd = apply(simgmm2[1:simi,], 2, sd), # GMM standard deviations
+    did_sd = apply(simdid[1:simi,], 2, sd) # DID standard deviations
+  )
+
+
+  # Print the results as a table
+  rownames(res) <- paste0("ATT(",did.results$group,",",did.results$t,")")
+  #print(res)
+}
+  #ATT dynamic
+  agg.es.id$att.egt
+
+  simgmm_dyn[simi,] <- agg.es.gmm$att.egt
+  simgmm2_dyn[simi,] <- agg.es.id$att.egt
+  simdid_dyn[simi,] <- agg.es.did$att.egt
+
+  if (simi > 2) {
+    # Compute column means and standard deviations
+    res_dyn <- data.frame(
+      gmm_mean = colMeans(simgmm_dyn[1:simi,]),   # GMM means
+      gmm2_mean = colMeans(simgmm2_dyn[1:simi,]),   # GMM means
+      did_mean = colMeans(simdid_dyn[1:simi,]),   # DID means
+      gmm_sd = apply(simgmm_dyn[1:simi,], 2, sd), # GMM standard deviations
+      gmm2_sd = apply(simgmm2_dyn[1:simi,], 2, sd), # GMM standard deviations
+      did_sd = apply(simdid_dyn[1:simi,], 2, sd) # DID standard deviations
+    )
+
+
+    # Print the results as a table
+    rownames(res_dyn) <- agg.es.did$egt
+    #print(res_dyn)
+  }
+
+  #Overall ATT
+  agg.es.id$overall.att
+
+  simgmm_overall[simi,] <- agg.es.gmm$overall.att
+  simgmm2_overall[simi,] <- agg.es.id$overall.att
+  simdid_overall[simi,] <- agg.es.did$overall.att
+
+  if (simi > 2) {
+    # Compute column means and standard deviations
+    res_overall <- data.frame(
+      gmm_mean = mean(simgmm_overall[1:simi, ]),   # GMM means
+      gmm2_mean = mean(simgmm2_overall[1:simi, ]),   # GMM means
+      did_mean = mean(simdid_overall[1:simi, ]),   # DID means
+      gmm_sd = sd(simgmm_overall[1:simi, ]), # GMM standard deviations
+      gmm2_sd = sd(simgmm2_overall[1:simi, ]), # GMM standard deviations
+      did_sd = sd(simdid_overall[1:simi, ]) # DID standard deviations
+    )
+
+
+    # Print the results as a table
+    rownames(res_overall) <- paste0("ATT")
+    #print(res_overall)
+  }
+
+
+}
 ```
