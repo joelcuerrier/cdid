@@ -4,7 +4,7 @@
 #'  average treatment effects
 #'
 
-#' @inheritParams aggte
+#' @inheritParams did::aggte
 #' @param call The function call to aggte
 #'
 #' @return [`AGGTEobj`] object
