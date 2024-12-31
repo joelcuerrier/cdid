@@ -221,7 +221,7 @@ Complete documentation and detailed examples are available through the package's
 
 ``` r
 ?cdid
-vignette("cdid-introduction")
+browseVignettes("cdid")
 ```
 
 and a dedicated webpage: <https://www.davidbenatia.com/projects/cdid-library/>.
