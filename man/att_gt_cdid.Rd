@@ -11,18 +11,16 @@ att_gt_cdid(
   gname,
   xformla = NULL,
   data,
-  chained = FALSE,
   panel = TRUE,
   allow_unbalanced_panel = TRUE,
   control_group,
   anticipation = 0,
   weightsname,
-  weight_assumption = NULL,
   alp = 0.05,
   bstrap = TRUE,
   cband = TRUE,
   biters = 1000,
-  clustervars = NULL,
+  clustervars,
   est_method,
   base_period = "varying",
   print_details = FALSE,
@@ -135,11 +133,6 @@ Default is \code{FALSE}.}
 \item{pl}{Whether or not to use parallel processing}
 
 \item{cores}{The number of cores to use for parallel processing}
-
-\item{faster_mode}{(Not used) This option enables a faster version of \code{did}, optimizing
-computation time for large datasets by improving data management within the package.
-The default is set to \code{FALSE}. While the difference is minimal for small datasets,
-it is recommended for use with large datasets.}
 }
 \value{
 an \code{\link{MP}} object containing all the results for group-time average

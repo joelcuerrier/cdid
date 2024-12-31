@@ -1,5 +1,4 @@
 #' @title att_gt_cdid
-
 #' @description `att_gt_cdid` computes average treatment effects.
 #' Our estimator accommodates (1) multiple time
 #' periods, (2) variation in treatment timing, (3) treatment effect heterogeneity,
@@ -66,10 +65,6 @@
 #' @param anticipation (Not used) The number of time periods before participating
 #'  in the treatment where units can anticipate participating in the
 #'  treatment and therefore it can affect their untreated potential outcomes
-#' @param faster_mode (Not used) This option enables a faster version of `did`, optimizing
-#' computation time for large datasets by improving data management within the package.
-#' The default is set to `FALSE`. While the difference is minimal for small datasets,
-#' it is recommended for use with large datasets.
 #' @param base_period (Not used) The cdid package only uses the g-1 base period for the moment. Whether to use a "varying" base period or a
 #'  "universal" base period.  Either choice results in the same
 #'  post-treatment estimates of ATT(g,t)'s.  In pre-treatment
@@ -109,18 +104,16 @@ att_gt_cdid <- function(yname,
                     xformla=NULL,
                     # propensityformla,
                     data,
-                    chained = FALSE, #True to use chained.
                     panel=TRUE,
                     allow_unbalanced_panel=TRUE,
                     control_group,
                     anticipation=0,
                     weightsname,
-                    weight_assumption=NULL,
                     alp=0.05,
                     bstrap=TRUE,
                     cband=TRUE,
                     biters=1000,
-                    clustervars=NULL,
+                    clustervars,
                     est_method,
                     base_period="varying",
                     print_details=FALSE,
@@ -142,7 +135,7 @@ att_gt_cdid <- function(yname,
                       alp=0.05,
                       bstrap=TRUE,
                       biters=1000,
-                      clustervars=NULL,
+                      clustervars,
                       cband=TRUE,
                       est_method,
                       base_period="varying",

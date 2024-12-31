@@ -6,6 +6,11 @@
 \usage{
 gg(x, thet)
 }
+\arguments{
+\item{x}{predictors}
+
+\item{thet}{parameters}
+}
 \description{
 Function to simplify weight computations. For more details on the methodology, see:
 Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences",

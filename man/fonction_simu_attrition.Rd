@@ -28,8 +28,6 @@ fonction_simu_attrition(
 \item{sigma_epsilon}{Standard deviation of the error term (epsilon).}
 
 \item{tprob}{Probability target to get approximately N\emph{T}tprob observations}
-
-\item{factor}{Adjustment factor for propensity score probabilities.}
 }
 \value{
 A data frame containing simulated data.

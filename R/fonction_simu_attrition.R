@@ -6,10 +6,11 @@
 #' Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences",
 #' Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
 #'
+#' @importFrom stats rnorm runif
+#'
 #' @param N Number of units
 #' @param T Number of periods
 #' @param theta2_alpha_Gg Coefficient for interaction between individual heterogeneity and time in the propensity score.
-#' @param factor Adjustment factor for propensity score probabilities.
 #' @param lambda1_alpha_St Coefficient for individual heterogeneity in the propensity score.
 #' @param sigma_alpha Standard deviation of individual heterogeneity (alpha).
 #' @param sigma_epsilon Standard deviation of the error term (epsilon).

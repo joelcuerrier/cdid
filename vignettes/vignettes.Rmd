@@ -1,10 +1,10 @@
 ---
-title: "Introduction to the Chained Diff-in-Diff (cdid)"
+title: "Introduction to cdid"
 author: "David Benatia"
 date:  "2024-12-22"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction to the Chained Diff-in-Diff (cdid)}
+  %\VignetteIndexEntry{Introduction to cdid}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -103,7 +103,18 @@ remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = TRU
 ```{r}
 #Load the relevant packages
 library(did) #Callaway and Sant'Anna (2021) 
-library(cdid) #Bellego, Benatia, and Dortet-Bernadet (2024)
+#library(cdid) #Bellego, Benatia, and Dortet-Bernadet (2024)
+source('/Users/dvbn/Dropbox/David/University/Research/chaineddid/cdid/cdid/R/process_attgt_gmm.R')
+source('/Users/dvbn/Dropbox/David/University/Research/chaineddid/cdid/cdid/R/pre_process_cdid.R')
+source('/Users/dvbn/Dropbox/David/University/Research/chaineddid/cdid/cdid/R/att_gt_cdid.R')
+source('/Users/dvbn/Dropbox/David/University/Research/chaineddid/cdid/cdid/R/GMM_compute_delta_att.R')
+source('/Users/dvbn/Dropbox/David/University/Research/chaineddid/cdid/cdid/R/GMM_convert_delta_to_att.R')
+source('/Users/dvbn/Dropbox/David/University/Research/chaineddid/cdid/cdid/R/MP.R')
+source('/Users/dvbn/Dropbox/David/University/Research/chaineddid/cdid/cdid/R/fonction_simu_attrition.R')
+source('/Users/dvbn/Dropbox/David/University/Research/chaineddid/cdid/cdid/R/gg.R')
+source('/Users/dvbn/Dropbox/David/University/Research/chaineddid/cdid/cdid/R/DIDparams.R')
+source('/Users/dvbn/Dropbox/David/University/Research/chaineddid/cdid/cdid/R/gmm_convert_result.R')
+
 
 set.seed(123)
 #Generate a dataset: 500 units, 8 time periods, with unit fixed-effects. 
@@ -144,6 +155,40 @@ did.results = did:: att_gt(
   pl = FALSE,
   cores = 1
 )
+
+
+ dp=pre_process_cdid(yname="Y",
+                     tname="date",
+                     idname="id",
+                     gname="date_G",
+                     xformla=~X,
+                     data=data0,
+                     panel=TRUE,
+                     allow_unbalanced_panel=TRUE,
+                     control_group="notyettreated",
+                     anticipation=0,
+                     weightsname="S",
+                     alp=0.05,
+                     bstrap=TRUE,
+                     biters=1000,
+                     clustervars=NULL,
+                     cband=TRUE,
+                     est_method="2-step",
+                     base_period="varying",
+                     print_details=FALSE,
+                     pl=FALSE,
+                     cores=1,
+                     call=match.call())
+
+result = gmm_compute_delta_att(dp)
+result = gmm_convert_delta_to_att(result)
+# if   (result$est_method == "2-step") {
+#   print(result)
+#   result_gmm = gmm_convert_result(result,1)}
+# result$est_method = "Identity"
+# if   (result$est_method == "Identity") {
+#   print(result)
+#   result_id = gmm_convert_result(result,2)}
 
 #run cdid with 2step weighting matrix
 result_2step = att_gt_cdid(yname="Y", tname="date",
@@ -195,9 +240,9 @@ aggregate parameters using the following commands
 
 ```{r}
 # Aggregation
-agg.es.did <- aggte(MP = did.results, type = 'dynamic')
-agg.es.2step <- aggte(MP = result_2step, type = 'dynamic')
-agg.es.id <- aggte(MP = result_id, type = 'dynamic')
+agg.es.did <- did::aggte(MP = did.results, type = 'dynamic')
+agg.es.2step <- did::aggte(MP = result_2step, type = 'dynamic')
+agg.es.id <- did::aggte(MP = result_id, type = 'dynamic')
 ```
 
 ```{r}

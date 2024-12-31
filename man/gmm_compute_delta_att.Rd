@@ -6,6 +6,9 @@
 \usage{
 gmm_compute_delta_att(dp)
 }
+\arguments{
+\item{dp}{a dp object}
+}
 \value{
 a \code{\link{DIDparams}} object
 }

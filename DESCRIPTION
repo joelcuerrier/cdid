@@ -15,32 +15,24 @@ Description: The cdid package provides an extension of the did package that impr
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports: 
-    openxlsx,
-    data.table,
-    BMisc,
-    jsonlite,
-    did,
-    stargazer,
+Imports:     
     Matrix,
-    devtools,
-    tidyr,
-    gridExtra,
-    ggplot2,
-    patchwork,
-    tidyr,
-    here,
-    knitr,
+    purrr,
+	MASS,
     did,
-    dplyr
+    BMisc,
+    methods,
+    stats,
+    utils
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 BugReports: https://github.com/joelcuerrier/cdid/issues
-# VignetteBuilder: knitr
-Depends:
-    R (>= 3.5.0),
-    dplyr,
-    did
+VignetteBuilder: knitr
 Suggests: 
+    rmarkdown,
     knitr,
-    rmarkdown
+    openxlsx,
+    data.table,
+    jsonlite,
+    stargazer,
+    devtools,

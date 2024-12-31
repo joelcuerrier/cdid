@@ -1,9 +1,11 @@
 #' @title GMM_convert_result
-#'
+#' @importFrom stats pchisq qnorm quantile
+#' @importFrom did mboot
 #' @description Function to convert results so they can be used by the did package developed by Brantly Callaway. For more details on the methodology, see:
 #' Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences",
 #' Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
-#'
+#' @param dp a dp object
+#' @param type 1 for 2step weighting, 2 for identity weighting
 #' @return a [`DIDparams`] object
 #'
 #' @export
@@ -169,16 +171,13 @@
 
       #
 
-      unique_id <- (1:length(unique(data[,idname]))) #unique(results$DIDparams$data$id)
+      unique_id <- (1:length(unique(data[,idname])))
       unique_gt <- paste0("(",results$group,",",results$t,")")
 
       inffunc_data <- expand.grid(id = unique_id,
                                   gt = unique_gt)
 
       inffunc_data$x <- as.vector(results$inffunc)
-
-      #results$inffunc[inffunc_data[20891,"id"]==unique_id, inffunc_data[20891,"gt"]==paste0("(",results$group,",",results$t,")")]
-      #inffunc_data[20891,]
 
       sparse_matrix <- Matrix::sparseMatrix(
         i = inffunc_data$id,

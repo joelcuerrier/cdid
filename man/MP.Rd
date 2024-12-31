@@ -52,6 +52,8 @@ common trends assumption}
 
 \item{DIDparams}{a \code{\link{DIDparams}} object.  A way to optionally return the parameters
 of the call to \code{\link[=att_gt]{att_gt()}} or \code{\link[=conditional_did_pretest]{conditional_did_pretest()}}.}
+
+\item{debT}{first time period}
 }
 \value{
 MP object

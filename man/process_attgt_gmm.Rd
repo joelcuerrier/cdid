@@ -2,12 +2,12 @@
 % Please edit documentation in R/process_attgt_gmm.R
 \name{process_attgt_gmm}
 \alias{process_attgt_gmm}
-\title{Process Results from \code{\link[=compute.att_gt]{compute.att_gt()}}}
+\title{Process Results}
 \usage{
 process_attgt_gmm(attgt.list)
 }
 \arguments{
-\item{attgt.list}{list of results from \code{\link[=compute.att_gt]{compute.att_gt()}}}
+\item{attgt.list}{list of results}
 }
 \value{
 list with elements:
@@ -16,5 +16,5 @@ list with elements:
 \item{att}{the group time average treatment effect}
 }
 \description{
-Process Results from \code{\link[=compute.att_gt]{compute.att_gt()}}
+Process Results
 }

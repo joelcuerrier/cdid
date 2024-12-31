@@ -1,7 +1,7 @@
-# Callaway, B. (2024). The did Library. Department of Economics, University of Georgia. Available at: https://github.com/bcallaway11/did
+# Adapted from Callaway, B. (2024). The did Library. Department of Economics, University of Georgia. Available at: https://github.com/bcallaway11/did
 
 #' @title MP
-#'
+#' @importFrom methods is
 #' @description Multi-period objects that hold results for group-time average treatment effects
 #'
 #' @param group which group (defined by period first treated) an group-time average treatment effect is for
@@ -20,17 +20,18 @@
 #'  common trends assumption
 #' @param aggte an aggregate treatment effects object
 #' @param alp the significance level, default is 0.05
+#' @param debT first time period
 #' @param DIDparams a [`DIDparams`] object.  A way to optionally return the parameters
 #'  of the call to [att_gt()] or [conditional_did_pretest()].
 #'
 #' @return MP object
 #' @export
 MP <- function(group, t, att, V_analytical, se, c, inffunc, n=NULL, W=NULL, Wpval=NULL, aggte=NULL, alp = 0.05, DIDparams=NULL,debT) {
-  
+
   out <- list(group=group, t=t, att=att, V_analytical=V_analytical, se=se, c=c,
   inffunc=inffunc, n=n, W=W, Wpval=Wpval, aggte=aggte, alp = alp,
   DIDparams=DIDparams, call=DIDparams$call)
-  
+
   class(out) <- "MP"
   return(out)
 }
@@ -53,7 +54,7 @@ summary.MP <- function(object, ...) {
   cat("\n")
 
   # citation
-  citation()
+ cat("Bellego C., Benatia D., and V. Dortet-Bernadet (2024). \"The Chained Difference-in-Differences.\" Journal of Econometrics. doi:10.1016/j.jeconom.2023.11.002.")
   cat("\n")
 
   # group time average treatment effects

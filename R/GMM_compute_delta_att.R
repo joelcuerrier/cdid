@@ -1,13 +1,19 @@
+#' @name gmm_compute_delta_att
 #' @title GMM_compute_delta_att
-#'
+#' @importFrom stats aggregate glm binomial coef predict model.matrix
+#' @importFrom MASS ginv
+#' @importFrom utils globalVariables
+#' @importFrom did DIDparams
+utils::globalVariables(c("C", "G"))
+
 #' @description Function to compute the delta ATT. For more details on the methodology, see:
 #' Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences",
 #' Journal of Econometrics, https://doi.org/10.1016/j.jeconom.2023.11.002.
-#'
+#' @param dp a dp object
 #' @return a [`DIDparams`] object
 #'
 #' @export
-#'
+
 gmm_compute_delta_att <-function(dp) {
 
   # all parameters are taken from pre-process dp object
@@ -102,15 +108,17 @@ gmm_compute_delta_att <-function(dp) {
 
           disdat$G <- 1 * (disdat[, gname] == glist[f])
 
-          if (is.null(xformla)) {
+          if (is.null(xformla) | xformla==~1) {
             xformla <- ~1}
           pformla <- xformla
 
           # Discard observations for which scores cannot be computed
           LesX<-BMisc::rhs.vars(pformla)
           bbb<-length(LesX)
-          for (jj in 1:bbb){
+          if (bbb>0) {
+          for (jj in 1:bbb){ #complete cases
             disdat<-disdat[is.na(disdat[,LesX[jj]])==FALSE,] }
+          }
 
           # Propensity score estimation
           pformla <- BMisc::toformula("G", BMisc::rhs.vars(pformla)) #G~X
@@ -142,8 +150,9 @@ gmm_compute_delta_att <-function(dp) {
           # Discard observations for which scores cannot be computed
           LesX<-BMisc::rhs.vars(pformla)
           bbb<-length(LesX)
+          if (bbb>0) {
           for (jj in 1:bbb){
-            disdat<-disdat[is.na(disdat[,LesX[jj]])==FALSE,] }
+            disdat<-disdat[is.na(disdat[,LesX[jj]])==FALSE,] }}
 
           # Propensity score estimation
           pformla <- BMisc::toformula("G", BMisc::rhs.vars(pformla)) #G~X

@@ -1,2 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.github$
+^\.gitignore$
+^\.DS_Store$
+^\.Rhistory$
+^doc$
+^Meta$

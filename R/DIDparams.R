@@ -20,7 +20,7 @@
 #' @export
 DIDparams <- function(yname,
                    tname,
-                   idname=NULL, 
+                   idname=NULL,
                    gname,
                    xformla=NULL,
                    data,
@@ -45,7 +45,7 @@ DIDparams <- function(yname,
                    tlist=NULL,
                    glist=NULL,
                    call=NULL) {
-  
+
   out <- list(yname=yname,
               tname=tname,
               idname=idname,

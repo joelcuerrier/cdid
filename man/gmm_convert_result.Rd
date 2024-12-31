@@ -6,6 +6,11 @@
 \usage{
 gmm_convert_result(dp, type)
 }
+\arguments{
+\item{dp}{a dp object}
+
+\item{type}{1 for 2step weighting, 2 for identity weighting}
+}
 \value{
 a \code{\link{DIDparams}} object
 }
