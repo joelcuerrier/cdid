@@ -32,8 +32,8 @@ editor_options:
     developed by [Callaway and Sant'Anna (Journal of Econometrics,
     2021)](https://www.sciencedirect.com/science/article/abs/pii/S0304407620303948)
     The cdid library is therefore intended to be used in connection with
-    the **did** library by [Brantly Callaway and Pedro H.C. Sant'Anna]:
-    [<https://bcallaway11.github.io/did/articles/did-basics.html>]. Our
+    the **did** library:
+    <https://bcallaway11.github.io/did/articles/did-basics.html>. Our
     approach improves efficiency and adapts seamlessly to unbalanced
     panels, making it particularly valuable for researchers facing data
     with missing observations.
@@ -42,20 +42,21 @@ editor_options:
     methods from our paper, showcasing their relevance for empirical
     research. **For those short on time, here are the key takeaways:**
 
-    -   **cdid** offers greater precision than **did** in balanced panel
-        data.
+    -   **cdid** offers greater precision (smaller standard errors) than
+        **did** with balanced panel data, by aggregating smaller ATT
+        parameters efficiently.
 
-    -   **cdid** outperforms **did** with unbalanced panels, provided
-        errors are serially correlated (e.g., in presence of unit-level
-        fixed effects). For time-independent errors, **did** may be
-        preferred (see the paper for more details).
+    -   **cdid** outperforms **did** with unbalanced panels,
+        particularly if errors are serially correlated (e.g., in
+        presence of unit-level fixed effects). Remark, however, units
+        observed only once across all time periods must be dropped
+        before estimation because they are not used by **cdid.**
 
     -   **cdid** is less prone to bias in cases of attrition, notably if
-        missingness is related to unobservable heterogeneity for example
-        due to correlations between individual fixed effects, treatment
-        assignment, and attrition/sampling. For cases where missingness
-        is related to observables, additional results from our paper
-        have yet to be implemented in the library (see the paper).
+        missingness is related to unobservable heterogeneity. For cases
+        where missingness is related to observables, additional results
+        from our paper have yet to be implemented in the library (see
+        the paper).
 
 ### Features of the cdid library
 
@@ -67,14 +68,16 @@ editor_options:
     "not-yet-treated."
 
 -   Provides two weighting matrix options for GMM-based aggregation of
-    $\Delta ATT(g,t)$ into $ATT(g,t)$: identity or 2-step. Small-sample
-    simulations show that:
+    $\Delta_k ATT(g,t)$ into $ATT(g,t)$: identity or 2-step.
+    Small-sample simulations show that:
 
     -   **Identity**: Best for smaller datasets with more missing data,
-        and less overidentifying restrictions.
+        and less overidentifying restrictions, like rotating panel
+        surveys.
 
     -   **2-step**: Best for larger, balanced datasets with many
-        overidentifying restrictions.
+        overidentifying restrictions, or unbalanced datasets with
+        relatively few missings.
 
 -   Implements simple propensity scores for treatment assignment where
     predictor columns X are treated as constant across time periods. For
@@ -89,16 +92,18 @@ editor_options:
 
 -   The library currently supports only the IPW estimator, though
     extensions to doubly-robust estimators like in the **did** library
-    are planned for the future.
+    are planned.
 
 # Getting started
 
 Installing the library requires using remotes at the moment because we
-haven't submitted the package on CRAN yet. The command is
+cannot submit the package on CRAN yet (Happy holidays!). The command is
 
 ``` r
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = TRUE, force = TRUE)
 ```
+
+## Balanced data 
 
 ```{r}
 #Load the relevant packages
@@ -121,8 +126,20 @@ data0=fonction_simu_attrition(N = 500,T = 8,theta2_alpha_Gg = 0.5,
 #We keep all observations, so we have a balanced dataset
 data0$S <- 1
 
-#run did
-did.results = did:: att_gt(
+#Look at the data
+head(data0,20)
+```
+
+The dataset is a dataframe with 3960 observations and 6 columns: $id$ to
+keep track of unit ids, $date$ to keep track of time periods, an outcome
+variable $Y$, a predictor $X$, a treatment date $date\_G$ (zero for
+control group), and a sampling dummy $S$ used to keep track which
+observations are used in the estimation. There are 495 unique id, and 8
+time periods.
+
+```{r}
+#run did library on balanced panel
+did.results = att_gt(
   yname="Y",
   tname="date",
   idname = "id",
@@ -144,40 +161,6 @@ did.results = did:: att_gt(
   pl = FALSE,
   cores = 1
 )
-
-
- dp=pre_process_cdid(yname="Y",
-                     tname="date",
-                     idname="id",
-                     gname="date_G",
-                     xformla=~X,
-                     data=data0,
-                     panel=TRUE,
-                     allow_unbalanced_panel=TRUE,
-                     control_group="notyettreated",
-                     anticipation=0,
-                     weightsname="S",
-                     alp=0.05,
-                     bstrap=TRUE,
-                     biters=1000,
-                     clustervars=NULL,
-                     cband=TRUE,
-                     est_method="2-step",
-                     base_period="varying",
-                     print_details=FALSE,
-                     pl=FALSE,
-                     cores=1,
-                     call=match.call())
-
-result = gmm_compute_delta_att(dp)
-result = gmm_convert_delta_to_att(result)
-# if   (result$est_method == "2-step") {
-#   print(result)
-#   result_gmm = gmm_convert_result(result,1)}
-# result$est_method = "Identity"
-# if   (result$est_method == "Identity") {
-#   print(result)
-#   result_id = gmm_convert_result(result,2)}
 
 #run cdid with 2step weighting matrix
 result_2step = att_gt_cdid(yname="Y", tname="date",
@@ -220,6 +203,7 @@ result_id = att_gt_cdid(yname="Y", tname="date",
 
 ```{r}
 print(did.results)
+# Remark that standard errors are smaller for most ATT(g,t) when using cdid
 print(result_2step)
 print(result_id)
 ```
@@ -229,9 +213,9 @@ aggregate parameters using the following commands
 
 ```{r}
 # Aggregation
-agg.es.did <- did::aggte(MP = did.results, type = 'dynamic')
-agg.es.2step <- did::aggte(MP = result_2step, type = 'dynamic')
-agg.es.id <- did::aggte(MP = result_id, type = 'dynamic')
+agg.es.did <- aggte(MP = did.results, type = 'dynamic')
+agg.es.2step <- aggte(MP = result_2step, type = 'dynamic')
+agg.es.id <- aggte(MP = result_id, type = 'dynamic')
 ```
 
 ```{r}
@@ -240,6 +224,7 @@ agg.es.did
 ```
 
 ```{r}
+#Remark that standard errors are smaller, notably so for the 2step estimator
 agg.es.2step
 ```
 
@@ -247,7 +232,9 @@ agg.es.2step
 agg.es.id
 ```
 
-Let us now do the same but with an unbalanced panel dataset
+## Unbalanced data 
+
+Let us now do the same but with an unbalanced panel dataset.
 
 ```{r}
 #Generate a dataset: 500 units, 8 time periods, with unit fixed-effects (alpha)
@@ -260,7 +247,7 @@ data0=fonction_simu_attrition(N = 500,T = 8,theta2_alpha_Gg = 0.5,
 data0 <- data0[data0$S==1,]
 
 #run did
-did.results = did:: att_gt(
+did.results =  att_gt(
   yname="Y",
   tname="date",
   idname = "id",
@@ -323,6 +310,7 @@ result_id = att_gt_cdid(yname="Y", tname="date",
 ```
 
 ```{r}
+#Note the precision gains
 print(did.results)
 print(result_2step)
 print(result_id)
@@ -330,13 +318,14 @@ print(result_id)
 
 ```{r}
 # Aggregation
+# There are other ways to aggregate, see the did library
 agg.es.did <- aggte(MP = did.results, type = 'dynamic')
 agg.es.2step <- aggte(MP = result_2step, type = 'dynamic')
 agg.es.id <- aggte(MP = result_id, type = 'dynamic')
 ```
 
 ```{r}
-# Print results
+#Note the precision gains
 agg.es.did
 ```
 

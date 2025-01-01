@@ -14,7 +14,7 @@ The `cdid` package extends the popular `did` library by Brantly Callaway to impr
     -   **Identity**: Best for smaller datasets with less overidentifying restrictions (many missings like in rotating panel surveys)
     -   **Two-step**: Best for larger datasets with many overidentifying restrictions (few missings).
 
-Future developments: generalized attrition model (sequential attrition and MAR on observables), doubly-robust estimator (so far only ipw is implemented), and improved computational efficiency.
+Future developments: generalized attrition model (MAR & sequential MAR), doubly-robust estimator (so far only ipw is implemented), and improved computational efficiency. Hopefully, it will be directly integrated within the did library.
 
 ## Installation
 
