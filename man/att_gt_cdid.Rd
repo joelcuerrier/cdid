@@ -15,13 +15,13 @@ att_gt_cdid(
   allow_unbalanced_panel = TRUE,
   control_group,
   anticipation = 0,
-  weightsname,
+  weightsname = NULL,
   alp = 0.05,
   bstrap = TRUE,
   cband = TRUE,
   biters = 1000,
-  clustervars,
-  est_method,
+  clustervars = NULL,
+  est_method = "2-step",
   base_period = "varying",
   print_details = FALSE,
   pl = FALSE,
@@ -71,7 +71,7 @@ participated yet.}
 in the treatment where units can anticipate participating in the
 treatment and therefore it can affect their untreated potential outcomes}
 
-\item{weightsname}{The name of the column containing the sampling weights.
+\item{weightsname}{The name of the column containing weights.
 If not set, all observations have same weight.}
 
 \item{alp}{the significance level, default is 0.05}

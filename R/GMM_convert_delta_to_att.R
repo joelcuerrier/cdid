@@ -27,7 +27,6 @@ glist <- dp$glist
 weightsname <- dp$weightsname
 xformla <- dp$xformla
 
-
 result <- dp$delta.att.influ #delta att and influence matrix from compute_delta_att.
 tlen <- length(tlist) #how many dates
 glen <- length(glist) #how many treatment cohorts

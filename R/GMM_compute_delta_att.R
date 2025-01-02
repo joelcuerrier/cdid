@@ -32,6 +32,10 @@ gmm_compute_delta_att <-function(dp) {
   xformla <- dp$xformla
   control_group <- dp$control_group
 
+  if (is.null(weightsname)) {
+    weightsname <- "noweights_default"
+    data[[weightsname]] <- 1
+    }
 
   #gmm.R calls GMM_estimPeriod_Boot dans fonctions_estimation_Boot.R
   ########################################

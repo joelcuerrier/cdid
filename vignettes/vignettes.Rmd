@@ -103,7 +103,7 @@ cannot submit the package on CRAN yet (Happy holidays!). The command is
 remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = TRUE, force = TRUE)
 ```
 
-## Balanced data 
+## Balanced data
 
 ```{r}
 #Load the relevant packages
@@ -169,7 +169,6 @@ result_2step = att_gt_cdid(yname="Y", tname="date",
                          xformla=~X,
                          data=data0,
                          control_group="notyettreated",
-                         weightsname="S",
                          alp=0.05,
                          bstrap=TRUE,
                          biters=1000,
@@ -188,7 +187,6 @@ result_id = att_gt_cdid(yname="Y", tname="date",
                         xformla=~X,
                         data=data0,
                         control_group="notyettreated",
-                        weightsname="S",
                         alp=0.05,
                         bstrap=TRUE,
                         biters=1000,
@@ -232,7 +230,7 @@ agg.es.2step
 agg.es.id
 ```
 
-## Unbalanced data 
+## Unbalanced data
 
 Let us now do the same but with an unbalanced panel dataset.
 
@@ -277,7 +275,6 @@ result_2step = att_gt_cdid(yname="Y", tname="date",
                          xformla=~X,
                          data=data0,
                          control_group="notyettreated",
-                         weightsname="S",
                          alp=0.05,
                          bstrap=TRUE,
                          biters=1000,
@@ -296,7 +293,6 @@ result_id = att_gt_cdid(yname="Y", tname="date",
                         xformla=~X,
                         data=data0,
                         control_group="notyettreated",
-                        weightsname="S",
                         alp=0.05,
                         bstrap=TRUE,
                         biters=1000,

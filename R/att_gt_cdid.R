@@ -14,7 +14,7 @@
 #'  This should be a positive number for all observations in treated groups.
 #'  It defines which "group" a unit belongs to.  It should be 0 for units
 #'  in the untreated group.
-#' @param weightsname The name of the column containing the sampling weights.
+#' @param weightsname The name of the column containing weights.
 #'  If not set, all observations have same weight.
 #' @param alp the significance level, default is 0.05
 #' @param bstrap Boolean for whether or not to compute standard errors using
@@ -102,19 +102,18 @@ att_gt_cdid <- function(yname,
                     idname=NULL,
                     gname,
                     xformla=NULL,
-                    # propensityformla,
                     data,
                     panel=TRUE,
                     allow_unbalanced_panel=TRUE,
                     control_group,
                     anticipation=0,
-                    weightsname,
+                    weightsname=NULL,
                     alp=0.05,
                     bstrap=TRUE,
                     cband=TRUE,
                     biters=1000,
-                    clustervars,
-                    est_method,
+                    clustervars=NULL,
+                    est_method="2-step",
                     base_period="varying",
                     print_details=FALSE,
                     pl=FALSE,
