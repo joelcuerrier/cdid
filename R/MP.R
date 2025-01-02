@@ -21,8 +21,7 @@
 #' @param aggte an aggregate treatment effects object
 #' @param alp the significance level, default is 0.05
 #' @param debT first time period
-#' @param DIDparams a [`DIDparams`] object.  A way to optionally return the parameters
-#'  of the call to [att_gt()] or [conditional_did_pretest()].
+#' @param DIDparams a [`DIDparams`] object.
 #'
 #' @return MP object
 #' @export

@@ -2,7 +2,7 @@
 
 The `cdid` package extends the popular `did` library by Brantly Callaway to improve efficiency and handle unbalanced panel data in staggered treatment designs. It implements the methodology introduced in:
 
-**Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences", Journal of Econometrics.** <doi:10.1016/j.jeconom.2023.11.002>
+**Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences", Journal of Econometrics.** <https://doi.org/10.1016/j.jeconom.2024.105783>
 
 ## Features
 
@@ -224,9 +224,9 @@ and a dedicated webpage: <https://www.davidbenatia.com/projects/cdid-library/>.
 
 ## References
 
-Bellego, C., Benatia, D., and Dortet-Bernadet, V. (2024). *The Chained Difference-in-Differences*. Journal of Econometrics. [DOI: 10.1016/j.jeconom.2023.11.002](https://doi.org/10.1016/j.jeconom.2023.11.002)
+Bellego, C., Benatia, D., and Dortet-Bernadet, V. (2024). *The Chained Difference-in-Differences*. Journal of Econometrics. <https://doi.org/10.1016/j.jeconom.2024.105783>
 
-Callaway, B., & Sant'Anna, P. H. C. (2021). *Difference-in-Differences with Multiple Time Periods*. Journal of Econometrics.
+Callaway, B., & Sant'Anna, P. H. C. (2021). *Difference-in-Differences with Multiple Time Periods*. Journal of Econometrics. <https://doi.org/10.1016/j.jeconom.2020.12.001>
 
 ## License
 

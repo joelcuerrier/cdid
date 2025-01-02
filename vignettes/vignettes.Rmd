@@ -13,6 +13,10 @@ editor_options:
 ---
 
 <!-- rmarkdown::pandoc_version() -->
+```{r setup, include=FALSE}
+# Set the working directory to the project root
+knitr::opts_knit$set(root.dir = getwd())
+```
 
 # Introduction
 
@@ -27,10 +31,10 @@ editor_options:
 
     In our recent paper [(Bellégo, Benatia, Dortet-Bernadet, Journal of
     Econometrics,
-    2024)](https://www.sciencedirect.com/science/article/pii/S0304407624001295),
+    2024)](<https://doi.org/10.1016/j.jeconom.2024.105783>),
     we address these gaps by extending the well-established method
     developed by [Callaway and Sant'Anna (Journal of Econometrics,
-    2021)](https://www.sciencedirect.com/science/article/abs/pii/S0304407620303948)
+    2021)](<https://doi.org/10.1016/j.jeconom.2020.12.001>)
     The cdid library is therefore intended to be used in connection with
     the **did** library:
     <https://bcallaway11.github.io/did/articles/did-basics.html>. Our
