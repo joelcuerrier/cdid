@@ -100,7 +100,7 @@ gmm_compute_delta_att <-function(dp) {
         # Here we estimate propensity scores using data on all indivs in current treatment cohort and control cohort.
         # This can vary if we use the not-yet-treated, so it's more convenient to keep it in the inner loop
         if (control_group == "nevertreated" & k==1) {
-          disdat <- data[!duplicated(data[["id"]]), ]
+          disdat <- data[!duplicated(data[[idname]]), ]
           disdat <- data[data[[gname]] == 0 | data[[gname]] == glist[f], ]
           disdat <- droplevels(disdat)
 
@@ -135,7 +135,7 @@ gmm_compute_delta_att <-function(dp) {
                            glist[f], " at time period: ", tlist[t +k]))}
         }
         if (control_group == "notyettreated") {
-          disdat <- data[!duplicated(data[["id"]]), ]
+          disdat <- data[!duplicated(data[[idname]]), ]
           disdat <- data[data[[gname]] == 0 | data[[gname]] == glist[f], ]
           disdat <- droplevels(disdat)
 
@@ -178,7 +178,7 @@ gmm_compute_delta_att <-function(dp) {
         mat_W[counter, att_neg_index] = -1  # Assign negative weight
 
 
-        # 2.2.2 Prep data for estimation !! Dec 14: it comes from this part.
+        # 2.2.2 Prep data for estimation
         # Make balanced panel for (tlist[t],tlist[t+k]). https://bcallaway11.github.io/BMisc/reference/makeBalancedPanel.html
         disdat <- data[(data[, tname] == tlist[t + k] | data[, tname] == tlist[t]), ]
         disdat <- BMisc::makeBalancedPanel(disdat, idname, tname) #This function drops observations from data.frame that are not part of balanced panel data set.
