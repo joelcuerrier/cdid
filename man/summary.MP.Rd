@@ -7,10 +7,32 @@
 \method{summary}{MP}(object, ...)
 }
 \arguments{
-\item{object}{an \code{MP} object}
+\item{object}{An \code{MP} object, representing the results of a multi-period analysis.}
 
-\item{...}{extra arguments}
+\item{...}{Additional arguments passed to the function.}
+}
+\value{
+No return value. This function is called for its side effects of
+printing a summary of the \code{MP} object to the console, including:
+\itemize{
+\item Call: The call used to create the \code{MP} object.
+\item Group-Time Average Treatment Effects: A table of estimates with confidence bands.
+\item Control Group: Information about the chosen control group (e.g., "Never Treated").
+\item Anticipation Periods: Number of periods used to account for anticipation effects.
+\item Estimation Method: Method used for treatment effect estimation.
+\item Pre-Test Results: p-values for the test of parallel trends assumption, if available.
+}
 }
 \description{
-prints a summary of a \code{MP} object
+Prints a detailed summary of an \code{MP} object. The function outputs key details of
+the group-time average treatment effects, such as estimation method, control group,
+and pre-test results for parallel trends.
+}
+\examples{
+# Assuming `mp_object` is a valid MP object
+# summary.MP(mp_object)
+
+}
+\seealso{
+\code{\link{MP}}, \code{\link{print.MP}}
 }

@@ -37,10 +37,29 @@ MP <- function(group, t, att, V_analytical, se, c, inffunc, n=NULL, W=NULL, Wpva
 
 #' @title summary.MP
 #'
-#' @description prints a summary of a \code{MP} object
+#' @description Prints a detailed summary of an \code{MP} object. The function outputs key details of
+#' the group-time average treatment effects, such as estimation method, control group,
+#' and pre-test results for parallel trends.
 #'
-#' @param object an \code{MP} object
-#' @param ... extra arguments
+#' @param object An \code{MP} object, representing the results of a multi-period analysis.
+#' @param ... Additional arguments passed to the function.
+#'
+#' @return No return value. This function is called for its side effects of
+#' printing a summary of the \code{MP} object to the console, including:
+#' \itemize{
+#'   \item Call: The call used to create the \code{MP} object.
+#'   \item Group-Time Average Treatment Effects: A table of estimates with confidence bands.
+#'   \item Control Group: Information about the chosen control group (e.g., "Never Treated").
+#'   \item Anticipation Periods: Number of periods used to account for anticipation effects.
+#'   \item Estimation Method: Method used for treatment effect estimation.
+#'   \item Pre-Test Results: p-values for the test of parallel trends assumption, if available.
+#' }
+#'
+#' @seealso \code{\link{MP}}, \code{\link{print.MP}}
+#'
+#' @examples
+#' # Assuming `mp_object` is a valid MP object
+#' # summary.MP(mp_object)
 #'
 #' @export
 summary.MP <- function(object, ...) {
@@ -130,12 +149,24 @@ summary.MP <- function(object, ...) {
 
 #' @title print.MP
 #'
-#' @description prints value of a \code{MP} object
+#' @description Prints a summary of the results contained in an \code{MP} object.
+#' This function calls \code{summary.MP} to display the details of the multi-period
+#' analysis results in a user-friendly format.
 #'
-#' @param x a \code{MP} object
-#' @param ... extra arguments
+#' @param x An \code{MP} object, representing the results of multi-period analysis.
+#' @param ... Additional arguments passed to \code{summary.MP}.
+#'
+#' @return No return value. This function is called for its side effects of
+#' printing the summary of the \code{MP} object to the console.
+#'
+#' @examples
+#' # Assuming `mp_object` is a valid MP object
+#' # print.MP(mp_object)
+#'
+#' @seealso \code{\link{summary.MP}}
 #'
 #' @export
-print.MP <- function(x,...) {
-  summary.MP(x,...)
+print.MP <- function(x, ...) {
+  summary.MP(x, ...)
 }
+

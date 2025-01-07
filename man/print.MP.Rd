@@ -7,10 +7,24 @@
 \method{print}{MP}(x, ...)
 }
 \arguments{
-\item{x}{a \code{MP} object}
+\item{x}{An \code{MP} object, representing the results of multi-period analysis.}
 
-\item{...}{extra arguments}
+\item{...}{Additional arguments passed to \code{summary.MP}.}
+}
+\value{
+No return value. This function is called for its side effects of
+printing the summary of the \code{MP} object to the console.
 }
 \description{
-prints value of a \code{MP} object
+Prints a summary of the results contained in an \code{MP} object.
+This function calls \code{summary.MP} to display the details of the multi-period
+analysis results in a user-friendly format.
+}
+\examples{
+# Assuming `mp_object` is a valid MP object
+# print.MP(mp_object)
+
+}
+\seealso{
+\code{\link{summary.MP}}
 }

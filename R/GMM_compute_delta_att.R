@@ -252,6 +252,10 @@ gmm_compute_delta_att <-function(dp) {
           # Delta ATT
           att<- t(as.numeric(pp))%*%as.numeric(dy)
 
+
+
+
+
           # A useful step for the influence matrix
           pp_noDenom<- devant*(GC%*%matrix(c(1, 1), ncol = 1))*(devant2*disdat[,weightsname])
 
