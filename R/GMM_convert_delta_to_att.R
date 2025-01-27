@@ -72,10 +72,17 @@ gmm_convert_delta_to_att <- function(dp){
   ATT<-as.data.frame(ATT)
   ncol_ATT<-ncol(ATT)
 
-  rows <- do.call(rbind,regmatches(row.names(ATT), gregexpr("\\d{4}", row.names(ATT))))
+  # Extract "g" and "t" from "ATT(g,t)"
+  matches <- regmatches(row.names(ATT), gregexpr("\\(([^,]+),([^\\)]+)\\)", row.names(ATT)))
+  elements <- do.call(rbind, lapply(matches, function(x) {
+    submatches <- regmatches(x, regexec("\\(([^,]+),([^\\)]+)\\)", x))
+    c(submatches[[1]][2], submatches[[1]][3])  # Extract element1 and element2
+  }))
+  elements <- apply(elements, 2, as.numeric)
+
   # Convert each column into numeric vectors
-  rgroup <- as.numeric(rows[, 1])
-  rtime <- as.numeric(rows[, 2])
+  rgroup <- as.numeric(elements[, 1])
+  rtime <- as.numeric(elements[, 2])
 
   ATT[,ncol_ATT+1] <- rgroup
   ATT[,ncol_ATT+2] <- rtime
