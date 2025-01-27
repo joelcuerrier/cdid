@@ -322,8 +322,9 @@ gmm_compute_delta_att <-function(dp) {
           nG<-round(mean(colSums(as.matrix(disdat$G  *(disdat[,weightsname]>0)))))
           nC<-round(mean(colSums(as.matrix(disdat$C  *(disdat[,weightsname]>0)))))
 
-          fatt[counter, c(gname, tname, yname, "nobsG", "nobsC")] <- list(
+          fatt[counter, c(gname, paste0("ref",tname),tname, yname, "nobsG", "nobsC")] <- list(
             glist[f],
+            tlist[t], #here I modified Jan 27 2025 tlist[t] to have refyear
             tlist[t + k],
             att,
             nG,

@@ -20,11 +20,6 @@ Prints a summary of the results contained in an \code{MP} object.
 This function calls \code{summary.MP} to display the details of the multi-period
 analysis results in a user-friendly format.
 }
-\examples{
-# Assuming `mp_object` is a valid MP object
-# print.MP(mp_object)
-
-}
 \seealso{
 \code{\link{summary.MP}}
 }

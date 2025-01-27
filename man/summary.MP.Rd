@@ -28,11 +28,6 @@ Prints a detailed summary of an \code{MP} object. The function outputs key detai
 the group-time average treatment effects, such as estimation method, control group,
 and pre-test results for parallel trends.
 }
-\examples{
-# Assuming `mp_object` is a valid MP object
-# summary.MP(mp_object)
-
-}
 \seealso{
 \code{\link{MP}}, \code{\link{print.MP}}
 }

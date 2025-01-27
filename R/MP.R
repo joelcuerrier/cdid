@@ -57,10 +57,6 @@ MP <- function(group, t, att, V_analytical, se, c, inffunc, n=NULL, W=NULL, Wpva
 #'
 #' @seealso \code{\link{MP}}, \code{\link{print.MP}}
 #'
-#' @examples
-#' # Assuming `mp_object` is a valid MP object
-#' # summary.MP(mp_object)
-#'
 #' @export
 summary.MP <- function(object, ...) {
   mpobj <- object
@@ -158,10 +154,6 @@ summary.MP <- function(object, ...) {
 #'
 #' @return No return value. This function is called for its side effects of
 #' printing the summary of the \code{MP} object to the console.
-#'
-#' @examples
-#' # Assuming `mp_object` is a valid MP object
-#' # print.MP(mp_object)
 #'
 #' @seealso \code{\link{summary.MP}}
 #'

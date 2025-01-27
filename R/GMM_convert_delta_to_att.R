@@ -12,24 +12,24 @@ gmm_convert_delta_to_att <- function(dp){
 
 
 
-# We extract the necessary variables from the DIDparams object
-data <- dp$data
-yname = dp$yname
-tname = dp$tname
-gname = dp$gname
-idname = dp$idname
-deb = min(dp$tlist)
-fin = max(dp$tlist)
-debT = min(dp$glist)
-finT = max(dp$glist)
-tlist <- dp$tlist
-glist <- dp$glist
-weightsname <- dp$weightsname
-xformla <- dp$xformla
+  # We extract the necessary variables from the DIDparams object
+  data <- dp$data
+  yname = dp$yname
+  tname = dp$tname
+  gname = dp$gname
+  idname = dp$idname
+  deb = min(dp$tlist)
+  fin = max(dp$tlist)
+  debT = min(dp$glist)
+  finT = max(dp$glist)
+  tlist <- dp$tlist
+  glist <- dp$glist
+  weightsname <- dp$weightsname
+  xformla <- dp$xformla
 
-result <- dp$delta.att.influ #delta att and influence matrix from compute_delta_att.
-tlen <- length(tlist) #how many dates
-glen <- length(glist) #how many treatment cohorts
+  result <- dp$delta.att.influ #delta att and influence matrix from compute_delta_att.
+  tlen <- length(tlist) #how many dates
+  glen <- length(glist) #how many treatment cohorts
 
   # 3. Post-estimation aggregation step
   # 3.1. Aggregate Delta ATT into ATT
@@ -44,8 +44,8 @@ glen <- length(glist) #how many treatment cohorts
   mat_W <- result[[4]]
   remov_col=c()
   for (f in 1:glen) {
-    for (t in 1:tlen) {
-      if (glist[f]-1 == tlist[t]){remov_col<-c(remov_col,(f-1)*tlen+t)}
+    for (t in 1:tlen) { #here I modified Jan 27 max(which(tlist<glist[f]))
+      if (tlist[max(which(tlist<glist[f]))] == tlist[t]){remov_col<-c(remov_col,(f-1)*tlen+t)}
     }
   }
   mat_W <- subset( mat_W, select = -c(remov_col ) )
@@ -71,13 +71,22 @@ glen <- length(glist) #how many treatment cohorts
   # Improve formatting
   ATT<-as.data.frame(ATT)
   ncol_ATT<-ncol(ATT)
-  for (f in 1:glen) {
-    for (t in 1:(tlen-1)) {
 
-      ATT[(f-1)*(tlen-1)+t,ncol_ATT+1]<-glist[f]
-      if(glist[f]-1>tlist[t]){ATT[(f-1)*(tlen-1)+t,ncol_ATT+2]<-tlist[t]}else{ATT[(f-1)*(tlen-1)+t,ncol_ATT+2]<-tlist[t]+1}
-    }
-  }
+  rows <- do.call(rbind,regmatches(row.names(ATT), gregexpr("\\d{4}", row.names(ATT))))
+  # Convert each column into numeric vectors
+  rgroup <- as.numeric(rows[, 1])
+  rtime <- as.numeric(rows[, 2])
+
+  ATT[,ncol_ATT+1] <- rgroup
+  ATT[,ncol_ATT+2] <- rtime
+  # for (f in 1:glen) {
+  #   for (t in 1:(tlen-1)) {
+  #
+  #     ATT[(f-1)*(tlen-1)+t,ncol_ATT+1]<-glist[f]
+  #     if(glist[f]-1>tlist[t]){ATT[(f-1)*(tlen-1)+t,ncol_ATT+2]<-tlist[t]}
+  #     else{ATT[(f-1)*(tlen-1)+t,ncol_ATT+2]<-tlist[t+1]}
+  #   }
+  # }
   colnames(ATT)[ncol_ATT+1]<-gname
   colnames(ATT)[ncol_ATT+2]<-tname
 
@@ -93,6 +102,7 @@ glen <- length(glist) #how many treatment cohorts
   # ATT: contains all ATT(g,t)'s, sorted as desired
   # agreg_influence: influence matrix is dim (nbindiv x 2 x nb of ATT(g,t)), influence values are in agreg_influence[,2,]
   dp$att.influ <-list(ATT,agreg_influence)
+
 
 
   dp
