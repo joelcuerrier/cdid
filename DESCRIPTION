@@ -1,7 +1,7 @@
 Package: cdid
 Type: Package
 Title: The Chained Difference-in-Differences
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     c(
       person("David", "Benatia", email = "david.benatia@hec.ca", role = c("cre", "aut")),
