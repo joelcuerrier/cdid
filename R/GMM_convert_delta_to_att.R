@@ -10,8 +10,6 @@
 
 gmm_convert_delta_to_att <- function(dp){
 
-
-
   # We extract the necessary variables from the DIDparams object
   data <- dp$data
   yname = dp$yname
