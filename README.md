@@ -1,5 +1,27 @@
 # cdid: The Chained Difference-in-Differences
 
+> [!IMPORTANT]
+> **This repository is deprecated.**
+> The maintained `cdid` package is now at **[dvbn/cdid](https://github.com/dvbn/cdid)**.
+> Use that repository for current installation instructions, documentation and issue reports.
+
+## Maintained package
+
+```r
+# Run once if remotes is not installed:
+# install.packages("remotes")
+remotes::install_github("dvbn/cdid")
+```
+
+- [Current repository](https://github.com/dvbn/cdid)
+- [User guide](https://github.com/dvbn/cdid/blob/main/docs/README.md)
+- [Questions and bug reports](https://github.com/dvbn/cdid/issues)
+
+<details>
+<summary>Legacy documentation (deprecated implementation)</summary>
+
+The material below describes the old implementation. Its installation commands and examples may not apply to the maintained package.
+
 The `cdid` package extends the popular `did` library by Brantly Callaway to improve efficiency and handle unbalanced panel data in staggered treatment designs. It implements the methodology introduced in:
 
 **Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences", Journal of Econometrics.** <https://doi.org/10.1016/j.jeconom.2024.105783>
@@ -231,3 +253,6 @@ Callaway, B., & Sant'Anna, P. H. C. (2021). *Difference-in-Differences with Mult
 ## License
 
 This package is licensed under the GPL-2 license.
+
+</details>
+
